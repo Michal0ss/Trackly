@@ -3,6 +3,7 @@ from app.database.db import SessionLocal
 from app.database import models, schemas
 
 router = APIRouter()
+print("Subscriptions router loaded")
 
 @router.post("/subscriptions")
 def create_subscription(sub: schemas.SubscriptionCreate):
@@ -20,3 +21,30 @@ def create_subscription(sub: schemas.SubscriptionCreate):
 def get_subscriptions():
     db = SessionLocal()
     return db.query(models.Subscription).all()
+
+#todo -> get by id
+
+
+@router.delete("/subscriptions/{subscription_id}")
+def delete_subscription(subscription_id: int):
+    db = SessionLocal()
+    sub = db.query(models.Subscription).filter(models.Subscription.id == subscription_id).first()
+    if not sub:
+        return {"error" : "Subscription not found"}
+    db.delete(sub)
+    db.commit()
+    return {"message": "Subscription successfully deleted"}
+
+@router.put("/subscriptions/{subscription_id}")
+def update_subscription(subscription_id: int, updated: schemas.SubscriptionUpdate):
+    db = SessionLocal()
+    sub = db.query(models.Subscription).filter(models.Subscription.id == subscription_id).first()
+    if not sub:
+        return {"error" : "Subscription not found"}
+
+    for key, value in updated.model_dump().items():
+        setattr(sub, key, value)
+
+    db.commit()
+    db.refresh(sub)
+    return sub

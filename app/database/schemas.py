@@ -11,3 +11,10 @@ class SubscriptionCreate(BaseModel):
 class SubscriptionResponse(SubscriptionCreate):
     id: int
     model_config = ConfigDict(from_attributes=True)
+
+class SubscriptionUpdate(BaseModel):
+    name: str
+    price: float
+    currency: str
+    billing_cycle: str
+    next_payment: date
