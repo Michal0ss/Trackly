@@ -16,17 +16,21 @@ def create_subscription(sub: schemas.SubscriptionCreate):
 
     return new_sub
 
-
 @router.get("/subscriptions")
 def get_subscriptions():
     db = SessionLocal()
     return db.query(models.Subscription).all()
 
-#todo -> get by id
-
+@router.get("/subscriptions/{subscription_id}")
+def get_subscriptions_by_id(subscription_id: int):
+    db = SessionLocal()
+    sub = db.query(models.Subscription).filter(models.Subscription.id == subscription_id).first()
+    if not sub:
+        return {"error" : "Subscription not found"}
+    return sub
 
 @router.delete("/subscriptions/{subscription_id}")
-def delete_subscription(subscription_id: int):
+def delete_subscription(subscription_id: int) -> dict[str, str]:
     db = SessionLocal()
     sub = db.query(models.Subscription).filter(models.Subscription.id == subscription_id).first()
     if not sub:

@@ -6,7 +6,7 @@ class SubscriptionCreate(BaseModel):
     price: float
     currency: str
     billing_cycle: str
-    next_payment: date
+    next_payment_date: date
 
 class SubscriptionResponse(SubscriptionCreate):
     id: int
@@ -17,4 +17,4 @@ class SubscriptionUpdate(BaseModel):
     price: float
     currency: str
     billing_cycle: str
-    next_payment: date
+    next_payment_date: date
