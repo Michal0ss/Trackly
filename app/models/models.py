@@ -2,7 +2,7 @@ from datetime import datetime, UTC
 from sqlalchemy import Boolean, Column, Date, Float, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 
-from .db import Base
+from app.database.db import Base
 
 class Subscription(Base):
     __tablename__ = "subscriptions"
@@ -24,8 +24,8 @@ class Users(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True)
-    google_id = Column(String, unique=True)
     email = Column(String, unique=True, nullable=True)
+    password = Column(String, nullable=True)
     created_at = Column(DateTime, default=datetime.now(UTC))
 
     subscriptions = relationship("Subscription", back_populates="user")

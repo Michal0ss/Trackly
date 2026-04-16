@@ -18,3 +18,12 @@ class SubscriptionUpdate(BaseModel):
     currency: str
     billing_cycle: str
     next_payment_date: date
+
+class UserCreate(BaseModel):
+    email: str
+    password: str
+
+class UserResponse(BaseModel):
+    id: int
+    email: str
+    model_config = ConfigDict(from_attributes=True)

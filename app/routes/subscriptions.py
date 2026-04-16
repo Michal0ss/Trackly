@@ -1,6 +1,8 @@
 from fastapi import APIRouter
 from app.database.db import SessionLocal
-from app.database import models, schemas
+from app.schemas import schemas
+from app.models import models
+from app.utils.security import hash_password
 
 router = APIRouter()
 print("Subscriptions router loaded")
@@ -52,3 +54,4 @@ def update_subscription(subscription_id: int, updated: schemas.SubscriptionUpdat
     db.commit()
     db.refresh(sub)
     return sub
+
