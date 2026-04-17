@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trackly Auth</title>
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="card">
+    <div class="glow"></div>
+
+    <div class="top">
+      <div class="badge">Trackly Extension</div>
+      <h1>Autoryzacja</h1>
+      <p class="subtitle">
+        Zarejestruj konto, zaloguj się i zapisz token JWT bezpośrednio we wtyczce.
+      </p>
+    </div>
+
+    <div class="tabs">
+      <button class="tab-btn active" id="registerTab" type="button">Rejestracja</button>
+      <button class="tab-btn" id="loginTab" type="button">Logowanie</button>
+    </div>
+
+    <div class="panel active" id="registerPanel">
+      <div class="field">
+        <label class="label" for="registerEmail">Email</label>
+        <input class="input" id="registerEmail" type="email" placeholder="np. jan@trackly.pl" />
+      </div>
+
+      <div class="field">
+        <label class="label" for="registerPassword">Hasło</label>
+        <input class="input" id="registerPassword" type="password" placeholder="Minimum kilka znaków" />
+      </div>
+
+      <button class="btn btn-primary" id="registerBtn" type="button">Załóż konto</button>
+    </div>
+
+    <div class="panel" id="loginPanel">
+      <div class="field">
+        <label class="label" for="loginEmail">Email</label>
+        <input class="input" id="loginEmail" type="email" placeholder="np. jan@trackly.pl" />
+      </div>
+
+      <div class="field">
+        <label class="label" for="loginPassword">Hasło</label>
+        <input class="input" id="loginPassword" type="password" placeholder="Wpisz hasło" />
+      </div>
+
+      <button class="btn btn-secondary" id="loginBtn" type="button">Zaloguj się</button>
+    </div>
+
+    <div class="status" id="statusBox"></div>
+
+    <div class="token-box">
+      <p class="token-title">Zapisany token</p>
+      <p class="token-value" id="tokenValue">Brak tokenu</p>
+
+      <div class="row">
+        <button class="btn btn-secondary" id="refreshTokenBtn" type="button">Odśwież widok</button>
+        <button class="btn btn-danger" id="logoutBtn" type="button">Wyloguj</button>
+      </div>
+
+      <p class="muted-note">
+        Token zapisuje się w <code>chrome.storage.local</code>, a jeśli nie jest dostępne, to w <code>localStorage</code>.
+      </p>
+    </div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+</html>
