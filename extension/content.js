@@ -6,7 +6,7 @@ setTimeout(() => {
     if (decision) {
         fetch("http://127.0.0.1:8000/subscriptions", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers: { "Content-Type": "application/json", "Authorization" : "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjo1LCJleHAiOjE3NzY0NDM5Mzh9.fqYA2Yw1VHcyvh6HThNQ-jlRUIwieuordYVrlrnwfO4" },
             body: JSON.stringify({
                 name: "Netflix",
                 price: 29.99,
