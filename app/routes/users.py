@@ -4,11 +4,15 @@ from fastapi.security import OAuth2PasswordRequestForm
 from app.database.db import SessionLocal
 from app.schemas import schemas
 from app.models import models
-from app.utils.security import hash_password, verify_password, create_access_token
+from app.schemas.schemas import UserResponse, UserMeResponse
+from app.utils.security import hash_password, verify_password, create_access_token, oauth2_scheme, get_current_user
 
 router = APIRouter()
 print("Users router loaded")
 
+@router.get("/users/me", response_model=schemas.UserMeResponse)
+def read_users_me(current_user: models.Users = Depends(get_current_user)):
+    return current_user
 
 @router.post("/users/register", response_model=schemas.UserResponse)
 def register(user: schemas.UserCreate):

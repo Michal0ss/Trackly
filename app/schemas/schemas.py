@@ -36,3 +36,7 @@ class UserResponse(BaseModel):
 class TokenResponse(BaseModel):
     access_token: str
     token_type: str
+
+class UserMeResponse(BaseModel):
+    id: int
+    email: str
