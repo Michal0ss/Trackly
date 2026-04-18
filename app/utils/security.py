@@ -8,10 +8,17 @@ from starlette.middleware.cors import CORSMiddleware
 
 from app.database.db import SessionLocal
 from app.models import models
+from dotenv import load_dotenv
+import os
 
-SECRET_KEY = "supersecretkey"  # na razie ok
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
+load_dotenv()
+
+SECRET_KEY = os.getenv("SECRET_KEY")
+ALGORITHM = os.getenv("ALGORITHM", "HS256")
+ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60"))
+if not SECRET_KEY:
+    raise ValueError("SECRET_KEY is not set")
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
 
 
