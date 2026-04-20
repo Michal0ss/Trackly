@@ -78,7 +78,7 @@ function removeToken() {
 
 async function refreshTokenPreview() {
   const token = await getToken();
-  tokenValue.textContent = token || "Brak tokenu";
+  tokenValue.textContent = token || "No token";
 }
 
 async function registerUser() {
@@ -88,7 +88,7 @@ async function registerUser() {
   const password = registerPassword.value;
 
   if (!email || !password) {
-    showStatus("Uzupełnij email i hasło do rejestracji.", "error");
+    showStatus("Please enter email and password to register.", "error");
     return;
   }
 
@@ -114,16 +114,16 @@ async function registerUser() {
       const errorMessage =
         (data && data.detail) ||
         (typeof data === "string" && data) ||
-        "Rejestracja nie powiodła się.";
+        "Registration failed.";
       throw new Error(errorMessage);
     }
 
-    showStatus("Konto zostało utworzone. Możesz się teraz zalogować.", "success");
+    showStatus("Account created. You can now log in.", "success");
     registerPassword.value = "";
     loginEmail.value = email;
     setActiveTab("login");
   } catch (error) {
-    showStatus(`Błąd rejestracji: ${error.message}`, "error");
+    showStatus(`Registration error: ${error.message}`, "error");
   }
 }
 
@@ -134,7 +134,7 @@ async function loginUser() {
   const password = loginPassword.value;
 
   if (!email || !password) {
-    showStatus("Uzupełnij email i hasło do logowania.", "error");
+    showStatus("Please enter email and password to log in.", "error");
     return;
   }
 
@@ -164,12 +164,12 @@ async function loginUser() {
       const errorMessage =
         (data && data.detail) ||
         (typeof data === "string" && data) ||
-        "Logowanie nie powiodło się.";
+        "Login failed.";
       throw new Error(errorMessage);
     }
 
     if (!data || !data.access_token) {
-      throw new Error("Backend nie zwrócił access_token.");
+      throw new Error("Backend did not return access_token.");
     }
 
     await saveToken(data.access_token);
@@ -208,7 +208,9 @@ async function checkSession() {
 
     if (response.status === 401) {
       console.log("Session expired");
-      chrome.storage.local.remove(["access_token"]);
+      await removeToken();
+      await refreshTokenPreview();
+      showStatus("Session expired. Please log in again.", "error");
       return;
     }
 
