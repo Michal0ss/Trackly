@@ -1,4 +1,4 @@
-from datetime import datetime, UTC
+from datetime import datetime, UTC, date
 from sqlalchemy import Boolean, Column, Date, Float, ForeignKey, Integer, String, DateTime
 from sqlalchemy.orm import relationship
 
@@ -10,13 +10,21 @@ class Subscription(Base):
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id"))
 
-    name = Column(String)
+    service_name = Column(String)
+    plan_name = Column(String)
     price = Column(Float)
     currency = Column(String(3))
     billing_cycle = Column(String)
-    next_payment_date = Column(Date)
-    is_auto_tracked = Column(Boolean, default=True)
-    created_at = Column(DateTime,default=datetime.now(UTC))
+
+    start_date = Column(Date, nullable=True)
+    end_date = Column(Date, nullable=True)
+    renewal_date = Column(Date, nullable=True)
+    detected_at = Column(Date,default=datetime.now(UTC))
+
+    status = Column(String)
+    source = Column(String)
+    source_url = Column(String)
+    auto_renew = Column(Boolean)
 
     user = relationship("Users", back_populates="subscriptions")
 

@@ -2,22 +2,37 @@ from pydantic import BaseModel, ConfigDict
 from datetime import date
 
 class SubscriptionCreate(BaseModel):
-    name: str
+    service_name: str
+    plan_name: str
     price: float
     currency: str
     billing_cycle: str
-    next_payment_date: date
+    start_date: date | None = None
+    renewal_date: date | None = None
+    end_date: date | None = None
+    status: str
+    source: str
+    source_url: str
+    auto_renew: bool
+
 
 class SubscriptionResponse(SubscriptionCreate):
     id: int
     model_config = ConfigDict(from_attributes=True)
 
 class SubscriptionUpdate(BaseModel):
-    name: str
+    service_name: str
+    plan_name: str
     price: float
     currency: str
     billing_cycle: str
-    next_payment_date: date
+    start_date: date | None = None
+    renewal_date: date | None = None
+    end_date: date | None = None
+    status: str
+    source: str
+    source_url: str
+    auto_renew: bool
 
 class UserCreate(BaseModel):
     email: str
