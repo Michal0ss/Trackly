@@ -176,17 +176,58 @@ async function loginUser() {
     await refreshTokenPreview();
 
     loginPassword.value = "";
-    showStatus("Zalogowano pomyślnie. Token został zapisany.", "success");
+    showStatus("Token saved, logged in succesfully.", "success");
   } catch (error) {
-    showStatus(`Błąd logowania: ${error.message}`, "error");
+    showStatus(`Loggin error: ${error.message}`, "error");
   }
 }
 
 async function logoutUser() {
   await removeToken();
   await refreshTokenPreview();
-  showStatus("Token został usunięty. Wylogowano użytkownika.", "info");
+  showStatus("Token was deleted. User logged out.", "info");
 }
+
+
+async function checkSession() {
+  chrome.storage.local.get(["access_token"], async (result) => {
+  const token = result.access_token;
+
+  if (!token) {
+    console.log("No token");
+    return;
+  }
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/users/me", {
+      method: "GET",
+      headers: {
+        "Authorization": `Bearer ${token}`
+      }
+    });
+
+    if (response.status === 401) {
+      console.log("Session expired");
+      chrome.storage.local.remove(["access_token"]);
+      return;
+    }
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const user = await response.json();
+    console.log("Logged in user:", user);
+  } catch (error) {
+    console.error("Trouble in session check:", error);
+  }
+});
+
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  checkSession();
+});
 
 registerTab.addEventListener("click", () => setActiveTab("register"));
 loginTab.addEventListener("click", () => setActiveTab("login"));
