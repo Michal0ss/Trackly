@@ -3,6 +3,8 @@ from app.database.db import SessionLocal
 from app.schemas import schemas
 from app.models import models
 from app.utils.security import get_current_user
+from sqlalchemy import func
+from datetime import date, timedelta
 
 router = APIRouter()
 print("Subscriptions router loaded")
@@ -26,6 +28,39 @@ def get_subscriptions(current_user=Depends(get_current_user)):
         return db.query(models.Subscription).filter(models.Subscription.user_id == current_user.id).all()
     finally:
         db.close()
+
+@router.get("/subscriptions/summary/budget")
+def get_budget_summary(current_user=Depends(get_current_user)):
+    db = SessionLocal()
+    try:
+        summary = (
+                db.query(models.Subscription.currency, func.sum(models.Subscription.price).label("total"))
+        .filter(models.Subscription.user_id == current_user.id)
+        .group_by(models.Subscription.currency)
+        .all()
+        )
+        budget_dict = {item.currency: item.total for item in summary}
+        return budget_dict
+    finally:
+        db.close()
+
+@router.get("/subscriptions/summary/expiring")
+def get_expiring_subscriptions(days: int = 3, current_user=Depends(get_current_user)):
+    db = SessionLocal()
+    try:
+        target_date = date.today() + timedelta(days=days)
+        expiring_subs = (
+            db.query(models.Subscription)
+            .filter(
+                models.Subscription.user_id == current_user.id,
+                models.Subscription.renewal_date == target_date
+            )
+            .all()
+        )
+        return expiring_subs
+    finally:
+        db.close()
+
 
 @router.get("/subscriptions/{subscription_id}")
 def get_subscriptions_by_id(subscription_id: int, current_user=Depends(get_current_user)):
