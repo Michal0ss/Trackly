@@ -13,6 +13,16 @@ print("Subscriptions router loaded")
 def create_subscription(sub: schemas.SubscriptionCreate, current_user=Depends(get_current_user)):
     db = SessionLocal()
     try:
+        existing_sub = (
+            db.query(models.Subscription)
+            .filter(models.Subscription.user_id == current_user.id,
+                    models.Subscription.service_name == sub.service_name,
+                    models.Subscription.status != "cancelled")
+            .first()
+        )
+        if existing_sub:
+            raise HTTPException(status_code=409, detail=f"Active subscription for the service: {sub.service_name} already exists")
+
         new_sub = models.Subscription(**sub.model_dump(), user_id=current_user.id)
         db.add(new_sub)
         db.commit()
