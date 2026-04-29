@@ -9,7 +9,7 @@ from datetime import date, timedelta
 router = APIRouter()
 print("Subscriptions router loaded")
 
-@router.post("/subscriptions")
+@router.post("/subscriptions", response_model=schemas.SubscriptionResponse)
 def create_subscription(sub: schemas.SubscriptionCreate, current_user=Depends(get_current_user)):
     db = SessionLocal()
     try:
@@ -31,7 +31,7 @@ def create_subscription(sub: schemas.SubscriptionCreate, current_user=Depends(ge
     finally:
         db.close()
 
-@router.get("/subscriptions")
+@router.get("/subscriptions", response_model=list[schemas.SubscriptionResponse])
 def get_subscriptions(current_user=Depends(get_current_user)):
     db = SessionLocal()
     try:
@@ -54,7 +54,7 @@ def get_budget_summary(current_user=Depends(get_current_user)):
     finally:
         db.close()
 
-@router.get("/subscriptions/summary/expiring")
+@router.get("/subscriptions/summary/expiring", response_model=list[schemas.SubscriptionResponse])
 def get_expiring_subscriptions(days: int = 3, current_user=Depends(get_current_user)):
     db = SessionLocal()
     try:
@@ -72,7 +72,7 @@ def get_expiring_subscriptions(days: int = 3, current_user=Depends(get_current_u
         db.close()
 
 
-@router.get("/subscriptions/{subscription_id}")
+@router.get("/subscriptions/{subscription_id}", response_model=schemas.SubscriptionResponse)
 def get_subscriptions_by_id(subscription_id: int, current_user=Depends(get_current_user)):
     db = SessionLocal()
     try:
@@ -110,7 +110,7 @@ def delete_subscription(subscription_id: int, current_user=Depends(get_current_u
     finally:
         db.close()
 
-@router.put("/subscriptions/{subscription_id}")
+@router.put("/subscriptions/{subscription_id}", response_model=schemas.SubscriptionResponse)
 def update_subscription(subscription_id: int, updated: schemas.SubscriptionUpdate, current_user=Depends(get_current_user)):
     db = SessionLocal()
     try:
