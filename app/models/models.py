@@ -19,7 +19,8 @@ class Subscription(Base):
     start_date = Column(Date, nullable=True)
     end_date = Column(Date, nullable=True)
     renewal_date = Column(Date, nullable=True)
-    detected_at = Column(Date,default=datetime.now(UTC))
+    detected_at = Column(DateTime, nullable=True, default=datetime.now(UTC))
+    created_at = Column(DateTime, default=datetime.now(UTC))
 
     status = Column(String)
     source = Column(String)
