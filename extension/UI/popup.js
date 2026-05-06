@@ -18,6 +18,9 @@ const loginBtn = document.getElementById("loginBtn");
 const refreshTokenBtn = document.getElementById("refreshTokenBtn");
 const logoutBtn = document.getElementById("logoutBtn");
 
+const authView = document.getElementById("authView");
+const subscriptionsView = document.getElementById("subscriptionsView");
+
 function setActiveTab(tab) {
   const isRegister = tab === "register";
 
@@ -174,9 +177,11 @@ async function loginUser() {
 
     await saveToken(data.access_token);
     await refreshTokenPreview();
+    showSubscriptionsView();
 
     loginPassword.value = "";
     showStatus("Token saved, logged in succesfully.", "success");
+
   } catch (error) {
     showStatus(`Loggin error: ${error.message}`, "error");
   }
@@ -185,6 +190,7 @@ async function loginUser() {
 async function logoutUser() {
   await removeToken();
   await refreshTokenPreview();
+  showAuthView();
   showStatus("Token was deleted. User logged out.", "info");
 }
 
@@ -210,6 +216,7 @@ async function checkSession() {
       console.log("Session expired");
       await removeToken();
       await refreshTokenPreview();
+      showAuthView();
       showStatus("Session expired. Please log in again.", "error");
       return;
     }
@@ -220,12 +227,24 @@ async function checkSession() {
 
     const user = await response.json();
     console.log("Logged in user:", user);
+    showSubscriptionsView()
   } catch (error) {
     console.error("Trouble in session check:", error);
   }
-});
-
+  });
 }
+
+
+function showAuthView() {
+  authView.style.display = "block";
+  subscriptionsView.style.display = "none";
+}
+
+function showSubscriptionsView() {
+  authView.style.display = "none";
+  subscriptionsView.style.display = "block";
+}
+
 
 document.addEventListener("DOMContentLoaded", () => {
   checkSession();
