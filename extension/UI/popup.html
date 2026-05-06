@@ -7,7 +7,7 @@
   <link rel="stylesheet" href="popup.css" />
 </head>
 <body>
-  <div class="card">
+  <div class="card"  id = "authView">
     <div class="glow"></div>
 
     <div class="top">
@@ -66,6 +66,10 @@
         Token zapisuje się w <code>chrome.storage.local</code>, a jeśli nie jest dostępne, to w <code>localStorage</code>.
       </p>
     </div>
+  </div>
+
+  <div id = "subscriptionsView" style="display: none;">
+
   </div>
 
   <script src="popup.js"></script>
