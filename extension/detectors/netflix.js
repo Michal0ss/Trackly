@@ -22,7 +22,3 @@ function extractNetflixCandidate() {
 function getNetflixStableKey(candidate) {
   return `${candidate.service_name}:${candidate.plan_name}:${candidate.price}:${candidate.currency}`;
 }
-
-function shouldPromptNetflix(candidate) {
-  return Boolean(candidate);
-}

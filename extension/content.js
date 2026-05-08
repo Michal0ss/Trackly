@@ -7,30 +7,48 @@ async function runNetflixDetectorFlow() {
 
   const candidate = extractNetflixCandidate();
 
-  if (!candidate) {return;}
+  if (!candidate) {
+    console.log("No Netflix subscription candidate found");
+    return;
+  }
+  const key = getNetflixStableKey(candidate);
 
-  if (!shouldPromptNetflix(candidate)) {return;}
+  if (!(await shouldPromptForKey(key))){
+    console.log("Prompt skipped because this candidate was already handled");
+    return;
+  }
+
+  await markKeyAsPrompted(key);
 
   const accepted = confirmSubscription(
-    `Czy chcesz dodać subskrypcję ${candidate.service_name}?`
+    `Do you want to add ${candidate.service_name} subscription?`
   );
 
-  if (!accepted) {return;}
+  if (!accepted) {
+    await markKeyAsRejected(key);
+    console.log("User rejected subscription prompt");
+    return;
+  }
+
+  await markKeyAsAccepted(key);
 
   const token = await getToken();
 
   if (!token) {
-    showError("Zaloguj się najpierw w rozszerzeniu.");
+    showError("Log in to the extension first.");
     return;
   }
 
   try {
-    const result = await createSubscriptionRequest(token, candidate);
-    console.log("Subscription created:", result);
-    showSuccess("Subskrypcja została dodana.");
+    const createdSubscription = await createSubscriptionRequest(token, candidate);
+
+    await markKeyAsSubmitted(key);
+
+    console.log("Subscription created:", createdSubscription);
+    showSuccess(`${candidate.service_name} subscription was added successfully.`);
   } catch (error) {
-    console.error("Create subscription error:", error);
-    showError(`Błąd dodawania subskrypcji: ${error.message}`);
+    console.error("Failed to create subscription:", error);
+    showError(`Could not add subscription: ${error.message}`);
   }
 }
 

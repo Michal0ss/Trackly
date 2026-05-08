@@ -19,6 +19,8 @@ const logoutBtn = document.getElementById("logoutBtn");
 const authView = document.getElementById("authView");
 const subscriptionsView = document.getElementById("subscriptionsView");
 
+const dashboardLogoutBtn = document.getElementById("dashboardLogoutBtn");
+
 function setActiveTab(tab) {
   const isRegister = tab === "register";
 
@@ -74,6 +76,14 @@ async function registerUser() {
   } catch (error) {
     showStatus(`Registration error: ${error.message}`, "error");
   }
+}
+
+async function logoutUser() {
+  await removeToken();
+  await refreshTokenPreview();
+  showAuthView();
+  setActiveTab("login");
+  showStatus("Account logged out.");
 }
 
 async function loginUser() {
@@ -137,5 +147,7 @@ registerBtn.addEventListener("click", registerUser);
 loginBtn.addEventListener("click", loginUser);
 refreshTokenBtn.addEventListener("click", refreshTokenPreview);
 logoutBtn.addEventListener("click", logoutUser);
+dashboardLogoutBtn.addEventListener("click", logoutUser);
+
 
 refreshTokenPreview();
