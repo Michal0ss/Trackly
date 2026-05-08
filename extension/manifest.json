@@ -10,7 +10,13 @@
   "content_scripts": [
     {
       "matches": ["*://*.netflix.com/*"],
-      "js": ["content.js"]
+      "js": [
+        "shared/storage.js",
+        "shared/api-client.js",
+        "shared/prompt.js",
+        "detectors/netflix.js",
+        "content.js"
+      ]
     }
   ]
 }
