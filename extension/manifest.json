@@ -15,6 +15,7 @@
         "shared/api-client.js",
         "shared/prompt.js",
         "shared/dedupe-state.js",
+        "shared/subscription-form.js",
         "detectors/netflix.js",
         "content.js"
       ]

@@ -2,56 +2,48 @@
 
 console.log("Trackly działa");
 
-async function runNetflixDetectorFlow() {
-  if (!matchesNetflixPage()) {return;}
+async function runDetectorFlow() {
+  if (!matchesNetflixPage()) {
+    return;
+  }
 
   const candidate = extractNetflixCandidate();
 
   if (!candidate) {
-    console.log("No Netflix subscription candidate found");
+    console.log("No subscription candidate found");
     return;
   }
+
   const key = getNetflixStableKey(candidate);
 
-  if (!(await shouldPromptForKey(key))){
+  if (!(await shouldPromptForKey(key))) {
     console.log("Prompt skipped because this candidate was already handled");
     return;
   }
 
-  await markKeyAsPrompted(key);
+  showSubscriptionForm(candidate, async (payload) => {
+    const token = await getToken();
 
-  const accepted = confirmSubscription(
-    `Do you want to add ${candidate.service_name} subscription?`
-  );
+    if (!token) {
+      showError("Log in to the extension first.");
+      return;
+    }
 
-  if (!accepted) {
-    await markKeyAsRejected(key);
-    console.log("User rejected subscription prompt");
-    return;
-  }
+    try {
+      const createdSubscription = await createSubscriptionRequest(token, payload);
 
-  await markKeyAsAccepted(key);
+      await markKeyAsSubmitted(key);
 
-  const token = await getToken();
-
-  if (!token) {
-    showError("Log in to the extension first.");
-    return;
-  }
-
-  try {
-    const createdSubscription = await createSubscriptionRequest(token, candidate);
-
-    await markKeyAsSubmitted(key);
-
-    console.log("Subscription created:", createdSubscription);
-    showSuccess(`${candidate.service_name} subscription was added successfully.`);
-  } catch (error) {
-    console.error("Failed to create subscription:", error);
-    showError(`Could not add subscription: ${error.message}`);
-  }
+      console.log("Subscription created:", createdSubscription);
+      showSuccess(`${payload.service_name} subscription was added successfully.`);
+    } catch (error) {
+      console.error("Failed to create subscription:", error);
+      showError(`Could not add subscription: ${error.message}`);
+    }
+  });
 }
 
+
 setTimeout(() => {
-  runNetflixDetectorFlow();
+  runDetectorFlow();
 }, 1000);
