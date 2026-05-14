@@ -2,7 +2,7 @@ from datetime import UTC, datetime, timedelta
 
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from jose import JWTError, jwt
+from jose import JWTError, jwt, ExpiredSignatureError
 from passlib.context import CryptContext
 from starlette.middleware.cors import CORSMiddleware
 
@@ -66,6 +66,12 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
         user_id = payload.get("user_id")
         if user_id is None:
             raise credentials_exception
+    except ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token has expired",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     except JWTError:
         raise credentials_exception
 
