@@ -9,8 +9,14 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.netflix.com/*"],
-      "js": ["content.js"]
+      "matches": [
+        "*://*.netflix.com/*",
+        "*://*.spotify.com/*"
+      ],
+      "js": [
+        "detectors/spotify.js",
+        "content.js"
+      ]
     }
   ]
 }
