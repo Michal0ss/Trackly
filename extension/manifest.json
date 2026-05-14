@@ -9,14 +9,11 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.netflix.com/*"],
+      "matches": [
+        "*://*.netflix.com/*",
+        "*://*.spotify.com/*"
+      ],
       "js": [
-        "shared/storage.js",
-        "shared/api-client.js",
-        "shared/prompt.js",
-        "shared/dedupe-state.js",
-        "shared/subscription-form.js",
-        "detectors/netflix.js",
         "detectors/spotify.js",
         "content.js"
       ]
