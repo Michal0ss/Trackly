@@ -253,3 +253,124 @@ h1 {
   color: var(--muted);
   line-height: 1.5;
 }
+
+.subscriptions-card {
+  min-height: 520px;
+}
+
+.subscriptions-summary {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+
+.summary-box {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.summary-label {
+  margin: 0 0 8px;
+  font-size: 12px;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.summary-value {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.subscriptions-section {
+  margin-top: 8px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.section-title {
+  margin: 0;
+  font-size: 18px;
+  color: var(--text);
+}
+
+.subscriptions-refresh-btn {
+  width: auto;
+  min-width: 120px;
+}
+
+.subscriptions-list {
+  display: grid;
+  gap: 12px;
+}
+
+.subscription-item {
+  padding: 16px;
+  border-radius: 18px;
+  background: rgba(15, 23, 42, 0.45);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.subscription-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+}
+
+.subscription-service {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.subscription-status {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  background: rgba(34, 197, 94, 0.16);
+  color: #dcfce7;
+  border: 1px solid rgba(34, 197, 94, 0.28);
+}
+
+.subscription-plan {
+  margin: 0 0 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.subscription-meta {
+  display: grid;
+  gap: 6px;
+  font-size: 13px;
+  color: #e2e8f0;
+}
+
+.subscription-empty-state {
+  padding: 18px;
+  border-radius: 18px;
+  text-align: center;
+  color: var(--muted);
+  background: rgba(15, 23, 42, 0.35);
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+}
+
+.subscriptions-actions {
+  margin-top: 18px;
+}

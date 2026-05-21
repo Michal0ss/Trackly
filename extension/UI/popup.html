@@ -68,22 +68,45 @@
     </div>
   </div>
 
-  <div class="card" id = "subscriptionsView" style="display: none;">
+  <div class="card subscriptions-card" id="subscriptionsView" style="display: none;">
     <div class="glow"></div>
 
-      <div class="top">
-        <div class="badge">Trackly Extension</div>
-        <h1>Panel subskrypcji</h1>
-        <p class="subtitle">Jesteś zalogowany. Tutaj później pokażesz dane użytkownika i subskrypcje.</p>
+    <div class="top">
+      <div class="badge">Trackly Extension</div>
+      <h1>Twoje subskrypcje</h1>
+      <p class="subtitle" id="userEmailText">Zalogowany użytkownik</p>
+    </div>
+
+    <div class="subscriptions-summary">
+      <div class="summary-box">
+        <p class="summary-label">Aktywne subskrypcje</p>
+        <p class="summary-value" id="subscriptionsCount">0</p>
       </div>
 
-      <div class="status show success">
-        Zalogowano pomyślnie.
+      <div class="summary-box">
+        <p class="summary-label">Miesięczny koszt</p>
+        <p class="summary-value" id="monthlyTotal">0 PLN</p>
+      </div>
+    </div>
+
+    <div class="subscriptions-section">
+      <div class="section-header">
+        <h2 class="section-title">Lista subskrypcji</h2>
+        <button class="btn btn-secondary subscriptions-refresh-btn" id="refreshSubscriptionsBtn" type="button">
+          Odśwież
+        </button>
       </div>
 
-      <div class="row">
-        <button class="btn btn-danger" id="dashboardLogoutBtn" type="button">Wyloguj</button>
+      <div class="subscriptions-list" id="subscriptionsList">
+        <div class="subscription-empty-state">
+          Nie masz jeszcze żadnych subskrypcji.
+        </div>
       </div>
+    </div>
+
+    <div class="subscriptions-actions">
+      <button class="btn btn-danger" id="dashboardLogoutBtn" type="button">Wyloguj</button>
+    </div>
   </div>
 
   <script src="../shared/storage.js"></script>
