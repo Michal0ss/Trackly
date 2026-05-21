@@ -68,10 +68,28 @@
     </div>
   </div>
 
-  <div id = "subscriptionsView" style="display: none;">
+  <div class="card" id = "subscriptionsView" style="display: none;">
+    <div class="glow"></div>
 
+      <div class="top">
+        <div class="badge">Trackly Extension</div>
+        <h1>Panel subskrypcji</h1>
+        <p class="subtitle">Jesteś zalogowany. Tutaj później pokażesz dane użytkownika i subskrypcje.</p>
+      </div>
+
+      <div class="status show success">
+        Zalogowano pomyślnie.
+      </div>
+
+      <div class="row">
+        <button class="btn btn-danger" id="dashboardLogoutBtn" type="button">Wyloguj</button>
+      </div>
   </div>
 
+  <script src="../shared/storage.js"></script>
+  <script src="../shared/api-client.js"></script>
+  <script src="../shared/dedupe-state.js"></script>
   <script src="popup.js"></script>
+
 </body>
 </html>

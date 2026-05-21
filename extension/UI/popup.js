@@ -1,5 +1,3 @@
-const API_BASE_URL = "http://127.0.0.1:8000";
-
 const registerTab = document.getElementById("registerTab");
 const loginTab = document.getElementById("loginTab");
 const registerPanel = document.getElementById("registerPanel");
@@ -21,6 +19,8 @@ const logoutBtn = document.getElementById("logoutBtn");
 const authView = document.getElementById("authView");
 const subscriptionsView = document.getElementById("subscriptionsView");
 
+const dashboardLogoutBtn = document.getElementById("dashboardLogoutBtn");
+
 function setActiveTab(tab) {
   const isRegister = tab === "register";
 
@@ -41,42 +41,14 @@ function clearStatus() {
   statusBox.className = "status";
 }
 
-function hasChromeStorage() {
-  return typeof chrome !== "undefined" && chrome.storage && chrome.storage.local;
+function showAuthView() {
+  authView.style.display = "block";
+  subscriptionsView.style.display = "none";
 }
 
-function saveToken(token) {
-  return new Promise((resolve) => {
-    if (hasChromeStorage()) {
-      chrome.storage.local.set({ access_token: token }, resolve);
-    } else {
-      localStorage.setItem("access_token", token);
-      resolve();
-    }
-  });
-}
-
-function getToken() {
-  return new Promise((resolve) => {
-    if (hasChromeStorage()) {
-      chrome.storage.local.get(["access_token"], (result) => {
-        resolve(result.access_token || null);
-      });
-    } else {
-      resolve(localStorage.getItem("access_token"));
-    }
-  });
-}
-
-function removeToken() {
-  return new Promise((resolve) => {
-    if (hasChromeStorage()) {
-      chrome.storage.local.remove(["access_token"], resolve);
-    } else {
-      localStorage.removeItem("access_token");
-      resolve();
-    }
-  });
+function showSubscriptionsView() {
+  authView.style.display = "none";
+  subscriptionsView.style.display = "block";
 }
 
 async function refreshTokenPreview() {
@@ -96,31 +68,7 @@ async function registerUser() {
   }
 
   try {
-    const response = await fetch(`${API_BASE_URL}/users/register`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({ email, password })
-    });
-
-    const rawText = await response.text();
-    let data = null;
-
-    try {
-      data = rawText ? JSON.parse(rawText) : null;
-    } catch {
-      data = rawText;
-    }
-
-    if (!response.ok) {
-      const errorMessage =
-        (data && data.detail) ||
-        (typeof data === "string" && data) ||
-        "Registration failed.";
-      throw new Error(errorMessage);
-    }
-
+    await registerUserRequest(email, password);
     showStatus("Account created. You can now log in.", "success");
     registerPassword.value = "";
     loginEmail.value = email;
@@ -128,6 +76,14 @@ async function registerUser() {
   } catch (error) {
     showStatus(`Registration error: ${error.message}`, "error");
   }
+}
+
+async function logoutUser() {
+  await removeToken();
+  await refreshTokenPreview();
+  showAuthView();
+  setActiveTab("login");
+  showStatus("Account logged out.");
 }
 
 async function loginUser() {
@@ -142,48 +98,16 @@ async function loginUser() {
   }
 
   try {
-    const formData = new URLSearchParams();
-    formData.append("username", email);
-    formData.append("password", password);
-
-    const response = await fetch(`${API_BASE_URL}/users/login`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded"
-      },
-      body: formData.toString()
-    });
-
-    const rawText = await response.text();
-    let data = null;
-
-    try {
-      data = rawText ? JSON.parse(rawText) : null;
-    } catch {
-      data = rawText;
-    }
-
-    if (!response.ok) {
-      const errorMessage =
-        (data && data.detail) ||
-        (typeof data === "string" && data) ||
-        "Login failed.";
-      throw new Error(errorMessage);
-    }
-
-    if (!data || !data.access_token) {
-      throw new Error("Backend did not return access_token.");
-    }
+    const data = await loginUserRequest(email, password);
 
     await saveToken(data.access_token);
     await refreshTokenPreview();
-    showSubscriptionsView();
 
     loginPassword.value = "";
-    showStatus("Token saved, logged in succesfully.", "success");
-
+    showSubscriptionsView();
+    showStatus("Logged in successfully.", "success");
   } catch (error) {
-    showStatus(`Loggin error: ${error.message}`, "error");
+    showStatus(`Login error: ${error.message}`, "error");
   }
 }
 
@@ -191,60 +115,27 @@ async function logoutUser() {
   await removeToken();
   await refreshTokenPreview();
   showAuthView();
-  showStatus("Token was deleted. User logged out.", "info");
+  showStatus("Logged out.", "info");
 }
 
-
 async function checkSession() {
-  chrome.storage.local.get(["access_token"], async (result) => {
-  const token = result.access_token;
+  const token = await getToken();
 
   if (!token) {
-    console.log("No token");
+    showAuthView();
     return;
   }
 
   try {
-    const response = await fetch("http://127.0.0.1:8000/users/me", {
-      method: "GET",
-      headers: {
-        "Authorization": `Bearer ${token}`
-      }
-    });
-
-    if (response.status === 401) {
-      console.log("Session expired");
-      await removeToken();
-      await refreshTokenPreview();
-      showAuthView();
-      showStatus("Session expired. Please log in again.", "error");
-      return;
-    }
-
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
-    }
-
-    const user = await response.json();
-    console.log("Logged in user:", user);
-    showSubscriptionsView()
+    await getCurrentUserRequest(token);
+    showSubscriptionsView();
   } catch (error) {
-    console.error("Trouble in session check:", error);
+    await removeToken();
+    await refreshTokenPreview();
+    showAuthView();
+    showStatus("Session expired. Please log in again.", "error");
   }
-  });
 }
-
-
-function showAuthView() {
-  authView.style.display = "block";
-  subscriptionsView.style.display = "none";
-}
-
-function showSubscriptionsView() {
-  authView.style.display = "none";
-  subscriptionsView.style.display = "block";
-}
-
 
 document.addEventListener("DOMContentLoaded", () => {
   checkSession();
@@ -256,5 +147,7 @@ registerBtn.addEventListener("click", registerUser);
 loginBtn.addEventListener("click", loginUser);
 refreshTokenBtn.addEventListener("click", refreshTokenPreview);
 logoutBtn.addEventListener("click", logoutUser);
+dashboardLogoutBtn.addEventListener("click", logoutUser);
+
 
 refreshTokenPreview();
