@@ -21,6 +21,8 @@ const subscriptionsView = document.getElementById("subscriptionsView");
 
 const dashboardLogoutBtn = document.getElementById("dashboardLogoutBtn");
 
+const refreshSubscriptionsBtn = document.getElementById("refreshSubscriptionsBtn");
+
 function setActiveTab(tab) {
   const isRegister = tab === "register";
 
@@ -102,6 +104,7 @@ async function loginUser() {
 
     await saveToken(data.access_token);
     await refreshTokenPreview();
+    await loadSubscriptions();
 
     loginPassword.value = "";
     showSubscriptionsView();
@@ -111,12 +114,12 @@ async function loginUser() {
   }
 }
 
-async function logoutUser() {
-  await removeToken();
-  await refreshTokenPreview();
-  showAuthView();
-  showStatus("Logged out.", "info");
-}
+// async function logoutUser() {
+//   await removeToken();
+//   await refreshTokenPreview();
+//   showAuthView();
+//   showStatus("Logged out.", "info");
+// }
 
 async function checkSession() {
   const token = await getToken();
@@ -128,6 +131,7 @@ async function checkSession() {
 
   try {
     await getCurrentUserRequest(token);
+    await loadSubscriptions();
     showSubscriptionsView();
   } catch (error) {
     await removeToken();
@@ -141,6 +145,7 @@ document.addEventListener("DOMContentLoaded", () => {
   checkSession();
 });
 
+
 registerTab.addEventListener("click", () => setActiveTab("register"));
 loginTab.addEventListener("click", () => setActiveTab("login"));
 registerBtn.addEventListener("click", registerUser);
@@ -148,6 +153,6 @@ loginBtn.addEventListener("click", loginUser);
 refreshTokenBtn.addEventListener("click", refreshTokenPreview);
 logoutBtn.addEventListener("click", logoutUser);
 dashboardLogoutBtn.addEventListener("click", logoutUser);
-
+refreshSubscriptionsBtn.addEventListener("click", loadSubscriptions);
 
 refreshTokenPreview();
