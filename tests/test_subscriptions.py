@@ -1,3 +1,4 @@
+#pytest -v
 TEST_SUB_DATA = {
     "service_name": "Netflix",
     "plan_name": "Premium",
