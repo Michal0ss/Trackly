@@ -11,6 +11,8 @@ from app.database.db import engine, Base
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_database():
+    if os.path.exists("./test_trackly.db"):
+        os.remove("./test_trackly.db")
     Base.metadata.create_all(bind=engine)
     yield
     #po zakonczeniu testow usuwam baze
