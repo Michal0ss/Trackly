@@ -11,14 +11,21 @@ from app.database.db import engine, Base
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_database():
+    engine.dispose()
     if os.path.exists("./test_trackly.db"):
-        os.remove("./test_trackly.db")
+        try: os.remove("./test_trackly.db")
+        except Exception:
+            pass
+
     Base.metadata.create_all(bind=engine)
     yield
-    #po zakonczeniu testow usuwam baze
-    Base.metadata.drop_all(bind=engine)
+
+    #po zakonczeniu testow usuwam baze i zwalniam polaczenia
+    engine.dispose()
     if os.path.exists("./test_trackly.db"):
-        os.remove("./test_trackly.db")
+        try: os.remove("./test_trackly.db")
+        except Exception:
+            pass
 
 @pytest.fixture
 def client():
