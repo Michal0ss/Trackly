@@ -1,3 +1,4 @@
+#pytest -v
 import os
 import pytest
 

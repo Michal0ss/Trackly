@@ -1,3 +1,4 @@
+#pytest -v
 def test_register_user_success(client):
     user_data = {
         "email": "testowy@example.com",
