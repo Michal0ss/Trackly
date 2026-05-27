@@ -9,6 +9,7 @@ async function runDetectorFlow() {
 
   const candidate = extractSpotifyCandidate();
 
+  //weryfikacja jakosci danych
   if (!candidate || !candidate.plan_name || !candidate.price) {
     console.log("Prompt skipped because of incomplete subscription data");
     return;
