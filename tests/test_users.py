@@ -1,7 +1,7 @@
 #pytest -v
 def test_register_user_success(client):
     user_data = {
-        "email": "testowy@example.com",
+        "email": "testowy_users@example.com",
         "password": "testowy123"
     }
 
@@ -9,14 +9,14 @@ def test_register_user_success(client):
     assert response.status_code == 200
 
     data = response.json()
-    assert data["email"] == "testowy@example.com"
+    assert data["email"] == "testowy_users@example.com"
     assert "id" in data
 
 
 def test_register_duplicate_user_fails(client):
     #rejestracja uzytkownika ktory juz istnieje
     user_data = {
-        "email": "testowy@example.com",
+        "email": "testowy_users@example.com",
         "password": "testowy12"
     }
 
@@ -29,7 +29,7 @@ def test_register_duplicate_user_fails(client):
 def test_login_success(client):
     #logowanie uzytkownika
     login_data = {
-        "username": "testowy@example.com",
+        "username": "testowy_users@example.com",
         "password": "testowy123"
     }
 
@@ -44,7 +44,7 @@ def test_login_success(client):
 def test_login_invalid_password_fails(client):
     #logowanie uzytkownika zlym haslem
     login_data = {
-        "username": "testowy@example.com",
+        "username": "testowy_users@example.com",
         "password": "testowy1234"
     }
 

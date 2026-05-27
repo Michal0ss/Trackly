@@ -26,7 +26,7 @@ def client():
 
 @pytest.fixture
 def auth_headers(client):
-    email = "testowy@example.com"
+    email = "testowy_conftest@example.com"
     password = "testowy123"
 
     #rejestracja
