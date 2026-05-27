@@ -41,15 +41,17 @@ async function runDetectorFlow() {
       console.error("Failed to create subscription:", error);
       const errMsg = error.message || "";
 
+      //relogin przy bledzie 401
+      //komunikat przy bledzie 409 (duplikat)
       if (errMsg.includes("401") || errMsg.toLowerCase().includes("credentials") || errMsg.toLowerCase().includes("unauthorized")) {
         showError("Your session has expired. Please log in again via the extension.")
 
       } else if (errMsg.toLowerCase().includes("already exists") || errMsg.includes("400") || errMsg.includes("409")) {
         showError("This subscription is already on your list.");
-        await markKeyAsSubmitted(key); // Don't ask again for this specific duplicate
+        await markKeyAsSubmitted(key); //niepytanie ponownie o ten sam duplikat
 
       } else {
-        showError(`Could not add subscription: ${errMsg}`);
+        showError(`Could not add subscription: ${errMsg}`); //bylo wczesniej
       }
     }
   });
