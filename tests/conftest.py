@@ -23,3 +23,17 @@ def client():
     #wirtualny klient api do testow
     with TestClient(app) as c:
         yield c
+
+@pytest.fixture
+def auth_headers(client):
+    email = "testowy@example.com"
+    password = "testowy123"
+
+    #rejestracja
+    client.post("/users/register", json={"email": email, "password": password})
+
+    #logowanie po token
+    login_response = client.post("/users/login", data={"username": email, "password": password})
+    token = login_response.json()["access_token"]
+
+    return {"Authorization": f"Bearer {token}"}
