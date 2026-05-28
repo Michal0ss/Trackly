@@ -23,6 +23,7 @@ const dashboardLogoutBtn = document.getElementById("dashboardLogoutBtn");
 
 const refreshSubscriptionsBtn = document.getElementById("refreshSubscriptionsBtn");
 
+const addSubscriptionBtn = document.getElementById("addSubscriptionBtn");
 function setActiveTab(tab) {
   const isRegister = tab === "register";
 
@@ -114,12 +115,34 @@ async function loginUser() {
   }
 }
 
-// async function logoutUser() {
-//   await removeToken();
-//   await refreshTokenPreview();
-//   showAuthView();
-//   showStatus("Logged out.", "info");
-// }
+function openManualSubscriptionForm() {
+  showSubscriptionForm(
+    {
+      service_name: "",
+      currency: "PLN",
+      source: "manual",
+      source_url: ""
+    },
+    async (payload) => {
+      const token = await getToken();
+
+      if (!token) {
+        showError("Log in to the extension first.");
+        return;
+      }
+
+      try {
+        const createdSubscription = await createSubscriptionRequest(token, payload);
+        await loadSubscriptions();
+        console.log(createdSubscription);
+        showSuccess(`subscription was added successfully.`);
+      } catch (error) {
+        console.error("Failed to create subscription:", error);
+        showError(`Could not add subscription: ${error.message}`);
+      }
+    }
+  );
+}
 
 async function checkSession() {
   const token = await getToken();
@@ -145,7 +168,7 @@ document.addEventListener("DOMContentLoaded", () => {
   checkSession();
 });
 
-
+addSubscriptionBtn.addEventListener("click", openManualSubscriptionForm);
 registerTab.addEventListener("click", () => setActiveTab("register"));
 loginTab.addEventListener("click", () => setActiveTab("login"));
 registerBtn.addEventListener("click", registerUser);
