@@ -362,6 +362,31 @@ h1 {
   color: #e2e8f0;
 }
 
+.subscription-actions-row {
+  display: flex;
+  justify-content: flex-end;
+  gap: 8px;
+  margin-top: 12px;
+}
+
+.sub-action-btn {
+  border: 0;
+  border-radius: 10px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  color: white;
+}
+
+.sub-delete-btn {
+  background: linear-gradient(135deg, var(--danger), #dc2626);
+}
+
+.sub-action-btn:hover {
+  filter: brightness(1.08);
+}
+
 .subscription-empty-state {
   padding: 18px;
   border-radius: 18px;

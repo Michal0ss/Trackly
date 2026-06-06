@@ -24,8 +24,58 @@ async function loadSubscriptions() {
     renderUserInfo(user);
     renderSubscriptionsSummary(subscriptions, budget);
     renderSubscriptionsList(subscriptions);
+    bindSubscriptionActions();
   } catch (error) {
     console.error("Failed to load subscriptions:", error);
+  }
+}
+
+let subscriptionActionsBound = false;
+
+function bindSubscriptionActions() {
+  if (subscriptionActionsBound) {
+    return;
+  }
+
+  const listElement = document.getElementById("subscriptionsList");
+
+  if (!listElement) {
+    return;
+  }
+
+  listElement.addEventListener("click", handleSubscriptionListClick);
+  subscriptionActionsBound = true;
+}
+
+async function handleSubscriptionListClick(event) {
+  const deleteBtn = event.target.closest("[data-action='delete']");
+
+  if (!deleteBtn) {
+    return;
+  }
+
+  const id = deleteBtn.dataset.id;
+  const item = deleteBtn.closest(".subscription-item");
+  const serviceName = item
+    ? item.querySelector(".subscription-service").textContent
+    : "tę subskrypcję";
+
+  if (!confirm(`Usunąć subskrypcję: ${serviceName}? Tej operacji nie można cofnąć.`)) {
+    return;
+  }
+
+  const token = await getToken();
+
+  if (!token) {
+    return;
+  }
+
+  try {
+    await deleteSubscriptionRequest(token, id);
+    await loadSubscriptions();
+  } catch (error) {
+    console.error("Failed to delete subscription:", error);
+    alert(`Nie udało się usunąć subskrypcji: ${error.message}`);
   }
 }
 
@@ -67,6 +117,12 @@ function renderSubscriptionItem(sub) {
         <span>Cykl: ${sub.billing_cycle}</span>
         <span>Odnowienie: ${sub.renewal_date || "brak danych"}</span>
         <span>Auto-renew: ${sub.auto_renew ? "tak" : "nie"}</span>
+      </div>
+
+      <div class="subscription-actions-row">
+        <button class="sub-action-btn sub-delete-btn" data-action="delete" data-id="${sub.id}" type="button">
+          Usuń
+        </button>
       </div>
     </div>
   `;

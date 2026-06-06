@@ -76,3 +76,12 @@ async function createSubscriptionRequest(token, payload) {
     body: JSON.stringify(payload)
   });
 }
+
+async function deleteSubscriptionRequest(token, id) {
+  return apiRequest(`/subscriptions/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+}
