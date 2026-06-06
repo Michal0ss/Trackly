@@ -85,3 +85,14 @@ async function deleteSubscriptionRequest(token, id) {
     }
   });
 }
+
+async function updateSubscriptionRequest(token, id, payload) {
+  return apiRequest(`/subscriptions/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify(payload)
+  });
+}
