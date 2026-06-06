@@ -383,6 +383,10 @@ h1 {
   background: linear-gradient(135deg, var(--danger), #dc2626);
 }
 
+.sub-edit-btn {
+  background: linear-gradient(135deg, var(--accent-2), #0284c7);
+}
+
 .sub-action-btn:hover {
   filter: brightness(1.08);
 }

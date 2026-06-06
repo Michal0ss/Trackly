@@ -1,9 +1,12 @@
 const TRACKLY_FORM_ID = "trackly-subscription-form-modal";
 
-function showSubscriptionForm(candidate, onSubmit) {
+function showSubscriptionForm(candidate, onSubmit, options = {}) {
   if (document.getElementById(TRACKLY_FORM_ID)) {
     return;
   }
+
+  const title = options.title || "Dodaj subskrypcję";
+  const submitLabel = options.submitLabel || "Dodaj";
 
   const modal = document.createElement("div");
   modal.id = TRACKLY_FORM_ID;
@@ -63,8 +66,15 @@ function showSubscriptionForm(candidate, onSubmit) {
   </div>
 `;
 
-
   document.body.appendChild(modal);
+
+  modal.querySelector("h2").textContent = title;
+  document.getElementById("trackly-save-btn").textContent = submitLabel;
+
+  document.getElementById("trackly-plan-name").value = candidate.plan_name || "";
+  document.getElementById("trackly-price").value = candidate.price ?? "";
+  document.getElementById("trackly-billing-cycle").value = candidate.billing_cycle || "monthly";
+  document.getElementById("trackly-auto-renew").checked = candidate.auto_renew ?? true;
 
   document.getElementById("trackly-cancel-btn").addEventListener("click", () => {
     modal.remove();
@@ -91,10 +101,10 @@ function buildSubscriptionPayload(candidate) {
     price: Number(document.getElementById("trackly-price").value),
     currency: document.getElementById("trackly-currency").value.trim().toUpperCase(),
     billing_cycle: document.getElementById("trackly-billing-cycle").value,
-    start_date: new Date().toISOString().split("T")[0],
-    renewal_date: null,
-    end_date: null,
-    status: "confirmed",
+    start_date: candidate.start_date || new Date().toISOString().split("T")[0],
+    renewal_date: candidate.renewal_date || null,
+    end_date: candidate.end_date || null,
+    status: candidate.status || "confirmed",
     source: candidate.source,
     source_url: candidate.source_url,
     auto_renew: document.getElementById("trackly-auto-renew").checked

@@ -31,6 +31,7 @@ async function loadSubscriptions() {
 }
 
 let subscriptionActionsBound = false;
+let currentSubscriptions = [];
 
 function bindSubscriptionActions() {
   if (subscriptionActionsBound) {
@@ -48,6 +49,13 @@ function bindSubscriptionActions() {
 }
 
 async function handleSubscriptionListClick(event) {
+  const editBtn = event.target.closest("[data-action='edit']");
+
+  if (editBtn) {
+    handleEditClick(editBtn);
+    return;
+  }
+
   const deleteBtn = event.target.closest("[data-action='delete']");
 
   if (!deleteBtn) {
@@ -77,6 +85,35 @@ async function handleSubscriptionListClick(event) {
     console.error("Failed to delete subscription:", error);
     alert(`Nie udało się usunąć subskrypcji: ${error.message}`);
   }
+}
+
+function handleEditClick(editBtn) {
+  const id = editBtn.dataset.id;
+  const sub = currentSubscriptions.find((s) => String(s.id) === String(id));
+
+  if (!sub) {
+    return;
+  }
+
+  showSubscriptionForm(
+    sub,
+    async (payload) => {
+      const token = await getToken();
+
+      if (!token) {
+        return;
+      }
+
+      try {
+        await updateSubscriptionRequest(token, id, payload);
+        await loadSubscriptions();
+      } catch (error) {
+        console.error("Failed to update subscription:", error);
+        alert(`Nie udało się zapisać zmian: ${error.message}`);
+      }
+    },
+    { title: "Edytuj subskrypcję", submitLabel: "Zapisz" }
+  );
 }
 
 function renderUserInfo(user) {
@@ -120,6 +157,9 @@ function renderSubscriptionItem(sub) {
       </div>
 
       <div class="subscription-actions-row">
+      <button class="sub-action-btn sub-edit-btn" data-action="edit" data-id="${sub.id}" type="button">
+          Edytuj
+        </button>
         <button class="sub-action-btn sub-delete-btn" data-action="delete" data-id="${sub.id}" type="button">
           Usuń
         </button>
@@ -130,6 +170,7 @@ function renderSubscriptionItem(sub) {
 
 
 function renderSubscriptionsList(subscriptions) {
+  currentSubscriptions = subscriptions;
   const listElement = document.getElementById("subscriptionsList");
 
   if (!subscriptions.length) {
