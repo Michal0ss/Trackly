@@ -18,7 +18,9 @@ async function apiRequest(path, options = {}) {
       (typeof data === "string" && data) ||
       `Request failed with status ${response.status}`;
 
-    throw new Error(errorMessage);
+    const error = new Error(errorMessage);
+    error.status = response.status;
+    throw error;
   }
 
   return data;
@@ -74,5 +76,34 @@ async function createSubscriptionRequest(token, payload) {
       "Authorization": `Bearer ${token}`
     },
     body: JSON.stringify(payload)
+  });
+}
+
+async function deleteSubscriptionRequest(token, id) {
+  return apiRequest(`/subscriptions/${id}`, {
+    method: "DELETE",
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+}
+
+async function updateSubscriptionRequest(token, id, payload) {
+  return apiRequest(`/subscriptions/${id}`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`
+    },
+    body: JSON.stringify(payload)
+  });
+}
+
+async function getExpiringSubscriptionsRequest(token, days = 3) {
+  return apiRequest(`/subscriptions/summary/expiring?days=${days}`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
   });
 }

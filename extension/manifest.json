@@ -11,7 +11,6 @@
     {
       "matches": ["*://*.netflix.com/*"],
       "js": [
-        "shared/subscription-view.js",
         "shared/storage.js",
         "shared/api-client.js",
         "shared/prompt.js",

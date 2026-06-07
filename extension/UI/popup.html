@@ -12,9 +12,9 @@
 
     <div class="top">
       <div class="badge">Trackly Extension</div>
-      <h1>Autoryzacja</h1>
+      <h1>Witaj w Trackly</h1>
       <p class="subtitle">
-        Zarejestruj konto, zaloguj się i zapisz token JWT bezpośrednio we wtyczce.
+        Załóż konto lub zaloguj się, aby mieć wszystkie swoje subskrypcje w jednym miejscu.
       </p>
     </div>
 
@@ -53,7 +53,27 @@
 
     <div class="status" id="statusBox"></div>
 
-    <div class="token-box">
+    <div class="info-box">
+      <p class="info-title">Czym jest Trackly?</p>
+      <p class="info-text">
+        Trackly automatycznie wykrywa Twoje subskrypcje i zbiera je w jednym miejscu —
+        widzisz koszty, daty odnowień i nic Cię już nie zaskoczy.
+      </p>
+      <p class="info-hint">Już wkrótce: panel webowy Trackly z pełnym podglądem subskrypcji.</p>
+      <!--
+        np. link do naszej stronki
+        <a class="info-link" href="https://trackly.pl" target="_blank" rel="noopener">
+          Otwórz Trackly w przeglądarce →
+        </a>
+      -->
+    </div>
+
+    <!--
+      panel deweloperski: podglad surowego tokenu JWT + odswiez widok/wyloguj
+      ukryty przed uzytkownikiem
+      logika dziala nadal - jak chcemy odpalic to usuwamy atrybut 'hidden'
+    -->
+    <div class="token-box" hidden>
       <p class="token-title">Zapisany token</p>
       <p class="token-value" id="tokenValue">Brak tokenu</p>
 
@@ -78,26 +98,54 @@
     </div>
 
     <div class="subscriptions-summary">
-      <div class="summary-box">
+      <div class="summary-box summary-box-wide">
         <p class="summary-label">Aktywne subskrypcje</p>
         <p class="summary-value" id="subscriptionsCount">0</p>
       </div>
 
       <div class="summary-box">
-        <p class="summary-label">Miesięczny koszt</p>
+        <p class="summary-label">Koszt miesięczny</p>
         <p class="summary-value" id="monthlyTotal">0 PLN</p>
+      </div>
+
+      <div class="summary-box">
+        <p class="summary-label">Koszt roczny</p>
+        <p class="summary-value" id="yearlyTotal">0 PLN</p>
+      </div>
+
+      <div class="summary-box summary-box-wide">
+        <p class="summary-label">Rocznie łącznie</p>
+        <p class="summary-value" id="annualTotal">0 PLN</p>
+      </div>
+    </div>
+
+    <div class="subscriptions-section">
+      <h2 class="section-title">Wkrótce odnawiane</h2>
+      <div class="subscriptions-list" id="expiringList">
+        <div class="subscription-empty-state">
+          Brak subskrypcji odnawiających się wkrótce.
+        </div>
       </div>
     </div>
 
     <div class="subscriptions-section">
       <div class="section-header">
         <h2 class="section-title">Lista subskrypcji</h2>
-        <button class="btn btn-secondary subscriptions-refresh-btn" id="refreshSubscriptionsBtn" type="button">
-          Odśwież
-        </button>
-        <button class="btn btn-primary subscriptions-add-btn" id="addSubscriptionBtn" type="button">
-          Dodaj subskrypcję
-        </button>
+        <div class="section-actions">
+          <button class="icon-btn" id="refreshSubscriptionsBtn" type="button" title="Odśwież" aria-label="Odśwież">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+          </button>
+          <button class="icon-btn icon-btn-add" id="addSubscriptionBtn" type="button" title="Dodaj subskrypcję" aria-label="Dodaj subskrypcję">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+        </div>
       </div>
 
       <div class="subscriptions-list" id="subscriptionsList">
