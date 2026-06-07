@@ -1,10 +1,12 @@
-async function getBudgetSummaryRequest(token) {
-  return apiRequest("/subscriptions/summary/budget", {
-    method: "GET",
-    headers: {
-      "Authorization": `Bearer ${token}`
-    }
-  });
+//neutralizowanie mylacych znakow, zamiana na bezpieczne odpowiedniki
+//przydatne do pozniejszego scrapowania z ML
+function escapeHtml(value) {
+  return String(value ?? "")
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
 }
 
 async function loadSubscriptions() {
@@ -183,15 +185,15 @@ function renderSubscriptionItem(sub) {
   return `
     <div class="subscription-item">
       <div class="subscription-item-header">
-        <p class="subscription-service">${sub.service_name}</p>
+         <p class="subscription-service">${escapeHtml(sub.service_name)}</p>
                 <span class="subscription-status status-${sub.status}">${sub.status}</span>
       </div>
 
-      <p class="subscription-plan">Plan: ${sub.plan_name}</p>
+      <p class="subscription-plan">Plan: ${escapeHtml(sub.plan_name)}</p>
 
       <div class="subscription-meta">
-        <span>Cena: ${sub.price} ${sub.currency}</span>
-        <span>Cykl: ${sub.billing_cycle}</span>
+        <span>Cena: ${sub.price} ${escapeHtml(sub.currency)}</span>
+        <span>Cykl: ${escapeHtml(sub.billing_cycle)}</span>
         <span>Odnowienie: ${sub.renewal_date || "brak danych"}</span>
         <span>Auto-renew: ${sub.auto_renew ? "tak" : "nie"}</span>
       </div>
@@ -241,10 +243,10 @@ function renderExpiringList(subscriptions) {
   listElement.innerHTML = subscriptions
     .map((sub) => `
       <div class="subscription-item">
-        <p class="subscription-service">${sub.service_name}</p>
+        <p class="subscription-service">${escapeHtml(sub.service_name)}</p>
         <div class="subscription-meta">
-          <span>Plan: ${sub.plan_name}</span>
-          <span>Cena: ${sub.price} ${sub.currency}</span>
+          <span>Plan: ${escapeHtml(sub.plan_name)}</span>
+          <span>Cena: ${sub.price} ${escapeHtml(sub.currency)}</span>
           <span>Odnowienie: ${sub.renewal_date}</span>
         </div>
       </div>
