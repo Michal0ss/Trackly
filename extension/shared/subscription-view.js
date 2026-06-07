@@ -15,13 +15,13 @@ async function loadSubscriptions() {
   }
 
   try {
-    const [user, subscriptions, budget] = await Promise.all([
+    const [user, subscriptions] = await Promise.all([
       getCurrentUserRequest(token),
-      getSubscriptionsRequest(token),
+      getSubscriptionsRequest(token)
     ]);
 
     renderUserInfo(user);
-    renderSubscriptionsSummary(subscriptions, budget);
+    renderSubscriptionsSummary(subscriptions);
     renderSubscriptionsList(subscriptions);
     bindSubscriptionActions();
   } catch (error) {
