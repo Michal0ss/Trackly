@@ -306,7 +306,7 @@ h1 {
 
 .section-header {
   display: flex;
-  align-items: center;
+  align-items: stretch;
   justify-content: space-between;
   gap: 12px;
   margin-bottom: 14px;
@@ -427,4 +427,12 @@ h1 {
 
 .subscriptions-actions {
   margin-top: 18px;
+}
+
+#expiringList {
+  margin-top: 14px;
+}
+
+.summary-box-wide {
+  grid-column: 1 / -1;
 }
