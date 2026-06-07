@@ -108,6 +108,10 @@ h1 {
   transform: translateY(-1px);
 }
 
+#loginTab.active {
+  background: linear-gradient(135deg, var(--accent-2), #0284c7);
+}
+
 .panel {
   display: none;
   animation: fadeIn 0.25s ease;
@@ -154,6 +158,11 @@ h1 {
 .input:focus {
   border-color: rgba(34, 197, 94, 0.7);
   box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.14);
+}
+
+#loginPanel .input:focus {
+  border-color: rgba(6, 182, 212, 0.7);
+  box-shadow: 0 0 0 4px rgba(6, 182, 212, 0.14);
 }
 
 .btn {
