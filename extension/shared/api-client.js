@@ -18,7 +18,9 @@ async function apiRequest(path, options = {}) {
       (typeof data === "string" && data) ||
       `Request failed with status ${response.status}`;
 
-    throw new Error(errorMessage);
+    const error = new Error(errorMessage);
+    error.status = response.status;
+    throw error;
   }
 
   return data;

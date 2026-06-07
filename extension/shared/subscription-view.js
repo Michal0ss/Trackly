@@ -28,6 +28,17 @@ async function loadSubscriptions() {
     bindSubscriptionActions();
   } catch (error) {
     console.error("Failed to load subscriptions:", error);
+
+    if (error.status === 401) {
+      await removeToken();
+
+      if (typeof showAuthView === "function") {
+        showAuthView();
+      }
+      if (typeof showStatus === "function") {
+        showStatus("Sesja wygasła. Zaloguj się ponownie.", "error");
+      }
+    }
   }
 }
 
