@@ -56,7 +56,7 @@ function showSubscriptionsView() {
 
 async function refreshTokenPreview() {
   const token = await getToken();
-  tokenValue.textContent = token || "No token";
+  tokenValue.textContent = token || "Brak tokenu";
 }
 
 async function registerUser() {
@@ -66,18 +66,18 @@ async function registerUser() {
   const password = registerPassword.value;
 
   if (!email || !password) {
-    showStatus("Please enter email and password to register.", "error");
+    showStatus("Podaj email i hasło, aby się zarejestrować.", "error");
     return;
   }
 
   try {
     await registerUserRequest(email, password);
-    showStatus("Account created. You can now log in.", "success");
+    showStatus("Konto utworzone. Możesz się teraz zalogować.", "success");
     registerPassword.value = "";
     loginEmail.value = email;
     setActiveTab("login");
   } catch (error) {
-    showStatus(`Registration error: ${error.message}`, "error");
+    showStatus(`Błąd rejestracji: ${error.message}`, "error");
   }
 }
 
@@ -86,7 +86,7 @@ async function logoutUser() {
   await refreshTokenPreview();
   showAuthView();
   setActiveTab("login");
-  showStatus("Account logged out.");
+  showStatus("Wylogowano.");
 }
 
 async function loginUser() {
@@ -96,7 +96,7 @@ async function loginUser() {
   const password = loginPassword.value;
 
   if (!email || !password) {
-    showStatus("Please enter email and password to log in.", "error");
+    showStatus("Podaj email i hasło, aby się zalogować.", "error");
     return;
   }
 
@@ -109,9 +109,9 @@ async function loginUser() {
 
     loginPassword.value = "";
     showSubscriptionsView();
-    showStatus("Logged in successfully.", "success");
+    showStatus("Zalogowano pomyślnie.", "success");
   } catch (error) {
-    showStatus(`Login error: ${error.message}`, "error");
+    showStatus(`Błąd logowania: ${error.message}`, "error");
   }
 }
 
@@ -159,7 +159,7 @@ async function checkSession() {
     await removeToken();
     await refreshTokenPreview();
     showAuthView();
-    showStatus("Session expired. Please log in again.", "error");
+    showStatus("Sesja wygasła. Zaloguj się ponownie.", "error");
   }
 }
 
