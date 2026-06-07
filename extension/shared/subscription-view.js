@@ -16,6 +16,8 @@ async function loadSubscriptions() {
     return;
   }
 
+  renderListLoading();
+
   try {
     const [user, subscriptions, expiring] = await Promise.all([
       getCurrentUserRequest(token),
@@ -210,6 +212,19 @@ function renderSubscriptionItem(sub) {
   `;
 }
 
+function renderListLoading() {
+  const listElement = document.getElementById("subscriptionsList");
+
+  if (!listElement) {
+    return;
+  }
+
+  listElement.innerHTML = `
+    <div class="subscription-empty-state">
+      Ładowanie subskrypcji…
+    </div>
+  `;
+}
 
 function renderSubscriptionsList(subscriptions) {
   currentSubscriptions = subscriptions;

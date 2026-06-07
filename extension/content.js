@@ -25,7 +25,7 @@ async function runDetectorFlow() {
     const token = await getToken();
 
     if (!token) {
-      showError("Log in to the extension first.");
+      showError("Najpierw zaloguj się we wtyczce.");
       return;
     }
 
@@ -35,10 +35,10 @@ async function runDetectorFlow() {
       await markKeyAsSubmitted(key);
 
       console.log("Subscription created:", createdSubscription);
-      showSuccess(`${payload.service_name} subscription was added successfully.`);
+      showSuccess(`Subskrypcja ${payload.service_name} została dodana.`);
     } catch (error) {
       console.error("Failed to create subscription:", error);
-      showError(`Could not add subscription: ${error.message}`);
+      showError(`Nie udało się dodać subskrypcji: ${error.message}`);
     }
   });
 }
