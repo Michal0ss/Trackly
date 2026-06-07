@@ -58,12 +58,15 @@ def get_budget_summary(current_user=Depends(get_current_user)):
 def get_expiring_subscriptions(days: int = 3, current_user=Depends(get_current_user)):
     db = SessionLocal()
     try:
-        target_date = date.today() + timedelta(days=days)
+        today = date.today()
+        target_date = today + timedelta(days=days)
         expiring_subs = (
             db.query(models.Subscription)
             .filter(
                 models.Subscription.user_id == current_user.id,
-                models.Subscription.renewal_date == target_date
+                models.Subscription.status == "confirmed",
+                models.Subscription.renewal_date >= today,
+                models.Subscription.renewal_date <= target_date,
             )
             .all()
         )

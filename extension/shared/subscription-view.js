@@ -171,7 +171,7 @@ function renderSubscriptionItem(sub) {
     <div class="subscription-item">
       <div class="subscription-item-header">
         <p class="subscription-service">${sub.service_name}</p>
-        <span class="subscription-status">${sub.status}</span>
+                <span class="subscription-status status-${sub.status}">${sub.status}</span>
       </div>
 
       <p class="subscription-plan">Plan: ${sub.plan_name}</p>

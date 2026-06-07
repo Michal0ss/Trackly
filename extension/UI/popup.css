@@ -349,6 +349,18 @@ h1 {
   border: 1px solid rgba(34, 197, 94, 0.28);
 }
 
+.subscription-status.status-cancelled {
+  background: rgba(239, 68, 68, 0.16);
+  color: #fee2e2;
+  border-color: rgba(239, 68, 68, 0.32);
+}
+
+.subscription-status.status-expired {
+  background: rgba(148, 163, 184, 0.16);
+  color: #e2e8f0;
+  border-color: rgba(148, 163, 184, 0.32);
+}
+
 .subscription-plan {
   margin: 0 0 8px;
   font-size: 13px;
