@@ -52,6 +52,11 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
       </select>
     </div>
 
+    <div class="trackly-field">
+      <label for="trackly-renewal-date">Data odnowienia</label>
+      <input id="trackly-renewal-date" type="date" />
+    </div>
+
     <label class="trackly-check">
       <input id="trackly-auto-renew" type="checkbox" checked />
       <span>Odnawia się automatycznie</span>
@@ -75,6 +80,7 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
   document.getElementById("trackly-price").value = candidate.price ?? "";
   document.getElementById("trackly-billing-cycle").value = candidate.billing_cycle || "monthly";
   document.getElementById("trackly-auto-renew").checked = candidate.auto_renew ?? true;
+  document.getElementById("trackly-renewal-date").value = candidate.renewal_date || "";
 
   document.getElementById("trackly-cancel-btn").addEventListener("click", () => {
     modal.remove();
@@ -106,7 +112,7 @@ function buildSubscriptionPayload(candidate) {
     currency: document.getElementById("trackly-currency").value.trim().toUpperCase(),
     billing_cycle: document.getElementById("trackly-billing-cycle").value,
     start_date: candidate.start_date || new Date().toISOString().split("T")[0],
-    renewal_date: candidate.renewal_date || null,
+    renewal_date: document.getElementById("trackly-renewal-date").value || null,
     end_date: candidate.end_date || null,
     status: candidate.status || "confirmed",
     source: candidate.source,
