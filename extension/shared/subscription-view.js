@@ -18,7 +18,6 @@ async function loadSubscriptions() {
     const [user, subscriptions, budget] = await Promise.all([
       getCurrentUserRequest(token),
       getSubscriptionsRequest(token),
-      getBudgetSummaryRequest(token)
     ]);
 
     renderUserInfo(user);
@@ -121,21 +120,49 @@ function renderUserInfo(user) {
   userEmailText.textContent = user.email;
 }
 
-function renderSubscriptionsSummary(subscriptions, budget) {
-  const subscriptionsCount = document.getElementById("subscriptionsCount");
-  const monthlyTotal = document.getElementById("monthlyTotal");
+function renderSubscriptionsSummary(subscriptions) {
+  const confirmed = subscriptions.filter((s) => s.status === "confirmed");
 
-  subscriptionsCount.textContent = subscriptions.length;
+  document.getElementById("subscriptionsCount").textContent = confirmed.length;
 
-  const budgetEntries = Object.entries(budget);
+  const monthly = {};
+  const yearly = {};
 
-  if (!budgetEntries.length) {
-    monthlyTotal.textContent = "0 PLN";
-    return;
+  confirmed.forEach((sub) => {
+    const currency = sub.currency || "PLN";
+    const price = Number(sub.price) || 0;
+
+    if (sub.billing_cycle === "yearly") {
+      yearly[currency] = (yearly[currency] || 0) + price;
+    } else {
+      monthly[currency] = (monthly[currency] || 0) + price;
+    }
+  });
+
+  const annual = {};
+
+  Object.entries(monthly).forEach(([currency, total]) => {
+    annual[currency] = (annual[currency] || 0) + total * 12;
+  });
+
+  Object.entries(yearly).forEach(([currency, total]) => {
+    annual[currency] = (annual[currency] || 0) + total;
+  });
+
+  document.getElementById("monthlyTotal").textContent = formatMoney(monthly);
+  document.getElementById("yearlyTotal").textContent = formatMoney(yearly);
+  document.getElementById("annualTotal").textContent = formatMoney(annual);
+}
+
+function formatMoney(totalsByCurrency) {
+  const entries = Object.entries(totalsByCurrency);
+
+  if (!entries.length) {
+    return "0 PLN";
   }
 
-  monthlyTotal.textContent = budgetEntries
-    .map(([currency, total]) => `${total} ${currency}`)
+  return entries
+    .map(([currency, total]) => `${Math.round(total * 100) / 100} ${currency}`)
     .join(" / ");
 }
 
