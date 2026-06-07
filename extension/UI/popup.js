@@ -127,18 +127,17 @@ function openManualSubscriptionForm() {
       const token = await getToken();
 
       if (!token) {
-        showError("Log in to the extension first.");
+        showStatus("Zaloguj się we wtyczce, aby dodać subskrypcję.", "error");
         return;
       }
 
       try {
-        const createdSubscription = await createSubscriptionRequest(token, payload);
+        await createSubscriptionRequest(token, payload);
         await loadSubscriptions();
-        console.log(createdSubscription);
-        showSuccess(`subscription was added successfully.`);
+        showStatus("Subskrypcja dodana.", "success");
       } catch (error) {
         console.error("Failed to create subscription:", error);
-        showError(`Could not add subscription: ${error.message}`);
+        showStatus(`Nie udało się dodać subskrypcji: ${error.message}`, "error");
       }
     }
   );

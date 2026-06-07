@@ -80,6 +80,10 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
     modal.remove();
   });
 
+  document.getElementById("trackly-close-btn").addEventListener("click", () => {
+    modal.remove();
+  });
+
   document.getElementById("trackly-save-btn").addEventListener("click", async () => {
     const payload = buildSubscriptionPayload(candidate);
     const error = validateSubscriptionPayload(payload);
