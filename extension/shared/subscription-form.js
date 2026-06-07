@@ -143,7 +143,7 @@ function validateSubscriptionPayload(payload) {
 
 const style = document.createElement("style");
 style.textContent = `
-  #trackly-subscription-form-modal {
+    #trackly-subscription-form-modal {
     position: fixed;
     inset: 0;
     z-index: 999999;
@@ -151,7 +151,8 @@ style.textContent = `
     display: flex;
     justify-content: flex-end;
     align-items: flex-start;
-    padding: 28px;
+    padding: 20px;
+    overflow-y: auto;
     font-family: "Segoe UI", Arial, sans-serif;
   }
 
