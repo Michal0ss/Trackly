@@ -9,6 +9,38 @@ function escapeHtml(value) {
     .replaceAll("'", "&#39;");
 }
 
+function showConfirm(message) {
+  return new Promise((resolve) => {
+    const overlay = document.createElement("div");
+    overlay.className = "trackly-confirm-overlay";
+    overlay.innerHTML = `
+      <div class="trackly-confirm-card">
+        <p class="trackly-confirm-message"></p>
+        <div class="trackly-confirm-actions">
+          <button type="button" class="trackly-confirm-cancel">Anuluj</button>
+          <button type="button" class="trackly-confirm-ok">Usuń</button>
+        </div>
+      </div>
+    `;
+
+    overlay.querySelector(".trackly-confirm-message").textContent = message;
+    document.body.appendChild(overlay);
+
+    const close = (result) => {
+      overlay.remove();
+      resolve(result);
+    };
+
+    overlay.querySelector(".trackly-confirm-cancel").addEventListener("click", () => close(false));
+    overlay.querySelector(".trackly-confirm-ok").addEventListener("click", () => close(true));
+    overlay.addEventListener("click", (event) => {
+      if (event.target === overlay) {
+        close(false);
+      }
+    });
+  });
+}
+
 async function loadSubscriptions() {
   const token = await getToken();
 
@@ -84,7 +116,8 @@ async function handleSubscriptionListClick(event) {
     ? item.querySelector(".subscription-service").textContent
     : "tę subskrypcję";
 
-  if (!confirm(`Usunąć subskrypcję: ${serviceName}? Tej operacji nie można cofnąć.`)) {
+  const confirmed = await showConfirm(`Usunąć subskrypcję: ${serviceName}? Tej operacji nie można cofnąć.`);
+  if (!confirmed) {
     return;
   }
 
