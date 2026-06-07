@@ -53,7 +53,12 @@
 
     <div class="status" id="statusBox"></div>
 
-    <div class="token-box">
+    <!--
+      panel deweloperski: podglad surowego tokenu JWT + odswiez widok/wyloguj
+      ukryty przed uzytkownikiem
+      logika dziala nadal - jak chcemy odpalic to usuwamy atrybut 'hidden'
+    -->
+    <div class="token-box" hidden>
       <p class="token-title">Zapisany token</p>
       <p class="token-value" id="tokenValue">Brak tokenu</p>
 
