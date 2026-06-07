@@ -15,14 +15,16 @@ async function loadSubscriptions() {
   }
 
   try {
-    const [user, subscriptions] = await Promise.all([
+    const [user, subscriptions, expiring] = await Promise.all([
       getCurrentUserRequest(token),
-      getSubscriptionsRequest(token)
+      getSubscriptionsRequest(token),
+      getExpiringSubscriptionsRequest(token, 7)
     ]);
 
     renderUserInfo(user);
     renderSubscriptionsSummary(subscriptions);
     renderSubscriptionsList(subscriptions);
+    renderExpiringList(expiring);
     bindSubscriptionActions();
   } catch (error) {
     console.error("Failed to load subscriptions:", error);
@@ -211,4 +213,30 @@ function renderSubscriptionsList(subscriptions) {
 
   const html = subscriptions.map(renderSubscriptionItem).join("");
   listElement.innerHTML = html;
+}
+
+function renderExpiringList(subscriptions) {
+  const listElement = document.getElementById("expiringList");
+
+  if (!subscriptions.length) {
+    listElement.innerHTML = `
+      <div class="subscription-empty-state">
+        Brak subskrypcji odnawiających się wkrótce.
+      </div>
+    `;
+    return;
+  }
+
+  listElement.innerHTML = subscriptions
+    .map((sub) => `
+      <div class="subscription-item">
+        <p class="subscription-service">${sub.service_name}</p>
+        <div class="subscription-meta">
+          <span>Plan: ${sub.plan_name}</span>
+          <span>Cena: ${sub.price} ${sub.currency}</span>
+          <span>Odnowienie: ${sub.renewal_date}</span>
+        </div>
+      </div>
+    `)
+    .join("");
 }

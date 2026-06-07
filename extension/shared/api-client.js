@@ -96,3 +96,12 @@ async function updateSubscriptionRequest(token, id, payload) {
     body: JSON.stringify(payload)
   });
 }
+
+async function getExpiringSubscriptionsRequest(token, days = 3) {
+  return apiRequest(`/subscriptions/summary/expiring?days=${days}`, {
+    method: "GET",
+    headers: {
+      "Authorization": `Bearer ${token}`
+    }
+  });
+}
