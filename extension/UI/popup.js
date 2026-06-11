@@ -21,6 +21,9 @@ const subscriptionsView = document.getElementById("subscriptionsView");
 
 const dashboardLogoutBtn = document.getElementById("dashboardLogoutBtn");
 
+const refreshSubscriptionsBtn = document.getElementById("refreshSubscriptionsBtn");
+
+const addSubscriptionBtn = document.getElementById("addSubscriptionBtn");
 function setActiveTab(tab) {
   const isRegister = tab === "register";
 
@@ -53,7 +56,7 @@ function showSubscriptionsView() {
 
 async function refreshTokenPreview() {
   const token = await getToken();
-  tokenValue.textContent = token || "No token";
+  tokenValue.textContent = token || "Brak tokenu";
 }
 
 async function registerUser() {
@@ -63,18 +66,18 @@ async function registerUser() {
   const password = registerPassword.value;
 
   if (!email || !password) {
-    showStatus("Please enter email and password to register.", "error");
+    showStatus("Podaj email i hasło, aby się zarejestrować.", "error");
     return;
   }
 
   try {
     await registerUserRequest(email, password);
-    showStatus("Account created. You can now log in.", "success");
+    showStatus("Konto utworzone. Możesz się teraz zalogować.", "success");
     registerPassword.value = "";
     loginEmail.value = email;
     setActiveTab("login");
   } catch (error) {
-    showStatus(`Registration error: ${error.message}`, "error");
+    showStatus(`Błąd rejestracji: ${error.message}`, "error");
   }
 }
 
@@ -83,7 +86,7 @@ async function logoutUser() {
   await refreshTokenPreview();
   showAuthView();
   setActiveTab("login");
-  showStatus("Account logged out.");
+  showStatus("Wylogowano.");
 }
 
 async function loginUser() {
@@ -93,7 +96,7 @@ async function loginUser() {
   const password = loginPassword.value;
 
   if (!email || !password) {
-    showStatus("Please enter email and password to log in.", "error");
+    showStatus("Podaj email i hasło, aby się zalogować.", "error");
     return;
   }
 
@@ -102,20 +105,42 @@ async function loginUser() {
 
     await saveToken(data.access_token);
     await refreshTokenPreview();
+    await loadSubscriptions();
 
     loginPassword.value = "";
     showSubscriptionsView();
-    showStatus("Logged in successfully.", "success");
+    showStatus("Zalogowano pomyślnie.", "success");
   } catch (error) {
-    showStatus(`Login error: ${error.message}`, "error");
+    showStatus(`Błąd logowania: ${error.message}`, "error");
   }
 }
 
-async function logoutUser() {
-  await removeToken();
-  await refreshTokenPreview();
-  showAuthView();
-  showStatus("Logged out.", "info");
+function openManualSubscriptionForm() {
+  showSubscriptionForm(
+    {
+      service_name: "",
+      currency: "PLN",
+      source: "manual",
+      source_url: ""
+    },
+    async (payload) => {
+      const token = await getToken();
+
+      if (!token) {
+        showStatus("Zaloguj się we wtyczce, aby dodać subskrypcję.", "error");
+        return;
+      }
+
+      try {
+        await createSubscriptionRequest(token, payload);
+        await loadSubscriptions();
+        showStatus("Subskrypcja dodana.",  "success");
+      } catch (error) {
+        console.error("Failed to create subscription:", error);
+        showStatus(`Nie udało się dodać subskrypcji: ${error.message}`, "error");
+      }
+    }
+  );
 }
 
 async function checkSession() {
@@ -128,12 +153,13 @@ async function checkSession() {
 
   try {
     await getCurrentUserRequest(token);
+    await loadSubscriptions();
     showSubscriptionsView();
   } catch (error) {
     await removeToken();
     await refreshTokenPreview();
     showAuthView();
-    showStatus("Session expired. Please log in again.", "error");
+    showStatus("Sesja wygasła. Zaloguj się ponownie.", "error");
   }
 }
 
@@ -141,6 +167,7 @@ document.addEventListener("DOMContentLoaded", () => {
   checkSession();
 });
 
+addSubscriptionBtn.addEventListener("click", openManualSubscriptionForm);
 registerTab.addEventListener("click", () => setActiveTab("register"));
 loginTab.addEventListener("click", () => setActiveTab("login"));
 registerBtn.addEventListener("click", registerUser);
@@ -148,6 +175,6 @@ loginBtn.addEventListener("click", loginUser);
 refreshTokenBtn.addEventListener("click", refreshTokenPreview);
 logoutBtn.addEventListener("click", logoutUser);
 dashboardLogoutBtn.addEventListener("click", logoutUser);
-
+refreshSubscriptionsBtn.addEventListener("click", loadSubscriptions);
 
 refreshTokenPreview();

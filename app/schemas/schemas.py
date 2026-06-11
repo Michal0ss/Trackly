@@ -50,3 +50,17 @@ class TokenResponse(BaseModel):
 class UserMeResponse(BaseModel):
     id: int
     email: str
+
+class SubscriptionDetectRequest(BaseModel):
+    text: str
+    url: str | None = None
+
+
+class SubscriptionDetectResponse(BaseModel):
+    is_subscription: bool
+    service_name: str | None = None
+    plan_name: str | None = None
+    price: float | None = None
+    currency: str | None = None
+    billing_cycle: str | None = None
+    confidence: float = 0.0

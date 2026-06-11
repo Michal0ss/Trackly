@@ -9,7 +9,19 @@
   },
   "content_scripts": [
     {
-      "matches": ["*://*.netflix.com/*"],
+      "matches": [
+                  "*://*.netflix.com/*",
+                  "*://*.spotify.com/*",
+                  "*://*.youtube.com/*",
+                  "*://*.disneyplus.com/*",
+                  "*://*.hbomax.com/*",
+                  "*://*.max.com/*",
+                  "*://*.apple.com/*",
+                  "*://*.icloud.com/*",
+                  "*://*.adobe.com/*",
+                  "*://*.microsoft.com/*",
+                  "*://*.github.com/*"
+                ],
       "js": [
         "shared/storage.js",
         "shared/api-client.js",
