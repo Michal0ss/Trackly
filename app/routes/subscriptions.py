@@ -5,9 +5,31 @@ from app.models import models
 from app.utils.security import get_current_user
 from sqlalchemy import func
 from datetime import date, timedelta
+from app.utils.subscription_detector import detect_subscription_from_text
 
 router = APIRouter()
 print("Subscriptions router loaded")
+
+@router.post("/subscriptions/detect", response_model=schemas.SubscriptionDetectResponse)
+def detect_subscription(
+    request: schemas.SubscriptionDetectRequest,
+    current_user=Depends(get_current_user),
+):
+    text = request.text.strip()
+
+    if not text:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Text is required",
+        )
+
+    limited_text = text[:10000]
+
+    return detect_subscription_from_text(
+        text=limited_text,
+        url=request.url,
+    )
+
 
 @router.post("/subscriptions", response_model=schemas.SubscriptionResponse)
 def create_subscription(sub: schemas.SubscriptionCreate, current_user=Depends(get_current_user)):

@@ -134,7 +134,7 @@ function openManualSubscriptionForm() {
       try {
         await createSubscriptionRequest(token, payload);
         await loadSubscriptions();
-        showStatus("Subskrypcja dodana.", "success");
+        showStatus("Subskrypcja dodana.",  "success");
       } catch (error) {
         console.error("Failed to create subscription:", error);
         showStatus(`Nie udało się dodać subskrypcji: ${error.message}`, "error");
