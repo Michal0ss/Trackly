@@ -111,13 +111,7 @@ def detect_billing_cycle(text: str) -> str | None:
     return None
 
 
-def calculate_confidence(
-    service_name: str | None,
-    plan_name: str | None,
-    price: float | None,
-    currency: str | None,
-    billing_cycle: str | None,
-) -> float:
+def calculate_confidence(service_name: str | None, plan_name: str | None, price: float | None, currency: str | None, billing_cycle: str | None) -> float:
     score = 0.0
 
     if service_name:
