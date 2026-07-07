@@ -20,13 +20,11 @@ function buildCandidateFromDetection(detected, pageUrl) {
 }
 
 function getDetectedSubscriptionKey(candidate) {
-  return [
-    candidate.source_url,
-    candidate.service_name,
-    candidate.plan_name,
-    candidate.price,
-    candidate.currency
-  ].join(":");
+  if (candidate.service_name) {
+    return candidate.service_name.toLowerCase();
+  }
+
+  return new URL(candidate.source_url).hostname;
 }
 
 async function runDetectorFlow() {
