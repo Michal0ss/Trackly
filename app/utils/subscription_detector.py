@@ -9,8 +9,8 @@ SERVICE_HINTS = {
     "disney": "Disney+",
     "hbo": "HBO Max",
     "max.com": "Max",
-    "apple": "Apple",
     "icloud": "iCloud",
+    "apple": "Apple",
     "adobe": "Adobe",
     "microsoft": "Microsoft",
     "github": "GitHub",
@@ -30,12 +30,19 @@ PLAN_KEYWORDS = [
 ]
 
 BILLING_CYCLE_HINTS = {
-    "monthly": ["monthly", "per month", "/month", "month", "miesięcznie", "co miesiąc"],
-    "yearly": ["yearly", "annually", "per year", "/year", "rok", "rocznie", "co rok"],
+    "monthly": ["monthly", "per month", "/month", "/mies", "miesięcznie", "co miesiąc"],
+    "yearly": ["yearly", "annually", "per year", "/year", "/rok", "rocznie", "co rok"],
+}
+
+CURRENCY_MAP = {
+    "ZŁ": "PLN",
+    "€": "EUR",
+    "$": "USD",
+    "£": "GBP",
 }
 
 PRICE_PATTERN = re.compile(
-    r"(?:(PLN|USD|EUR|GBP)\s*)?(\d+[,.]\d{2})(?:\s*(zł|PLN|USD|EUR|GBP))?",
+    r"(?:(?P<cur_before>zł|PLN|USD|EUR|GBP|€|\$|£)\s*)?(?P<amount>\d{1,4}[,.]\d{2})(?:\s*(?P<cur_after>zł|PLN|USD|EUR|GBP|€|\$|£))?",
     re.IGNORECASE,
 )
 
@@ -45,14 +52,17 @@ def normalize_text(text: str) -> str:
 
 
 def detect_service(text: str, url: str | None = None) -> str | None:
-    source = text
-
     if url:
-        hostname = urlparse(url).hostname or ""
-        source = f"{hostname} {text}"
+        hostname = (urlparse(url).hostname or "").lower()
+
+        for hint, service_name in SERVICE_HINTS.items():
+            if hint in hostname:
+                return service_name
+
+    lowered = text.lower()
 
     for hint, service_name in SERVICE_HINTS.items():
-        if hint.lower() in source.lower():
+        if hint in lowered:
             return service_name
 
     return None
@@ -62,36 +72,35 @@ def detect_plan(text: str) -> str | None:
     normalized = normalize_text(text)
 
     for plan in PLAN_KEYWORDS:
-        if plan in normalized:
+        if re.search(rf"\b{plan}\b", normalized):
             return plan.capitalize()
 
     return None
 
 
+def find_price_match(text: str):
+    for match in PRICE_PATTERN.finditer(text):
+        if match.group("cur_before") or match.group("cur_after"):
+            return match
+
+    return None
+
+
 def detect_price(text: str) -> float | None:
-    match = PRICE_PATTERN.search(text)
+    match = find_price_match(text)
 
     if not match:
         return None
 
-    raw_price = match.group(2)
-    return float(raw_price.replace(",", "."))
+    return float(match.group("amount").replace(",", "."))
 
 
 def detect_currency(text: str) -> str | None:
-    match = PRICE_PATTERN.search(text)
+    match = find_price_match(text)
 
     if match:
-        before_currency = match.group(1)
-        after_currency = match.group(3)
-
-        currency = before_currency or after_currency
-
-        if currency:
-            currency = currency.upper()
-            if currency == "ZŁ":
-                return "PLN"
-            return currency
+        currency = (match.group("cur_before") or match.group("cur_after")).upper()
+        return CURRENCY_MAP.get(currency, currency)
 
     normalized = normalize_text(text)
 
