@@ -83,9 +83,35 @@ function showDetectionToast(candidate, { onAccept, onDismiss } = {}) {
   renderPrompt();
 }
 
+const TRACKLY_MESSAGE_TOAST_ID = "trackly-message-toast";
+const TRACKLY_MESSAGE_TOAST_MS = 6000;
+
+function showPageToast(message, { variant = "error" } = {}) {
+  const existing = document.getElementById(TRACKLY_MESSAGE_TOAST_ID);
+
+  if (existing) {
+    existing.remove();
+  }
+
+  const toast = document.createElement("div");
+  toast.id = TRACKLY_MESSAGE_TOAST_ID;
+  toast.innerHTML = `
+    <div class="trackly-toast-card trackly-toast-${variant}">
+      <p class="trackly-toast-badge">Trackly</p>
+      <p class="trackly-toast-title"></p>
+    </div>
+  `;
+
+  toast.querySelector(".trackly-toast-title").textContent = message;
+  document.body.appendChild(toast);
+
+  setTimeout(() => toast.remove(), TRACKLY_MESSAGE_TOAST_MS);
+}
+
 const tracklyToastStyle = document.createElement("style");
 tracklyToastStyle.textContent = `
-  #trackly-detection-toast {
+  #trackly-detection-toast,
+  #trackly-message-toast {
     position: fixed;
     right: 20px;
     bottom: 20px;
@@ -99,7 +125,8 @@ tracklyToastStyle.textContent = `
     to { opacity: 1; transform: translateY(0); }
   }
 
-  #trackly-detection-toast .trackly-toast-card {
+  #trackly-detection-toast .trackly-toast-card,
+  #trackly-message-toast .trackly-toast-card {
     width: 300px;
     background: #0f172a;
     color: #f8fafc;
@@ -159,6 +186,10 @@ tracklyToastStyle.textContent = `
 
   .trackly-toast-btn:hover {
     filter: brightness(1.08);
+  }
+
+  .trackly-toast-error .trackly-toast-badge {
+    color: #fca5a5;
   }
 `;
 

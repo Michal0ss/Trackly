@@ -146,6 +146,8 @@ function openManualSubscriptionForm() {
 async function maybeShowPendingDetection() {
   const pending = await getPendingDetection();
 
+  chrome.action.setBadgeText({ text: "" });
+
   if (!pending || !pending.candidate) {
     return;
   }

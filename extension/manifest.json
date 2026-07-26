@@ -4,6 +4,9 @@
   "version": "1.0",
   "permissions": ["activeTab","storage"],
   "host_permissions": ["http://127.0.0.1:8000/*"],
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
     "default_popup": "./UI/popup.html"
   },
@@ -25,7 +28,6 @@
       "js": [
         "shared/storage.js",
         "shared/api-client.js",
-        "shared/prompt.js",
         "shared/dedupe-state.js",
         "shared/detection-toast.js",
         "detectors/netflix.js",

@@ -132,7 +132,9 @@ async function handleSubscriptionListClick(event) {
     await loadSubscriptions();
   } catch (error) {
     console.error("Failed to delete subscription:", error);
-    alert(`Nie udało się usunąć subskrypcji: ${error.message}`);
+    if (typeof showStatus === "function") {
+      showStatus(`Nie udało się usunąć subskrypcji: ${error.message}`, "error");
+    }
   }
 }
 
@@ -158,7 +160,9 @@ function handleEditClick(editBtn) {
         await loadSubscriptions();
       } catch (error) {
         console.error("Failed to update subscription:", error);
-        alert(`Nie udało się zapisać zmian: ${error.message}`);
+        if (typeof showStatus === "function") {
+          showStatus(`Nie udało się zapisać zmian: ${error.message}`, "error");
+        }
       }
     },
     { title: "Edytuj subskrypcję", submitLabel: "Zapisz" }

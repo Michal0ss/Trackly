@@ -71,6 +71,7 @@ async function runDetectorFlow() {
     showDetectionToast(candidate, {
       onAccept: async () => {
         await savePendingDetection(candidate, key);
+        chrome.runtime.sendMessage({ type: "TRACKLY_DETECTION_PENDING" }).catch(() => {});
       },
       onDismiss: () => {
         console.log("Detection dismissed by user");
@@ -80,7 +81,7 @@ async function runDetectorFlow() {
     console.error("Subscription detection failed:", error);
 
     if (error.status === 401) {
-      showError("Sesja wygasła. Zaloguj się ponownie.");
+      showPageToast("Sesja wygasła. Zaloguj się ponownie.", { variant: "error" });
     }
   }
 }
