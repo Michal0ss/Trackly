@@ -1,5 +1,18 @@
 const TRACKLY_FORM_ID = "trackly-subscription-form-modal";
 
+function calculateRenewalDate(startDate, billingCycle) {
+  const base = startDate ? new Date(`${startDate}T00:00:00Z`) : new Date();
+  const monthsToAdd = billingCycle === "yearly" ? 12 : 1;
+
+  const result = new Date(Date.UTC(
+    base.getUTCFullYear(),
+    base.getUTCMonth() + monthsToAdd,
+    base.getUTCDate()
+  ));
+
+  return result.toISOString().split("T")[0];
+}
+
 function showSubscriptionForm(candidate, onSubmit, options = {}) {
   if (document.getElementById(TRACKLY_FORM_ID)) {
     return;
@@ -80,14 +93,36 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
   document.getElementById("trackly-price").value = candidate.price ?? "";
   document.getElementById("trackly-billing-cycle").value = candidate.billing_cycle || "monthly";
   document.getElementById("trackly-auto-renew").checked = candidate.auto_renew ?? true;
-  document.getElementById("trackly-renewal-date").value = candidate.renewal_date || "";
+
+  const billingCycleSelect = document.getElementById("trackly-billing-cycle");
+  const renewalDateInput = document.getElementById("trackly-renewal-date");
+  let renewalDateEdited = Boolean(candidate.renewal_date);
+
+  renewalDateInput.value = candidate.renewal_date
+    || calculateRenewalDate(candidate.start_date, billingCycleSelect.value);
+
+  renewalDateInput.addEventListener("input", () => {
+    renewalDateEdited = true;
+  });
+
+  billingCycleSelect.addEventListener("change", () => {
+    if (!renewalDateEdited) {
+      renewalDateInput.value = calculateRenewalDate(candidate.start_date, billingCycleSelect.value);
+    }
+  });
 
   document.getElementById("trackly-cancel-btn").addEventListener("click", () => {
     modal.remove();
+    if (options.onCancel) {
+      options.onCancel();
+    }
   });
 
   document.getElementById("trackly-close-btn").addEventListener("click", () => {
     modal.remove();
+    if (options.onCancel) {
+      options.onCancel();
+    }
   });
 
   document.getElementById("trackly-save-btn").addEventListener("click", async () => {

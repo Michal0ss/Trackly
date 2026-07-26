@@ -68,20 +68,12 @@ async function runDetectorFlow() {
 
     await markKeyAsPrompted(key);
 
-    showSubscriptionForm(candidate, async (payload) => {
-      try {
-        const createdSubscription = await createSubscriptionRequest(
-          token,
-          payload
-        );
-
-        await markKeyAsSubmitted(key);
-
-        console.log("Subscription created:", createdSubscription);
-        showSuccess(`Subskrypcja ${payload.service_name} została dodana.`);
-      } catch (error) {
-        console.error("Failed to create subscription:", error);
-        showError(`Nie udało się dodać subskrypcji: ${error.message}`);
+    showDetectionToast(candidate, {
+      onAccept: async () => {
+        await savePendingDetection(candidate, key);
+      },
+      onDismiss: () => {
+        console.log("Detection dismissed by user");
       }
     });
   } catch (error) {
