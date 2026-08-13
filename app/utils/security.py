@@ -41,7 +41,7 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(oauth2_
 
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        detail="Nie udało się zweryfikować sesji",
         headers={"WWW-Authenticate": "Bearer"},
     )
 
@@ -53,7 +53,7 @@ def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(oauth2_
     except ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token has expired",
+            detail="Sesja wygasła",
             headers={"WWW-Authenticate": "Bearer"},
         )
     except JWTError:

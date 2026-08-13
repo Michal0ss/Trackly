@@ -18,15 +18,24 @@ SERVICE_HINTS = {
 
 PLAN_KEYWORDS = [
     "basic",
+    "podstawowy",
+    "podstawowa",
     "standard",
+    "standardowy",
     "premium",
     "family",
+    "rodzinny",
+    "rodzina",
+    "duo",
     "individual",
+    "indywidualny",
     "student",
+    "studencki",
     "pro",
     "plus",
     "ultimate",
     "business",
+    "biznes",
 ]
 
 BILLING_CYCLE_HINTS = {
@@ -79,11 +88,31 @@ def detect_plan(text: str) -> str | None:
 
 
 def find_price_match(text: str):
-    for match in PRICE_PATTERN.finditer(text):
-        if match.group("cur_before") or match.group("cur_after"):
-            return match
+    """Zwraca dopasowanie ceny, które faktycznie ma przy sobie walutę,
+    najbliższe wzmiance o cyklu rozliczenia. Gołe liczby bez waluty
+    (oceny, wersje, daty) są odrzucane, bo w praktyce to głównie one
+    trafiały jako "cena" przy naiwnym pierwszym dopasowaniu."""
+    candidates = [
+        match for match in PRICE_PATTERN.finditer(text)
+        if match.group("cur_before") or match.group("cur_after")
+    ]
 
-    return None
+    if not candidates:
+        return None
+
+    lowered = text.lower()
+    cycle_positions = []
+
+    for hints in BILLING_CYCLE_HINTS.values():
+        for hint in hints:
+            pos = lowered.find(hint)
+            if pos != -1:
+                cycle_positions.append(pos)
+
+    if not cycle_positions:
+        return candidates[0]
+
+    return min(candidates, key=lambda m: min(abs(m.start() - pos) for pos in cycle_positions))
 
 
 def detect_price(text: str) -> float | None:

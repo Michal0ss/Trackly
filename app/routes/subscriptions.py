@@ -20,7 +20,7 @@ def detect_subscription(
     if not text:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Text is required",
+            detail="Tekst jest wymagany",
         )
 
     limited_text = text[:10000]
@@ -43,7 +43,7 @@ def create_subscription(sub: schemas.SubscriptionCreate, current_user=Depends(ge
             .first()
         )
         if existing_sub:
-            raise HTTPException(status_code=409, detail=f"Active subscription for the service: {sub.service_name} already exists")
+            raise HTTPException(status_code=409, detail=f"Masz już aktywną subskrypcję serwisu {sub.service_name}")
 
         new_sub = models.Subscription(**sub.model_dump(), user_id=current_user.id)
         db.add(new_sub)
@@ -110,7 +110,7 @@ def get_subscriptions_by_id(subscription_id: int, current_user=Depends(get_curre
             .first()
         )
         if not sub:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nie znaleziono subskrypcji")
         return sub
     finally:
         db.close()
@@ -128,7 +128,7 @@ def delete_subscription(subscription_id: int, current_user=Depends(get_current_u
             .first()
         )
         if not sub:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nie znaleziono subskrypcji")
         db.delete(sub)
         db.commit()
         return {"message": "Subscription successfully deleted"}
@@ -148,7 +148,7 @@ def update_subscription(subscription_id: int, updated: schemas.SubscriptionUpdat
             .first()
         )
         if not sub:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Subscription not found")
+            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Nie znaleziono subskrypcji")
 
         for key, value in updated.model_dump().items():
             setattr(sub, key, value)

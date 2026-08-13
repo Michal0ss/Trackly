@@ -8,6 +8,9 @@
     "client_id": "575055537719-i5gev08155b989197ngk12air2eelspv.apps.googleusercontent.com",
     "scopes": ["https://www.googleapis.com/auth/userinfo.email"]
   },
+  "background": {
+    "service_worker": "background.js"
+  },
   "action": {
     "default_popup": "./UI/popup.html"
   },
@@ -28,10 +31,10 @@
                 ],
       "js": [
         "shared/storage.js",
-        "shared/api-client.js",
-        "shared/prompt.js",
+        "shared/detector.js",
+        "shared/journey-state.js",
         "shared/dedupe-state.js",
-        "shared/subscription-form.js",
+        "shared/detection-toast.js",
         "content.js"
       ]
     }

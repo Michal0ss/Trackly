@@ -1,5 +1,18 @@
 const TRACKLY_FORM_ID = "trackly-subscription-form-modal";
 
+function calculateRenewalDate(startDate, billingCycle) {
+  const base = startDate ? new Date(`${startDate}T00:00:00Z`) : new Date();
+  const monthsToAdd = billingCycle === "yearly" ? 12 : 1;
+
+  const result = new Date(Date.UTC(
+    base.getUTCFullYear(),
+    base.getUTCMonth() + monthsToAdd,
+    base.getUTCDate()
+  ));
+
+  return result.toISOString().split("T")[0];
+}
+
 function showSubscriptionForm(candidate, onSubmit, options = {}) {
   if (document.getElementById(TRACKLY_FORM_ID)) {
     return;
@@ -40,7 +53,12 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
 
       <div class="trackly-field">
         <label for="trackly-currency">Waluta</label>
-        <input id="trackly-currency" type="text" value="${candidate.currency || "PLN"}" maxlength="3" />
+        <select id="trackly-currency">
+          <option value="PLN">PLN</option>
+          <option value="EUR">EUR</option>
+          <option value="USD">USD</option>
+          <option value="GBP">GBP</option>
+        </select>
       </div>
     </div>
 
@@ -79,18 +97,41 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
   document.getElementById("trackly-plan-name").value = candidate.plan_name || "";
   document.getElementById("trackly-price").value = candidate.price ?? "";
   document.getElementById("trackly-billing-cycle").value = candidate.billing_cycle || "monthly";
+  document.getElementById("trackly-currency").value = candidate.currency || "PLN";
   document.getElementById("trackly-auto-renew").checked = candidate.auto_renew ?? true;
-  document.getElementById("trackly-renewal-date").value = candidate.renewal_date || "";
 
-  document.getElementById("trackly-cancel-btn").addEventListener("click", () => {
-    modal.remove();
+  const billingCycleSelect = document.getElementById("trackly-billing-cycle");
+  const renewalDateInput = document.getElementById("trackly-renewal-date");
+  let renewalDateEdited = Boolean(candidate.renewal_date);
+
+  renewalDateInput.value = candidate.renewal_date
+    || calculateRenewalDate(candidate.start_date, billingCycleSelect.value);
+
+  renewalDateInput.addEventListener("input", () => {
+    renewalDateEdited = true;
   });
 
-  document.getElementById("trackly-close-btn").addEventListener("click", () => {
-    modal.remove();
+  billingCycleSelect.addEventListener("change", () => {
+    if (!renewalDateEdited) {
+      renewalDateInput.value = calculateRenewalDate(candidate.start_date, billingCycleSelect.value);
+    }
   });
 
-  document.getElementById("trackly-save-btn").addEventListener("click", async () => {
+  const closeForm = () => {
+    modal.remove();
+
+    if (typeof options.onCancel === "function") {
+      options.onCancel();
+    }
+  };
+
+  document.getElementById("trackly-cancel-btn").addEventListener("click", closeForm);
+  document.getElementById("trackly-close-btn").addEventListener("click", closeForm);
+
+  const saveBtn = document.getElementById("trackly-save-btn");
+  const savingLabel = "Zapisywanie…";
+
+  saveBtn.addEventListener("click", async () => {
     const payload = buildSubscriptionPayload(candidate);
     const error = validateSubscriptionPayload(payload);
 
@@ -99,7 +140,16 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
       return;
     }
 
-    await onSubmit(payload);
+    saveBtn.disabled = true;
+    saveBtn.textContent = savingLabel;
+
+    try {
+      await onSubmit(payload);
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = submitLabel;
+    }
+
     modal.remove();
   });
 }
@@ -143,6 +193,11 @@ function validateSubscriptionPayload(payload) {
 
 const style = document.createElement("style");
 style.textContent = `
+    #trackly-subscription-form-modal,
+    #trackly-subscription-form-modal * {
+    box-sizing: border-box;
+    }
+  
     #trackly-subscription-form-modal {
     position: fixed;
     inset: 0;
@@ -292,6 +347,11 @@ style.textContent = `
   .trackly-btn:hover,
   .trackly-icon-btn:hover {
     filter: brightness(1.08);
+  }
+
+  .trackly-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 `;
 

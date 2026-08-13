@@ -101,6 +101,50 @@ function openManualSubscriptionForm() {
   );
 }
 
+async function maybeShowPendingDetection() {
+  const pending = await getPendingDetection();
+
+  chrome.action.setBadgeText({ text: "" });
+
+  if (!pending || !pending.candidate) {
+    return;
+  }
+
+  showSubscriptionForm(
+    pending.candidate,
+    async (payload) => {
+      const token = await getToken();
+
+      if (!token) {
+        showStatus("Zaloguj się we wtyczce, aby dodać subskrypcję.", "error");
+        return;
+      }
+
+      try {
+        await createSubscriptionRequest(token, payload);
+
+        if (pending.key) {
+          await markKeyAsSubmitted(pending.key);
+        }
+
+        await clearPendingDetection();
+        await loadSubscriptions();
+        showStatus(`Subskrypcja ${payload.service_name} została dodana.`, "success");
+      } catch (error) {
+        console.error("Failed to create subscription:", error);
+        showStatus(`Nie udało się dodać subskrypcji: ${error.message}`, "error");
+      }
+    },
+    {
+      title: "Wykryto subskrypcję",
+      submitLabel: "Dodaj",
+      onCancel: () => {
+        clearPendingDetection();
+      }
+    }
+  );
+}
+
 async function checkSession() {
   const token = await getToken();
 
@@ -113,6 +157,7 @@ async function checkSession() {
     await getCurrentUserRequest(token);
     await loadSubscriptions();
     showSubscriptionsView();
+    await maybeShowPendingDetection();
   } catch (error) {
     await removeToken();
     await refreshTokenPreview();
