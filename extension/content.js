@@ -7,6 +7,8 @@ const PENDING_PURCHASE_TTL_MS = 10 * 60 * 1000;
 const URL_WATCH_INTERVAL_MS = 1000;
 const MAX_CONTROL_TEXT_LENGTH = 60;
 const PURCHASE_FORM_DELAY_MS = 2000;
+const PURCHASE_FORM_RETRY_MS = 5000;
+const PURCHASE_FORM_MAX_RETRIES = 12;
 
 const PURCHASE_KEYWORDS = [
   "kup",
@@ -28,11 +30,10 @@ const PURCHASE_KEYWORDS = [
   "confirm purchase",
   "start membership",
   "proceed to payment",
-  "wypróbuj za darmo",
-  "wypróbuj bezpłatnie",
-  "rozpocznij okres próbny",
-  "bezpłatny okres próbny",
-  "start free trial",
+  "wypróbuj",
+  "wyprobuj",
+  "okres próbny",
+  "free trial",
   "start trial",
   "try free",
 ];
@@ -114,7 +115,7 @@ function buildCandidate(journeyData, serviceKey, pageUrl) {
   };
 }
 
-async function showPurchaseForm(serviceKey) {
+async function showPurchaseForm(serviceKey, attempt = 0) {
     if (!(await shouldPromptForKey(serviceKey))) {
     debugLog("Formularz pominięty:", serviceKey, await getKeyStatus(serviceKey));
     return;
@@ -124,6 +125,16 @@ async function showPurchaseForm(serviceKey) {
 
   if (!token) {
     debugLog("Formularz pominięty - użytkownik niezalogowany");
+    return;
+  }
+
+  if (!pageMentions(PURCHASE_SUCCESS_KEYWORDS) && pageMentions(PAYMENT_PAGE_KEYWORDS)) {
+    debugLog("Strona płatności - czekam", `(próba ${attempt + 1})`);
+
+    if (attempt < PURCHASE_FORM_MAX_RETRIES) {
+      setTimeout(() => showPurchaseForm(serviceKey, attempt + 1), PURCHASE_FORM_RETRY_MS);
+    }
+
     return;
   }
 
@@ -168,7 +179,8 @@ function looksLikePurchaseControl(control) {
     return false;
   }
 
-  return PURCHASE_KEYWORDS.some((keyword) => label.includes(keyword));
+  return PURCHASE_KEYWORDS.some((keyword) => new RegExp(`(?<![\\p{L}\\p{N}])${keyword}(?![\\p{L}\\p{N}])`, "u").test(label)
+  );
 }
 
 async function handlePossiblePurchaseClick(event) {
@@ -244,10 +256,6 @@ async function resumePendingPurchase(serviceKey) {
     return;
   }
 
-    if (!pageMentions(PURCHASE_SUCCESS_KEYWORDS) && pageMentions(PAYMENT_PAGE_KEYWORDS)) {
-    debugLog("Strona płatności - czekam z formularzem do następnej strony");
-    return;
-  }
 
   debugLog("Wznawiam formularz po przejściu na kolejną stronę:", serviceKey);
   await showPurchaseForm(serviceKey);

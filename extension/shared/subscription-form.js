@@ -146,6 +146,11 @@ function validateSubscriptionPayload(payload) {
 
 const style = document.createElement("style");
 style.textContent = `
+    #trackly-subscription-form-modal,
+    #trackly-subscription-form-modal * {
+    box-sizing: border-box;
+    }
+  
     #trackly-subscription-form-modal {
     position: fixed;
     inset: 0;
