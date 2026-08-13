@@ -29,15 +29,6 @@ class SubscriptionResponse(SubscriptionBase):
 class SubscriptionUpdate(SubscriptionBase):
     pass
 
-class UserCreate(BaseModel):
-    email: str
-    password: str
-
-class UserResponse(BaseModel):
-    id: int
-    email: str
-    model_config = ConfigDict(from_attributes=True)
-
 # class UserLogin(BaseModel):
 #     email: str
 #     password: str
@@ -64,3 +55,6 @@ class SubscriptionDetectResponse(BaseModel):
     currency: str | None = None
     billing_cycle: str | None = None
     confidence: float = 0.0
+
+class GoogleLoginRequest(BaseModel):
+    access_token: str

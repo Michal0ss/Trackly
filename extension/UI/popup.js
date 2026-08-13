@@ -1,37 +1,44 @@
-const registerTab = document.getElementById("registerTab");
-const loginTab = document.getElementById("loginTab");
-const registerPanel = document.getElementById("registerPanel");
-const loginPanel = document.getElementById("loginPanel");
-
 const statusBox = document.getElementById("statusBox");
 const tokenValue = document.getElementById("tokenValue");
-
-const registerEmail = document.getElementById("registerEmail");
-const registerPassword = document.getElementById("registerPassword");
-const loginEmail = document.getElementById("loginEmail");
-const loginPassword = document.getElementById("loginPassword");
-
-const registerBtn = document.getElementById("registerBtn");
-const loginBtn = document.getElementById("loginBtn");
 const refreshTokenBtn = document.getElementById("refreshTokenBtn");
 const logoutBtn = document.getElementById("logoutBtn");
-
 const authView = document.getElementById("authView");
 const subscriptionsView = document.getElementById("subscriptionsView");
-
 const dashboardLogoutBtn = document.getElementById("dashboardLogoutBtn");
-
 const refreshSubscriptionsBtn = document.getElementById("refreshSubscriptionsBtn");
-
 const addSubscriptionBtn = document.getElementById("addSubscriptionBtn");
-function setActiveTab(tab) {
-  const isRegister = tab === "register";
+const googleLoginBtn = document.getElementById("googleLoginBtn");
 
-  registerTab.classList.toggle("active", isRegister);
-  loginTab.classList.toggle("active", !isRegister);
+function getGoogleToken() {
+  return new Promise((resolve, reject) => {
+    chrome.identity.getAuthToken({ interactive: true }, (token) => {
+      if (chrome.runtime.lastError || !token) {
+        reject(new Error(chrome.runtime.lastError?.message || "Nie udało się pobrać tokenu Google"));
+        return;
+      }
 
-  registerPanel.classList.toggle("active", isRegister);
-  loginPanel.classList.toggle("active", !isRegister);
+      resolve(token);
+    });
+  });
+}
+
+async function loginWithGoogle() {
+  clearStatus();
+  showStatus("Łączenie z Google...");
+
+  try {
+    const googleToken = await getGoogleToken();
+    const data = await googleLoginRequest(googleToken);
+
+    await saveToken(data.access_token);
+    await refreshTokenPreview();
+    await loadSubscriptions();
+
+    showSubscriptionsView();
+    showStatus("Zalogowano pomyślnie.", "success");
+  } catch (error) {
+    showStatus(`Błąd logowania: ${error.message}`, "error");
+  }
 }
 
 function showStatus(message, type = "info") {
@@ -59,60 +66,11 @@ async function refreshTokenPreview() {
   tokenValue.textContent = token || "Brak tokenu";
 }
 
-async function registerUser() {
-  clearStatus();
-
-  const email = registerEmail.value.trim();
-  const password = registerPassword.value;
-
-  if (!email || !password) {
-    showStatus("Podaj email i hasło, aby się zarejestrować.", "error");
-    return;
-  }
-
-  try {
-    await registerUserRequest(email, password);
-    showStatus("Konto utworzone. Możesz się teraz zalogować.", "success");
-    registerPassword.value = "";
-    loginEmail.value = email;
-    setActiveTab("login");
-  } catch (error) {
-    showStatus(`Błąd rejestracji: ${error.message}`, "error");
-  }
-}
-
 async function logoutUser() {
   await removeToken();
   await refreshTokenPreview();
   showAuthView();
-  setActiveTab("login");
   showStatus("Wylogowano.");
-}
-
-async function loginUser() {
-  clearStatus();
-
-  const email = loginEmail.value.trim();
-  const password = loginPassword.value;
-
-  if (!email || !password) {
-    showStatus("Podaj email i hasło, aby się zalogować.", "error");
-    return;
-  }
-
-  try {
-    const data = await loginUserRequest(email, password);
-
-    await saveToken(data.access_token);
-    await refreshTokenPreview();
-    await loadSubscriptions();
-
-    loginPassword.value = "";
-    showSubscriptionsView();
-    showStatus("Zalogowano pomyślnie.", "success");
-  } catch (error) {
-    showStatus(`Błąd logowania: ${error.message}`, "error");
-  }
 }
 
 function openManualSubscriptionForm() {
@@ -168,10 +126,7 @@ document.addEventListener("DOMContentLoaded", () => {
 });
 
 addSubscriptionBtn.addEventListener("click", openManualSubscriptionForm);
-registerTab.addEventListener("click", () => setActiveTab("register"));
-loginTab.addEventListener("click", () => setActiveTab("login"));
-registerBtn.addEventListener("click", registerUser);
-loginBtn.addEventListener("click", loginUser);
+googleLoginBtn.addEventListener("click", loginWithGoogle);
 refreshTokenBtn.addEventListener("click", refreshTokenPreview);
 logoutBtn.addEventListener("click", logoutUser);
 dashboardLogoutBtn.addEventListener("click", logoutUser);

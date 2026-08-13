@@ -14,42 +14,13 @@
       <div class="badge">Trackly Extension</div>
       <h1>Witaj w Trackly</h1>
       <p class="subtitle">
-        Załóż konto lub zaloguj się, aby mieć wszystkie swoje subskrypcje w jednym miejscu.
+        Zaloguj się kontem Google, aby mieć wszystkie swoje subskrypcje w jednym miejscu.
       </p>
     </div>
 
-    <div class="tabs">
-      <button class="tab-btn active" id="registerTab" type="button">Rejestracja</button>
-      <button class="tab-btn" id="loginTab" type="button">Logowanie</button>
-    </div>
-
-    <div class="panel active" id="registerPanel">
-      <div class="field">
-        <label class="label" for="registerEmail">Email</label>
-        <input class="input" id="registerEmail" type="email" placeholder="np. jan@trackly.pl" />
-      </div>
-
-      <div class="field">
-        <label class="label" for="registerPassword">Hasło</label>
-        <input class="input" id="registerPassword" type="password" placeholder="Minimum kilka znaków" />
-      </div>
-
-      <button class="btn btn-primary" id="registerBtn" type="button">Załóż konto</button>
-    </div>
-
-    <div class="panel" id="loginPanel">
-      <div class="field">
-        <label class="label" for="loginEmail">Email</label>
-        <input class="input" id="loginEmail" type="email" placeholder="np. jan@trackly.pl" />
-      </div>
-
-      <div class="field">
-        <label class="label" for="loginPassword">Hasło</label>
-        <input class="input" id="loginPassword" type="password" placeholder="Wpisz hasło" />
-      </div>
-
-      <button class="btn btn-secondary" id="loginBtn" type="button">Zaloguj się</button>
-    </div>
+    <button class="btn btn-primary" id="googleLoginBtn" type="button">
+      Zaloguj się przez Google
+    </button>
 
     <div class="status" id="statusBox"></div>
 

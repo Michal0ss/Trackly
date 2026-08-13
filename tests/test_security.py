@@ -1,12 +1,17 @@
 #pytest -v
-from app.utils.security import hash_password, verify_password
+from datetime import UTC, datetime
+from jose import jwt
+from app.utils.security import ALGORITHM, SECRET_KEY, create_access_token
+
+def test_access_token_contains_user_id():
+    token = create_access_token({"user_id": 42})
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+
+    assert payload["user_id"] == 42
 
 
-def test_password_hashing_and_verification():
-    plain_password = "haslo123"
+def test_access_token_expires_in_the_future():
+    token = create_access_token({"user_id": 1})
+    payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
 
-    hashed = hash_password(plain_password)
-
-    assert hashed != plain_password
-    assert verify_password(plain_password, hashed) is True
-    assert verify_password("haslo12", hashed) is False
+    assert payload["exp"] > datetime.now(UTC).timestamp()

@@ -8,6 +8,9 @@ os.environ["DATABASE_URL"] = "sqlite:///./test_trackly.db"
 from fastapi.testclient import TestClient
 from app.main import app
 from app.database.db import engine, Base
+from app.database.db import SessionLocal
+from app.models import models
+from app.utils.security import create_access_token
 
 @pytest.fixture(scope="session", autouse=True)
 def setup_database():
@@ -35,14 +38,19 @@ def client():
 
 @pytest.fixture
 def auth_headers(client):
-    email = "testowy_conftest@example.com"
-    password = "testowy123"
+    db = SessionLocal()
+    try:
+        email = "testowy_conftest@example.com"
+        user = db.query(models.Users).filter(models.Users.email == email).first()
 
-    #rejestracja
-    client.post("/users/register", json={"email": email, "password": password})
+        if not user:
+            user = models.Users(email=email, google_id="test-google-id")
+            db.add(user)
+            db.commit()
+            db.refresh(user)
 
-    #logowanie po token
-    login_response = client.post("/users/login", data={"username": email, "password": password})
-    token = login_response.json()["access_token"]
+        token = create_access_token({"user_id": user.id})
+    finally:
+        db.close()
 
     return {"Authorization": f"Bearer {token}"}

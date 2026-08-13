@@ -26,27 +26,13 @@ async function apiRequest(path, options = {}) {
   return data;
 }
 
-async function registerUserRequest(email, password) {
-  return apiRequest("/users/register", {
+async function googleLoginRequest(googleToken) {
+  return apiRequest("/users/google-login", {
     method: "POST",
     headers: {
       "Content-Type": "application/json"
     },
-    body: JSON.stringify({ email, password })
-  });
-}
-
-async function loginUserRequest(email, password) {
-  const formData = new URLSearchParams();
-  formData.append("username", email);
-  formData.append("password", password);
-
-  return apiRequest("/users/login", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/x-www-form-urlencoded"
-    },
-    body: formData.toString()
+    body: JSON.stringify({ access_token: googleToken })
   });
 }
 
