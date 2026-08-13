@@ -21,15 +21,24 @@ const SERVICE_HINTS = {
 
 const PLAN_KEYWORDS = [
   "basic",
+  "podstawowy",
+  "podstawowa",
   "standard",
+  "standardowy",
   "premium",
   "family",
+  "rodzinny",
+  "rodzina",
+  "duo",
   "individual",
+  "indywidualny",
   "student",
+  "studencki",
   "pro",
   "plus",
   "ultimate",
-  "business"
+  "business",
+  "biznes"
 ];
 
 const BILLING_CYCLE_HINTS = {
@@ -85,13 +94,37 @@ function detectPlan(text) {
 }
 
 function findPriceMatch(text) {
-  for (const match of text.matchAll(PRICE_PATTERN)) {
-    if (match.groups.curBefore || match.groups.curAfter) {
-      return match;
+  const candidates = [...text.matchAll(PRICE_PATTERN)].filter(
+    (match) => match.groups.curBefore || match.groups.curAfter
+  );
+
+  if (!candidates.length) {
+    return null;
+  }
+
+  const lowered = text.toLowerCase();
+  const cyclePositions = [];
+
+  for (const hints of Object.values(BILLING_CYCLE_HINTS)) {
+    for (const hint of hints) {
+      const pos = lowered.indexOf(hint);
+
+      if (pos !== -1) {
+        cyclePositions.push(pos);
+      }
     }
   }
 
-  return null;
+  if (!cyclePositions.length) {
+    return candidates[0];
+  }
+
+  const distanceToNearestCycle = (match) =>
+    Math.min(...cyclePositions.map((pos) => Math.abs(match.index - pos)));
+
+  return candidates.reduce((best, match) =>
+    distanceToNearestCycle(match) < distanceToNearestCycle(best) ? match : best
+  );
 }
 
 function detectPrice(text) {
