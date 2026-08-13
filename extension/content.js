@@ -88,14 +88,12 @@ function buildCandidate(journeyData, serviceKey, pageUrl) {
   };
 }
 
-//serwis juz zapisany - nie zaczepiamy uzytkownika drugi raz
 async function isServiceAlreadySaved(serviceKey) {
   const entry = await getKeyStatus(serviceKey);
 
   return Boolean(entry && typeof entry === "object" && entry.status === "submitted");
 }
 
-//kandydat trafia do pamieci, ikona wtyczki mruga, formularz czeka w popupie
 async function queueDetection(serviceKey, candidate) {
   await savePendingDetection(candidate, serviceKey);
   chrome.runtime.sendMessage({ type: "TRACKLY_DETECTION_PENDING" }).catch(() => {});
@@ -118,7 +116,6 @@ async function collectAndMaybeOfferToast() {
   const pageUrl = window.location.href;
   const serviceKey = getServiceKey(detected, pageUrl);
 
-  //zbieramy po cichu kazdy okruch, nawet gdy strona nie wyglada jeszcze na subskrypcyjna
   if (hasAnythingWorthSaving(detected)) {
     await rememberJourneyData(serviceKey, detected, pageUrl);
     debugLog("Zebrano dane:", serviceKey, detected);
@@ -170,7 +167,7 @@ async function handlePossiblePurchaseClick(event) {
   }
 
   const control = target.closest(
-    "button, a, [role='button'], input[type='submit'], input[type='button']"
+      "button, a, [role='button'], input[type='submit'], input[type='button']"
   );
 
   if (!control || !looksLikePurchaseControl(control)) {
@@ -191,7 +188,6 @@ async function handlePossiblePurchaseClick(event) {
     await rememberJourneyData(serviceKey, detected, pageUrl);
   }
 
-  //swiadome klikniecie zakupu jest silniejsze niz wczesniejsze wyciszenie toasta
   if (await isServiceAlreadySaved(serviceKey)) {
     debugLog("Zakup pominiety, serwis juz zapisany:", serviceKey);
     return;
@@ -201,14 +197,19 @@ async function handlePossiblePurchaseClick(event) {
 
   const candidate = buildCandidate(await getJourneyData(serviceKey), serviceKey, pageUrl);
 
+  const alreadyPending = await getPendingDetection();
+
   await queueDetection(serviceKey, candidate);
-  showPageToast(
-    `Zapisaliśmy ${candidate.service_name}. Otwórz Trackly z paska narzędzi, aby dokończyć.`,
-    { variant: "success" }
-  );
+  hideDetectionToast();
+
+  if (!alreadyPending || alreadyPending.key !== serviceKey) {
+    showPageToast(
+        `Zapisaliśmy ${candidate.service_name}. Otwórz Trackly z paska narzędzi, aby dokończyć.`,
+        {variant: "success"}
+    );
+  }
 }
 
-//serwisy dzialaja bez przeladowan, wiec pilnujemy zmian adresu
 function watchUrlChanges() {
   let lastUrl = window.location.href;
 
