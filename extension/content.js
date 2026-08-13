@@ -27,7 +27,14 @@ const PURCHASE_KEYWORDS = [
   "complete purchase",
   "confirm purchase",
   "start membership",
-  "proceed to payment"
+  "proceed to payment",
+  "wypróbuj za darmo",
+  "wypróbuj bezpłatnie",
+  "rozpocznij okres próbny",
+  "bezpłatny okres próbny",
+  "start free trial",
+  "start trial",
+  "try free",
 ];
 
 function debugLog(...args) {
