@@ -9,6 +9,8 @@ const BILLING_CYCLE_LABELS = {
   yearly: "Rocznie"
 };
 
+//neutralizowanie mylacych znakow, zamiana na bezpieczne odpowiedniki
+//przydatne do pozniejszego scrapowania z ML
 function escapeHtml(value) {
   return String(value ?? "")
     .replaceAll("&", "&amp;")
