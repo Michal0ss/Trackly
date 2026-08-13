@@ -30,7 +30,6 @@
         "shared/api-client.js",
         "shared/dedupe-state.js",
         "shared/detection-toast.js",
-        "detectors/netflix.js",
         "content.js"
       ]
     }
