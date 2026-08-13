@@ -82,13 +82,16 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
   document.getElementById("trackly-auto-renew").checked = candidate.auto_renew ?? true;
   document.getElementById("trackly-renewal-date").value = candidate.renewal_date || "";
 
-  document.getElementById("trackly-cancel-btn").addEventListener("click", () => {
+  const closeForm = () => {
     modal.remove();
-  });
 
-  document.getElementById("trackly-close-btn").addEventListener("click", () => {
-    modal.remove();
-  });
+    if (typeof options.onClose === "function") {
+      options.onClose();
+    }
+  };
+
+  document.getElementById("trackly-cancel-btn").addEventListener("click", closeForm);
+  document.getElementById("trackly-close-btn").addEventListener("click", closeForm);
 
   document.getElementById("trackly-save-btn").addEventListener("click", async () => {
     const payload = buildSubscriptionPayload(candidate);
