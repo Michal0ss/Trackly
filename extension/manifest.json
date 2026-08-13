@@ -26,7 +26,9 @@
         "shared/storage.js",
         "shared/api-client.js",
         "shared/prompt.js",
+        "shared/detector.js",
         "shared/dedupe-state.js",
+        "shared/journey-state.js",
         "shared/subscription-form.js",
         "content.js"
       ]
