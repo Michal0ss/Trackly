@@ -53,7 +53,12 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
 
       <div class="trackly-field">
         <label for="trackly-currency">Waluta</label>
-        <input id="trackly-currency" type="text" value="${candidate.currency || "PLN"}" maxlength="3" />
+        <select id="trackly-currency">
+          <option value="PLN">PLN</option>
+          <option value="EUR">EUR</option>
+          <option value="USD">USD</option>
+          <option value="GBP">GBP</option>
+        </select>
       </div>
     </div>
 
@@ -92,6 +97,7 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
   document.getElementById("trackly-plan-name").value = candidate.plan_name || "";
   document.getElementById("trackly-price").value = candidate.price ?? "";
   document.getElementById("trackly-billing-cycle").value = candidate.billing_cycle || "monthly";
+  document.getElementById("trackly-currency").value = candidate.currency || "PLN";
   document.getElementById("trackly-auto-renew").checked = candidate.auto_renew ?? true;
 
   const billingCycleSelect = document.getElementById("trackly-billing-cycle");
@@ -125,7 +131,10 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
     }
   });
 
-  document.getElementById("trackly-save-btn").addEventListener("click", async () => {
+  const saveBtn = document.getElementById("trackly-save-btn");
+  const savingLabel = "Zapisywanie…";
+
+  saveBtn.addEventListener("click", async () => {
     const payload = buildSubscriptionPayload(candidate);
     const error = validateSubscriptionPayload(payload);
 
@@ -134,7 +143,16 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
       return;
     }
 
-    await onSubmit(payload);
+    saveBtn.disabled = true;
+    saveBtn.textContent = savingLabel;
+
+    try {
+      await onSubmit(payload);
+    } finally {
+      saveBtn.disabled = false;
+      saveBtn.textContent = submitLabel;
+    }
+
     modal.remove();
   });
 }
@@ -327,6 +345,11 @@ style.textContent = `
   .trackly-btn:hover,
   .trackly-icon-btn:hover {
     filter: brightness(1.08);
+  }
+
+  .trackly-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 `;
 
