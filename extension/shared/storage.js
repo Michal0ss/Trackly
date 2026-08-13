@@ -35,3 +35,35 @@ function removeToken() {
     }
   });
 }
+
+function savePendingDetection(candidate, key) {
+  return new Promise((resolve) => {
+    if (hasChromeStorage()) {
+      chrome.storage.local.set({ pending_detection: { candidate, key } }, resolve);
+    } else {
+      resolve();
+    }
+  });
+}
+
+function getPendingDetection() {
+  return new Promise((resolve) => {
+    if (hasChromeStorage()) {
+      chrome.storage.local.get(["pending_detection"], (result) => {
+        resolve(result.pending_detection || null);
+      });
+    } else {
+      resolve(null);
+    }
+  });
+}
+
+function clearPendingDetection() {
+  return new Promise((resolve) => {
+    if (hasChromeStorage()) {
+      chrome.storage.local.remove(["pending_detection"], resolve);
+    } else {
+      resolve();
+    }
+  });
+}

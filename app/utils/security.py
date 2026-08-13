@@ -57,7 +57,7 @@ def create_access_token(data: dict):
 def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        detail="Nie udało się zweryfikować sesji",
         headers={"WWW-Authenticate": "Bearer"},
     )
 
@@ -69,7 +69,7 @@ def get_current_user(token: str = Depends(oauth2_scheme)):
     except ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token has expired",
+            detail="Sesja wygasła",
             headers={"WWW-Authenticate": "Bearer"},
         )
     except JWTError:

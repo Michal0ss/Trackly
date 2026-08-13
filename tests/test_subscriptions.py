@@ -40,7 +40,7 @@ def test_create_duplicate_subscription_fails(client, auth_headers):
     )
 
     assert response.status_code == 409
-    assert "already exists" in response.json()["detail"]
+    assert "aktywną subskrypcję" in response.json()["detail"]
 
 
 def test_get_subscriptions_list(client, auth_headers):
@@ -71,7 +71,7 @@ def test_get_subscription_not_found(client, auth_headers):
     response = client.get("/subscriptions/99999", headers=auth_headers)
 
     assert response.status_code == 404
-    assert response.json()["detail"] == "Subscription not found"
+    assert "Nie znaleziono subskrypcji" in response.json()["detail"]
 
 
 def test_unauthorized_access_fails(client):

@@ -1,3 +1,14 @@
+const STATUS_LABELS = {
+  confirmed: "Aktywna",
+  cancelled: "Anulowana",
+  expired: "Wygasła"
+};
+
+const BILLING_CYCLE_LABELS = {
+  monthly: "Miesięcznie",
+  yearly: "Rocznie"
+};
+
 //neutralizowanie mylacych znakow, zamiana na bezpieczne odpowiedniki
 //przydatne do pozniejszego scrapowania z ML
 function escapeHtml(value) {
@@ -132,7 +143,9 @@ async function handleSubscriptionListClick(event) {
     await loadSubscriptions();
   } catch (error) {
     console.error("Failed to delete subscription:", error);
-    alert(`Nie udało się usunąć subskrypcji: ${error.message}`);
+    if (typeof showStatus === "function") {
+      showStatus(`Nie udało się usunąć subskrypcji: ${error.message}`, "error");
+    }
   }
 }
 
@@ -158,7 +171,9 @@ function handleEditClick(editBtn) {
         await loadSubscriptions();
       } catch (error) {
         console.error("Failed to update subscription:", error);
-        alert(`Nie udało się zapisać zmian: ${error.message}`);
+        if (typeof showStatus === "function") {
+          showStatus(`Nie udało się zapisać zmian: ${error.message}`, "error");
+        }
       }
     },
     { title: "Edytuj subskrypcję", submitLabel: "Zapisz" }
@@ -221,14 +236,14 @@ function renderSubscriptionItem(sub) {
     <div class="subscription-item">
       <div class="subscription-item-header">
          <p class="subscription-service">${escapeHtml(sub.service_name)}</p>
-                <span class="subscription-status status-${sub.status}">${sub.status}</span>
+            <span class="subscription-status status-${sub.status}">${STATUS_LABELS[sub.status] || escapeHtml(sub.status)}</span>
       </div>
 
       <p class="subscription-plan">Plan: ${escapeHtml(sub.plan_name)}</p>
 
       <div class="subscription-meta">
         <span>Cena: ${sub.price} ${escapeHtml(sub.currency)}</span>
-        <span>Cykl: ${escapeHtml(sub.billing_cycle)}</span>
+        <span>Cykl: ${BILLING_CYCLE_LABELS[sub.billing_cycle] || escapeHtml(sub.billing_cycle)}</span>
         <span>Odnowienie: ${sub.renewal_date || "brak danych"}</span>
         <span>Auto-renew: ${sub.auto_renew ? "tak" : "nie"}</span>
       </div>
