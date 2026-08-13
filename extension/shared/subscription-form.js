@@ -117,19 +117,16 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
     }
   });
 
-  document.getElementById("trackly-cancel-btn").addEventListener("click", () => {
+  const closeForm = () => {
     modal.remove();
-    if (options.onCancel) {
-      options.onCancel();
-    }
-  });
 
-  document.getElementById("trackly-close-btn").addEventListener("click", () => {
-    modal.remove();
-    if (options.onCancel) {
+    if (typeof options.onCancel === "function") {
       options.onCancel();
     }
-  });
+  };
+
+  document.getElementById("trackly-cancel-btn").addEventListener("click", closeForm);
+  document.getElementById("trackly-close-btn").addEventListener("click", closeForm);
 
   const saveBtn = document.getElementById("trackly-save-btn");
   const savingLabel = "Zapisywanie…";
@@ -196,6 +193,11 @@ function validateSubscriptionPayload(payload) {
 
 const style = document.createElement("style");
 style.textContent = `
+    #trackly-subscription-form-modal,
+    #trackly-subscription-form-modal * {
+    box-sizing: border-box;
+    }
+  
     #trackly-subscription-form-modal {
     position: fixed;
     inset: 0;

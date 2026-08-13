@@ -27,7 +27,8 @@
                 ],
       "js": [
         "shared/storage.js",
-        "shared/api-client.js",
+        "shared/detector.js",
+        "shared/journey-state.js",
         "shared/dedupe-state.js",
         "shared/detection-toast.js",
         "content.js"
