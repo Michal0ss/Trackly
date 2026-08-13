@@ -6,6 +6,7 @@ const PENDING_PURCHASE_KEY = "pending_purchase";
 const PENDING_PURCHASE_TTL_MS = 10 * 60 * 1000;
 const URL_WATCH_INTERVAL_MS = 1000;
 const MAX_CONTROL_TEXT_LENGTH = 60;
+const PURCHASE_FORM_DELAY_MS = 2000;
 
 const PURCHASE_KEYWORDS = [
   "kup",
@@ -107,15 +108,15 @@ function buildCandidate(journeyData, serviceKey, pageUrl) {
 }
 
 async function showPurchaseForm(serviceKey) {
-  if (!(await shouldPromptForKey(serviceKey))) {
-    debugLog("Formularz pominięty — serwis zapisany lub wyciszony:", serviceKey);
+    if (!(await shouldPromptForKey(serviceKey))) {
+    debugLog("Formularz pominięty:", serviceKey, await getKeyStatus(serviceKey));
     return;
   }
 
   const token = await getToken();
 
   if (!token) {
-    debugLog("Formularz pominięty — użytkownik niezalogowany");
+    debugLog("Formularz pominięty - użytkownik niezalogowany");
     return;
   }
 
@@ -124,13 +125,14 @@ async function showPurchaseForm(serviceKey) {
 
   debugLog("Pokazuję formularz zakupu:", candidate);
 
-  showSubscriptionForm(
+    showSubscriptionForm(
     candidate,
     async (payload) => {
       try {
         await createSubscriptionRequest(token, payload);
         await markKeyAsSubmitted(serviceKey);
         await clearJourneyData(serviceKey);
+        await clearPendingPurchase();
         showSuccess(`Subskrypcja ${payload.service_name} została dodana.`);
       } catch (error) {
         console.error("Failed to create subscription:", error);
@@ -140,11 +142,12 @@ async function showPurchaseForm(serviceKey) {
     {
       title: "Zapisz subskrypcję",
       submitLabel: "Zapisz",
-      onClose: () => markKeyAsDismissed(serviceKey)
+      onClose: async () => {
+        await markKeyAsDismissed(serviceKey);
+        await clearPendingPurchase();
+      }
     }
   );
-
-  await clearPendingPurchase();
 }
 
 function looksLikePurchaseControl(control) {
@@ -181,8 +184,41 @@ async function handlePossiblePurchaseClick(event) {
 
   debugLog("Wykryto kliknięcie zakupu:", serviceKey);
 
-  await setPendingPurchase(serviceKey);
-  await showPurchaseForm(serviceKey);
+    await setPendingPurchase(serviceKey);
+
+  setTimeout(() => {
+    showPurchaseForm(serviceKey);
+  }, PURCHASE_FORM_DELAY_MS);
+}
+
+const PAYMENT_PAGE_KEYWORDS = [
+  "numer karty",
+  "dane karty",
+  "metoda płatności",
+  "sposób płatności",
+  "data ważności",
+  "card number",
+  "payment method",
+  "billing address",
+  "expiry date",
+  "cvv"
+];
+
+const PURCHASE_SUCCESS_KEYWORDS = [
+  "dziękujemy",
+  "dziekujemy",
+  "potwierdzenie zamówienia",
+  "subskrypcja aktywna",
+  "thank you",
+  "welcome to",
+  "payment successful",
+  "order confirmed"
+];
+
+function pageMentions(keywords) {
+  const text = (document.body ? document.body.innerText : "").toLowerCase();
+
+  return keywords.some((keyword) => text.includes(keyword));
 }
 
 async function resumePendingPurchase(serviceKey) {
@@ -198,6 +234,11 @@ async function resumePendingPurchase(serviceKey) {
   }
 
   if (pending.service_key !== serviceKey) {
+    return;
+  }
+
+    if (!pageMentions(PURCHASE_SUCCESS_KEYWORDS) && pageMentions(PAYMENT_PAGE_KEYWORDS)) {
+    debugLog("Strona płatności - czekam z formularzem do następnej strony");
     return;
   }
 
