@@ -34,7 +34,7 @@ class Users(Base):
 
     id = Column(Integer, primary_key=True)
     email = Column(String, unique=True, nullable=True)
-    password = Column(String, nullable=True)
+    google_id = Column(String, unique=True, nullable=True)
     created_at = Column(DateTime, default=datetime.now(UTC))
 
     subscriptions = relationship("Subscription", back_populates="user")

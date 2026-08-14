@@ -194,3 +194,11 @@ tracklyToastStyle.textContent = `
 `;
 
 document.head.appendChild(tracklyToastStyle);
+
+function hideDetectionToast() {
+  const toast = document.getElementById(TRACKLY_TOAST_ID);
+
+  if (toast) {
+    toast.remove();
+  }
+}

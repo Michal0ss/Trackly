@@ -245,7 +245,7 @@ function renderSubscriptionItem(sub) {
         <span>Cena: ${sub.price} ${escapeHtml(sub.currency)}</span>
         <span>Cykl: ${BILLING_CYCLE_LABELS[sub.billing_cycle] || escapeHtml(sub.billing_cycle)}</span>
         <span>Odnowienie: ${sub.renewal_date || "brak danych"}</span>
-        <span>Auto-renew: ${sub.auto_renew ? "tak" : "nie"}</span>
+        <span>Automatyczne odnawianie: ${sub.auto_renew ? "tak" : "nie"}</span>
       </div>
 
       <div class="subscription-actions-row">

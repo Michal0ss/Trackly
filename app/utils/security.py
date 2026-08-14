@@ -1,9 +1,8 @@
 from datetime import UTC, datetime, timedelta
 
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from jose import JWTError, jwt, ExpiredSignatureError
-from passlib.context import CryptContext
 from starlette.middleware.cors import CORSMiddleware
 
 from app.database.db import SessionLocal
@@ -19,23 +18,7 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(os.getenv("ACCESS_TOKEN_EXPIRE_MINUTES", "60")
 if not SECRET_KEY:
     raise ValueError("SECRET_KEY is not set")
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/users/login")
-
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-fallback_pwd_context = CryptContext(schemes=["pbkdf2_sha256"], deprecated="auto")
-
-def hash_password(password: str):
-    try:
-        return pwd_context.hash(password)
-    except Exception:
-        return fallback_pwd_context.hash(password)
-
-def verify_password(plain_password : str, hashed_password: str) -> bool:
-    try:
-        return pwd_context.verify(plain_password, hashed_password)
-    except Exception:
-        return fallback_pwd_context.verify(plain_password, hashed_password)
+oauth2_scheme = HTTPBearer()
 
 def cors_config(app):
     origins = ["*"]
@@ -53,8 +36,9 @@ def create_access_token(data: dict):
     to_encode.update({"exp": expire})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
+def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(oauth2_scheme)):
+    token = credentials.credentials
 
-def get_current_user(token: str = Depends(oauth2_scheme)):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Nie udało się zweryfikować sesji",

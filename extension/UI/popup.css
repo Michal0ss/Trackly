@@ -29,7 +29,6 @@ body {
     linear-gradient(135deg, var(--bg-1), var(--bg-2));
   color: var(--text);
   min-width: 380px;
-  min-height: 560px;
   padding: 18px;
 }
 
@@ -225,9 +224,9 @@ h1 {
 }
 
 .status.info {
-  background: rgba(6, 182, 212, 0.15);
-  border: 1px solid rgba(6, 182, 212, 0.35);
-  color: #cffafe;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  color: #cbd5e1;
 }
 
 .info-box {
@@ -484,9 +483,9 @@ h1 {
 }
 
 .sub-edit-btn {
-  background: rgba(6, 182, 212, 0.16);
-  color: #67e8f9;
-  border-color: rgba(6, 182, 212, 0.32);
+  background: rgba(255, 255, 255, 0.06);
+  color: #cbd5e1;
+  border-color: rgba(255, 255, 255, 0.14);
 }
 
 #dashboardLogoutBtn {
