@@ -37,7 +37,7 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
 
     <div class="trackly-field">
       <label for="trackly-service-name">Serwis</label>
-      <input id="trackly-service-name" type="text" value="${candidate.service_name}" />
+      <input id="trackly-service-name" type="text" value="" />
     </div>
 
     <div class="trackly-field">
@@ -94,6 +94,7 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
   modal.querySelector("h2").textContent = title;
   document.getElementById("trackly-save-btn").textContent = submitLabel;
 
+  document.getElementById("trackly-service-name").value = candidate.service_name || "";
   document.getElementById("trackly-plan-name").value = candidate.plan_name || "";
   document.getElementById("trackly-price").value = candidate.price ?? "";
   document.getElementById("trackly-billing-cycle").value = candidate.billing_cycle || "monthly";
