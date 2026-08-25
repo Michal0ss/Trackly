@@ -1,4 +1,19 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="0 0 128 128">
+  <desc>
+    Zrodlo ikony Trackly. Pliki PNG generujemy z tego pliku.
+
+    UWAGA: nie uzywaj qlmanage - podklada biale tlo i zaokraglone rogi wychodza biale
+    zamiast przezroczystych. Chrome renderuje z kanalem alfa:
+
+    CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
+    "$CHROME" --headless --disable-gpu --hide-scrollbars \
+      --default-background-color=00000000 \
+      --screenshot=base.png --window-size=512,512 "file://$PWD/icon.svg"
+    for s in 16 32 48 128; do cp base.png "icon${s}.png"; sips -Z $s "icon${s}.png"; done
+    rm base.png
+
+    Krój: Avenir Next Demi Bold (systemowy na macOS).
+  </desc>
   <rect width="128" height="128" rx="30" fill="#22c55e"/>
   <text x="64" y="97" font-family="Avenir Next" font-weight="600" font-size="92"
         fill="#0f172a" text-anchor="middle">t</text>
