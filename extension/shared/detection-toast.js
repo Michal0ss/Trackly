@@ -31,7 +31,7 @@ function showDetectionToast(candidate, { onAccept, onDismiss } = {}) {
 
   function renderPrompt() {
     card.innerHTML = `
-      <p class="trackly-toast-badge">Trackly Detector</p>
+      <img class="trackly-toast-logo" src="${chrome.runtime.getURL("logo/wordmark.png")}" alt="Trackly" />
       <p class="trackly-toast-title"></p>
       <p class="trackly-toast-subtitle"></p>
       <div class="trackly-toast-actions">
@@ -73,7 +73,7 @@ function showDetectionToast(candidate, { onAccept, onDismiss } = {}) {
 
   function renderConfirmation() {
     card.innerHTML = `
-      <p class="trackly-toast-badge">Trackly Detector</p>
+      <img class="trackly-toast-logo" src="${chrome.runtime.getURL("logo/wordmark.png")}" alt="Trackly" />
       <p class="trackly-toast-title">Zapisano ✓</p>
       <p class="trackly-toast-subtitle">Otwórz Trackly z paska narzędzi, aby dokończyć dodawanie.</p>
     `;
@@ -97,7 +97,7 @@ function showPageToast(message, { variant = "error" } = {}) {
   toast.id = TRACKLY_MESSAGE_TOAST_ID;
   toast.innerHTML = `
     <div class="trackly-toast-card trackly-toast-${variant}">
-      <p class="trackly-toast-badge">Trackly</p>
+      <img class="trackly-toast-logo" src="${chrome.runtime.getURL("logo/wordmark.png")}" alt="Trackly" />
       <p class="trackly-toast-title"></p>
     </div>
   `;
@@ -136,13 +136,11 @@ tracklyToastStyle.textContent = `
     box-shadow: 0 18px 50px rgba(0, 0, 0, 0.45);
   }
 
-  .trackly-toast-badge {
-    margin: 0 0 6px;
-    color: #86efac;
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+  .trackly-toast-logo {
+    display: block;
+    width: 58px;
+    height: auto;
+    margin: 0 0 8px;
   }
 
   .trackly-toast-title {
@@ -188,8 +186,8 @@ tracklyToastStyle.textContent = `
     filter: brightness(1.08);
   }
 
-  .trackly-toast-error .trackly-toast-badge {
-    color: #fca5a5;
+  #trackly-message-toast .trackly-toast-error {
+    border-left: 3px solid #ef4444;
   }
 `;
 

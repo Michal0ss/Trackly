@@ -28,7 +28,7 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
   <div class="trackly-card">
     <div class="trackly-top">
       <div>
-        <p class="trackly-badge">Trackly Detector</p>
+        <img class="trackly-logo" src="${chrome.runtime.getURL("logo/wordmark.png")}" alt="Trackly" />
         <h2>Dodaj subskrypcję</h2>
         <p class="trackly-subtitle">Uzupełnij dane wykrytej subskrypcji przed zapisaniem.</p>
       </div>
@@ -229,13 +229,11 @@ style.textContent = `
     margin-bottom: 18px;
   }
 
-  .trackly-badge {
-    margin: 0 0 8px;
-    color: #86efac;
-    font-size: 11px;
-    font-weight: 700;
-    letter-spacing: 0.08em;
-    text-transform: uppercase;
+  #trackly-subscription-form-modal .trackly-logo {
+    display: block;
+    width: 92px;
+    height: auto;
+    margin: 0 0 10px;
   }
 
   .trackly-top h2 {

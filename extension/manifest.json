@@ -27,6 +27,24 @@
       "128": "icons/icon128.png"
     }
   },
+  "web_accessible_resources": [
+    {
+      "resources": ["logo/wordmark.png"],
+      "matches": [
+        "*://*.netflix.com/*",
+        "*://*.spotify.com/*",
+        "*://*.youtube.com/*",
+        "*://*.disneyplus.com/*",
+        "*://*.hbomax.com/*",
+        "*://*.max.com/*",
+        "*://*.apple.com/*",
+        "*://*.icloud.com/*",
+        "*://*.adobe.com/*",
+        "*://*.microsoft.com/*",
+        "*://*.github.com/*"
+      ]
+    }
+  ],
   "content_scripts": [
     {
       "matches": [
