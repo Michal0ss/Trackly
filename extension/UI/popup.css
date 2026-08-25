@@ -56,6 +56,18 @@ body {
   margin-bottom: 18px;
 }
 
+.wordmark {
+  display: block;
+  width: 150px;
+  height: auto;
+  margin-bottom: 16px;
+}
+
+.wordmark-small {
+  width: 92px;
+  margin-bottom: 10px;
+}
+
 .badge {
   display: inline-block;
   font-size: 12px;
