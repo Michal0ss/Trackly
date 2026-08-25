@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="588" height="210" viewBox="14 20 196 70">
+  <desc>Napis Trackly, wariant z kropka na koncu. Kolory pod JASNE tlo.
+  Zielen ciemniejsza niz w wersji na ciemne tlo, bo #22c55e ma na bieli za maly kontrast.</desc>
+  <text x="20" y="70" font-family="Avenir Next" font-weight="600" font-size="58" letter-spacing="-1">
+    <tspan fill="#0f172a">track</tspan><tspan fill="#15803d">ly</tspan><tspan fill="#15803d" font-weight="700">.</tspan>
+  </text>
+</svg>

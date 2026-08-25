@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="789" height="237" viewBox="7 11 263 79">
+  <desc>Napis Trackly, wariant w pigulce. Kolory pod JASNE tlo.</desc>
+  <rect x="14" y="18" width="250" height="66" rx="33"
+        fill="#15803d" fill-opacity="0.08" stroke="#15803d" stroke-opacity="0.35" stroke-width="2"/>
+  <text x="139" y="62" font-family="Avenir Next" font-weight="600" font-size="46" letter-spacing="-1" text-anchor="middle">
+    <tspan fill="#0f172a">track</tspan><tspan fill="#15803d">ly</tspan>
+  </text>
+</svg>
