@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="681" height="210" viewBox="12 20 227 70">
+  <desc>Napis Trackly, wariant z kropka czuwania. Kolory pod ciemne tlo.</desc>
+  <circle cx="34" cy="52" r="16" fill="#22c55e" opacity="0.18"/>
+  <circle cx="34" cy="52" r="8" fill="#22c55e"/>
+  <text x="62" y="70" font-family="Avenir Next" font-weight="600" font-size="58" letter-spacing="-1">
+    <tspan fill="#e2e8f0">track</tspan><tspan fill="#22c55e">ly</tspan>
+  </text>
+</svg>
