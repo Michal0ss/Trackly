@@ -9,6 +9,16 @@ const refreshSubscriptionsBtn = document.getElementById("refreshSubscriptionsBtn
 const addSubscriptionBtn = document.getElementById("addSubscriptionBtn");
 const googleLoginBtn = document.getElementById("googleLoginBtn");
 
+const GREETINGS = ["Witaj", "Cześć", "Miło Cię widzieć", "Dobrze Cię widzieć"];
+
+function showRandomGreeting() {
+  const greeting = document.getElementById("greeting");
+
+  if (greeting) {
+    greeting.textContent = GREETINGS[Math.floor(Math.random() * GREETINGS.length)];
+  }
+}
+
 function getGoogleToken() {
   return new Promise((resolve, reject) => {
     chrome.identity.getAuthToken({ interactive: true }, (token) => {
@@ -167,6 +177,7 @@ async function checkSession() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  showRandomGreeting();
   checkSession();
 });
 
