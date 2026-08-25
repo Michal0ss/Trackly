@@ -21,13 +21,14 @@ if not SECRET_KEY:
 oauth2_scheme = HTTPBearer()
 
 def cors_config(app):
-    origins = ["*"]
+    origins = [o.strip() for o in os.getenv("ALLOWED_ORIGINS", "").split(",") if o.strip()]
+
     app.add_middleware(
         CORSMiddleware,
         allow_origins=origins,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
+        allow_credentials=False,
+        allow_methods=["GET", "POST", "PUT", "DELETE"],
+        allow_headers=["Authorization", "Content-Type"],
     )
 
 def create_access_token(data: dict):

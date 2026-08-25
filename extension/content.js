@@ -1,6 +1,6 @@
 /* global chrome */
 
-const DEBUG = true;
+const DEBUG = false;
 const URL_WATCH_INTERVAL_MS = 1000;
 const MAX_CONTROL_TEXT_LENGTH = 60;
 
