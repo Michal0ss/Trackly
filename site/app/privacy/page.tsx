@@ -24,7 +24,7 @@ export default function Privacy() {
         </div>
       </header>
 
-      <main className="shell doc">
+      <main className="shell doc" id="tresc">
         <a className="doc-back" href="/">
           ← Wróć na stronę główną
         </a>
@@ -33,7 +33,7 @@ export default function Privacy() {
         <p className="doc-updated">Ostatnia aktualizacja: 26 sierpnia 2026</p>
 
         <p>
-          Trackly to rozszerzenie do przeglądarki Chrome, które pomaga śledzić subskrypcje.
+          Trackly to rozszerzenie do przeglądarki, które pomaga śledzić subskrypcje.
           Ten dokument opisuje, jakie dane zbieramy, po co i co się z nimi dzieje. Staraliśmy
           się napisać go językiem, który da się przeczytać bez prawnika.
         </p>

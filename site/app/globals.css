@@ -210,8 +210,27 @@ a {
   background: rgba(255, 255, 255, 0.09);
 }
 
-.btn[aria-disabled="true"] {
-  cursor: default;
+/* Informacja o stanie, nie przycisk. Zielony przycisk, ktory nic nie robi,
+   obiecuje klikniecie, ktorego jeszcze nie ma. */
+.soon {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  font-size: 14.5px;
+  font-weight: 600;
+  color: var(--muted);
+  background: rgba(148, 163, 184, 0.07);
+  border: 1px dashed var(--line-strong);
+  border-radius: 999px;
+  padding: 11px 18px;
+}
+
+.soon-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--cyan);
+  flex: none;
 }
 
 /* ---------- sekcje ---------- */
@@ -221,27 +240,70 @@ a {
   border-top: 1px solid var(--line);
 }
 
+/* Naglowek i wprowadzenie obok siebie. W jednej kolumnie zostawialy pusta
+   prawa polowe ekranu, co przy szerokim monitorze wygladalo na niedokonczone. */
 .band-head {
-  max-width: 58ch;
   margin-bottom: 56px;
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  display: grid;
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  gap: 16px 60px;
+  align-items: end;
 }
 
 .band-head h2 {
   font-size: clamp(29px, 3.8vw, 42px);
+  max-width: 18ch;
 }
 
 .band-head p {
   color: var(--muted);
   font-size: 18px;
+  max-width: 46ch;
+  padding-bottom: 5px;
+}
+
+@media (max-width: 900px) {
+  .band-head {
+    grid-template-columns: 1fr;
+    gap: 14px;
+  }
+
+  .band-head h2,
+  .band-head p {
+    max-width: 58ch;
+  }
+
+  .band-head p {
+    padding-bottom: 0;
+  }
 }
 
 :focus-visible {
   outline: 2px solid var(--green);
   outline-offset: 3px;
   border-radius: 4px;
+}
+
+/* Skrot dla osob poruszajacych sie klawiatura - pozwala pominac nawigacje
+   i wskoczyc od razu w tresc. Widoczny dopiero po otrzymaniu focusu. */
+.skip {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+}
+
+.skip:focus {
+  left: 14px;
+  top: 14px;
+  background: var(--green);
+  color: #052e16;
+  padding: 11px 18px;
+  border-radius: 10px;
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  text-decoration: none;
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -309,13 +371,14 @@ a {
 }
 
 .demo-ext img {
-  width: 20px;
-  height: 20px;
-  border-radius: 5px;
+  width: 22px;
+  height: 22px;
 }
 
+/* Podswietlenie neutralne, nie zielone. Ikona jest teraz zielona litera bez
+   tla, wiec zielona poswiata pod nia tylko ja rozmywala. */
 .demo-ext.is-alert {
-  background: rgba(34, 197, 94, 0.16);
+  background: rgba(148, 163, 184, 0.16);
   animation: extPulse 0.9s ease-in-out 2;
 }
 
@@ -324,16 +387,18 @@ a {
   50% { transform: scale(1.14); }
 }
 
+/* Ciemne tlo, bo w pasku badge lezy na zielonej literze - patrz BADGE_COLOR
+   w extension/background.js. Makieta ma pokazywac to, co widac naprawde. */
 .demo-badge {
   position: absolute;
-  right: -3px;
-  bottom: -3px;
-  min-width: 15px;
-  height: 15px;
+  right: -1px;
+  bottom: -1px;
+  min-width: 14px;
+  height: 14px;
   padding: 0 4px;
-  border-radius: 8px;
-  background: var(--green);
-  color: #052e16;
+  border-radius: 7px;
+  background: #0f172a;
+  color: #fff;
   font-size: 10px;
   font-weight: 800;
   display: grid;
@@ -610,23 +675,24 @@ a {
   margin-top: 12px;
 }
 
+/* Bez flexa. Jako element flex kropka byla osobnym dzieckiem i przy waskim
+   ekranie tekst zawijal sie pod nia, zostawiajac ja sama w linii. Inline-block
+   plynie razem z pierwszym wierszem. */
 .hero-note {
-  display: flex;
-  align-items: center;
-  gap: 10px;
   font-size: 14.5px;
   color: var(--dim);
-  flex-wrap: wrap;
 }
 
 .dot-live {
+  display: inline-block;
+  vertical-align: middle;
+  margin-right: 9px;
   width: 8px;
   height: 8px;
   border-radius: 50%;
   background: var(--green);
   box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.5);
   animation: livePulse 2.4s ease-out infinite;
-  flex: none;
 }
 
 @keyframes livePulse {

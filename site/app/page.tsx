@@ -57,7 +57,7 @@ export default function Home() {
         </div>
       </header>
 
-      <main>
+      <main id="tresc">
         <section className="hero">
           <div className="shell hero-grid">
             <div className="hero-copy">
@@ -67,12 +67,13 @@ export default function Home() {
                 oraz daty odnowień - zanim zaskoczy Cię przelew.
               </p>
               <div className="hero-actions" id="instalacja">
-                <a className="btn btn-primary" href="#" aria-disabled="true">
-                  Wkrótce w Chrome Web Store
-                </a>
-                <a className="btn btn-ghost" href="#jak-to-dziala">
+                <a className="btn btn-primary" href="#jak-to-dziala">
                   Zobacz, jak działa
                 </a>
+                <span className="soon">
+                  <span className="soon-dot" aria-hidden="true" />
+                  Wkrótce w Chrome Web Store
+                </span>
               </div>
               <p className="hero-note">
                 <span className="dot-live" aria-hidden="true" />
@@ -90,7 +91,7 @@ export default function Home() {
           <div className="shell">
             <Reveal>
               <div className="band-head">
-                  <h2>Trzy kroki, z czego dwa robi wtyczka</h2>
+                <h2>Trzy kroki, z czego dwa robi wtyczka</h2>
                 <p>
                   Nie musisz niczego wpisywać z pamięci ani pilnować terminów. Trackly włącza się
                   dokładnie wtedy, kiedy powstaje nowa subskrypcja.
@@ -116,7 +117,7 @@ export default function Home() {
           <div className="shell">
             <Reveal>
               <div className="band-head">
-                  <h2>Liczby, które faktycznie coś znaczą</h2>
+                <h2>Liczby, które faktycznie coś znaczą</h2>
                 <p>
                   Subskrypcje miesięczne i roczne pokazujemy osobno, zamiast dzielić roczne przez
                   dwanaście. Widzisz to, co realnie schodzi z konta.
@@ -164,7 +165,7 @@ export default function Home() {
           <div className="shell privacy-grid">
             <Reveal>
               <div>
-                  <h2>Treść stron nie opuszcza Twojej przeglądarki</h2>
+                <h2>Treść stron nie opuszcza Twojej przeglądarki</h2>
                 <p className="privacy-text">
                   Rozpoznawanie subskrypcji dzieje się w całości na Twoim komputerze. Trackly nie
                   wysyła nigdzie tego, co przeglądasz - ani adresów stron, ani ich zawartości.
