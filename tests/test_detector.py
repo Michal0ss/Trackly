@@ -41,6 +41,17 @@ def test_currency_fallback_pln():
     assert detect_currency("płatność w zł") == "PLN"
 
 
+def test_price_with_zl_without_diacritic():
+    assert detect_price("26,99 zl miesiecznie") == 26.99
+    assert detect_currency("26,99 zl miesiecznie") == "PLN"
+    assert detect_price("zl 43,00") == 43.0
+
+
+def test_zl_inside_a_word_is_not_a_currency():
+    assert detect_currency("zlecenie na kwote 12,99 bez waluty") is None
+    assert detect_currency("faktura 99,99 zlecenia dodatkowe") is None
+
+
 #plan
 
 def test_plan_not_matched_inside_words():
@@ -49,7 +60,17 @@ def test_plan_not_matched_inside_words():
 
 def test_plan_matched_as_word():
     assert detect_plan("GitHub Pro 4.00 USD") == "Pro"
-    assert detect_plan("Plan Premium — 43,00 zł") == "Premium"
+    assert detect_plan("Plan Premium - 43,00 zł") == "Premium"
+
+
+def test_plan_not_matched_before_polish_ending():
+    assert detect_plan("plan ma same plusów i zalet") is None
+    assert detect_plan("nasze plusy to niska cena") is None
+
+
+def test_bare_family_noun_is_not_a_plan():
+    assert detect_plan("cała rodzina moze korzystac z konta") is None
+    assert detect_plan("Spotify Premium Rodzinny") == "Premium"
 
 
 #cykl rozliczen

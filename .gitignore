@@ -2,6 +2,11 @@
 __pycache__/
 *.pyc
 .idea/
+.claude/
+.pytest_cache/
 *.db
+.env*
 *.env
+!.env.example
 *todo.txt
+*.pem

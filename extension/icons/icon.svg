@@ -1,14 +1,6 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="179.9 209.9 236.3 236.3">
   <desc>
-    Zrodlo ikony Trackly, wariant na CIEMNY pasek narzedzi. Pliki PNG generujemy z tego pliku.
-
-    To ta sama litera i ten sam kroj co "t" w logo/wordmark.svg, tylko w zieleni i bez tla.
-    viewBox nie jest okragly, bo zostal wyliczony z pomiaru: litera zajmuje 97 na 189
-    jednostek ze srodkiem w punkcie (298, 328), a kadr dobrano tak, zeby wypelniala
-    dokladnie 80% wysokosci. Nizej byloby za drobno, wyzej litera wchodzi pod badge,
-    ktory Chrome rysuje w prawym dolnym rogu.
-
-    UWAGA: nie uzywaj qlmanage - podklada biale tlo. Chrome renderuje z kanalem alfa:
+    Nie uzywaj qlmanage - podklada biale tlo. Chrome renderuje z kanalem alfa:
 
     CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome"
     "$CHROME" --headless --disable-gpu --hide-scrollbars \
@@ -17,7 +9,7 @@
     for s in 16 32 48 128; do cp base.png "icon${s}.png"; sips -Z $s "icon${s}.png"; done
     rm base.png
 
-    Kroj: Avenir Next Demi Bold (systemowy na macOS) - na innym systemie litera wyjdzie inna.
+    Kroj: Avenir Next Demi Bold, systemowy na macOS.
   </desc>
   <text x="300" y="420" font-family="Avenir Next" font-weight="600" font-size="300"
         letter-spacing="-1" fill="#22c55e" text-anchor="middle">t</text>

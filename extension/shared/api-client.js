@@ -93,15 +93,3 @@ async function getExpiringSubscriptionsRequest(token, days = 3) {
     }
   });
 }
-
-
-async function detectSubscriptionRequest(token, payload) {
-  return apiRequest("/subscriptions/detect", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`
-    },
-    body: JSON.stringify(payload)
-  });
-}

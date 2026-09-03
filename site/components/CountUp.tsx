@@ -10,10 +10,6 @@ export default function CountUp({
   decimals?: number;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
-  // Startujemy od wartosci docelowej, nie od zera. Strona jest generowana
-  // statycznie, wiec to ona ladzie w wysylanym HTML - bez tego kazdy, kto ma
-  // wylaczony JavaScript, i kazdy robot indeksujacy widzi "0,00 zl".
-  // Zerujemy dopiero w efekcie, czyli gdy juz wiemy, ze animacja ruszy.
   const [value, setValue] = useState(to);
 
   useEffect(() => {

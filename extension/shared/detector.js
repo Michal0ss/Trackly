@@ -1,5 +1,6 @@
 const CURRENCY_MAP = {
   "ZŁ": "PLN",
+  "ZL": "PLN",
   "€": "EUR",
   "$": "USD",
   "£": "GBP"
@@ -28,7 +29,6 @@ const PLAN_KEYWORDS = [
   "premium",
   "family",
   "rodzinny",
-  "rodzina",
   "duo",
   "individual",
   "indywidualny",
@@ -47,7 +47,7 @@ const BILLING_CYCLE_HINTS = {
 };
 
 const PRICE_PATTERN =
-  /(?:(?<curBefore>zł|PLN|USD|EUR|GBP|€|\$|£)\s*)?(?<amount>\d{1,4}[,.]\d{2})(?:\s*(?<curAfter>zł|PLN|USD|EUR|GBP|€|\$|£))?/gi;
+  /(?:(?<![\p{L}\p{N}])(?<curBefore>zł|zl|PLN|USD|EUR|GBP|€|\$|£)\s*)?(?<amount>\d{1,4}[,.]\d{2})(?:\s*(?<curAfter>zł|zl|PLN|USD|EUR|GBP|€|\$|£)(?![\p{L}\p{N}]))?/giu;
 
 function normalizeText(text) {
   return text.toLowerCase().trim().split(/\s+/).join(" ");
@@ -85,7 +85,7 @@ function detectPlan(text) {
   const normalized = normalizeText(text);
 
   for (const plan of PLAN_KEYWORDS) {
-    if (new RegExp(`\\b${plan}\\b`).test(normalized)) {
+    if (new RegExp(`(?<![\\p{L}\\p{N}])${plan}(?![\\p{L}\\p{N}])`, "u").test(normalized)) {
       return plan.charAt(0).toUpperCase() + plan.slice(1);
     }
   }
@@ -147,7 +147,7 @@ function detectCurrency(text) {
 
   const normalized = normalizeText(text);
 
-  if (normalized.includes("zł") || normalized.includes("pln")) {
+  if (/(?<![\p{L}\p{N}])(zł|zl|pln)(?![\p{L}\p{N}])/u.test(normalized)) {
     return "PLN";
   }
 

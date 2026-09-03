@@ -111,6 +111,12 @@ function openManualSubscriptionForm() {
   );
 }
 
+async function syncPendingBadge() {
+  const pending = await countPendingDetections();
+
+  chrome.action.setBadgeText({ text: pending ? String(pending) : "" });
+}
+
 async function maybeShowPendingDetection() {
   const pending = await getPendingDetection();
 
@@ -137,7 +143,8 @@ async function maybeShowPendingDetection() {
           await markKeyAsSubmitted(pending.key);
         }
 
-        await clearPendingDetection();
+        await clearPendingDetection(pending.key);
+        await syncPendingBadge();
         await loadSubscriptions();
         showStatus(`Subskrypcja ${payload.service_name} została dodana.`, "success");
       } catch (error) {
@@ -149,7 +156,7 @@ async function maybeShowPendingDetection() {
       title: "Wykryto subskrypcję",
       submitLabel: "Dodaj",
       onCancel: () => {
-        clearPendingDetection();
+        clearPendingDetection(pending.key).then(syncPendingBadge);
       }
     }
   );

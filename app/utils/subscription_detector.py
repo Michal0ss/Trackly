@@ -25,7 +25,6 @@ PLAN_KEYWORDS = [
     "premium",
     "family",
     "rodzinny",
-    "rodzina",
     "duo",
     "individual",
     "indywidualny",
@@ -45,13 +44,14 @@ BILLING_CYCLE_HINTS = {
 
 CURRENCY_MAP = {
     "ZŁ": "PLN",
+    "ZL": "PLN",
     "€": "EUR",
     "$": "USD",
     "£": "GBP",
 }
 
 PRICE_PATTERN = re.compile(
-    r"(?:(?P<cur_before>zł|PLN|USD|EUR|GBP|€|\$|£)\s*)?(?P<amount>\d{1,4}[,.]\d{2})(?:\s*(?P<cur_after>zł|PLN|USD|EUR|GBP|€|\$|£))?",
+    r"(?:(?<!\w)(?P<cur_before>zł|zl|PLN|USD|EUR|GBP|€|\$|£)\s*)?(?P<amount>\d{1,4}[,.]\d{2})(?:\s*(?P<cur_after>zł|zl|PLN|USD|EUR|GBP|€|\$|£)(?!\w))?",
     re.IGNORECASE,
 )
 
@@ -133,7 +133,7 @@ def detect_currency(text: str) -> str | None:
 
     normalized = normalize_text(text)
 
-    if "zł" in normalized or "pln" in normalized:
+    if re.search(r"(?<!\w)(zł|zl|pln)(?!\w)", normalized):
         return "PLN"
 
     return None

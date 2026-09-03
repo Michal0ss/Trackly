@@ -36,34 +36,71 @@ function removeToken() {
   });
 }
 
-function savePendingDetection(candidate, key) {
+const PENDING_DETECTION_LIMIT = 10;
+
+function readPendingDetections() {
   return new Promise((resolve) => {
-    if (hasChromeStorage()) {
-      chrome.storage.local.set({ pending_detection: { candidate, key } }, resolve);
-    } else {
+    if (!hasChromeStorage()) {
+      resolve([]);
+      return;
+    }
+
+    chrome.storage.local.get(["pending_detection"], (result) => {
+      const stored = result.pending_detection;
+
+      if (Array.isArray(stored)) {
+        resolve(stored.filter((entry) => entry && entry.candidate));
+      } else if (stored && stored.candidate) {
+        resolve([stored]);
+      } else {
+        resolve([]);
+      }
+    });
+  });
+}
+
+function writePendingDetections(entries) {
+  return new Promise((resolve) => {
+    if (!hasChromeStorage()) {
       resolve();
-    }
-  });
-}
-
-function getPendingDetection() {
-  return new Promise((resolve) => {
-    if (hasChromeStorage()) {
-      chrome.storage.local.get(["pending_detection"], (result) => {
-        resolve(result.pending_detection || null);
-      });
-    } else {
-      resolve(null);
-    }
-  });
-}
-
-function clearPendingDetection() {
-  return new Promise((resolve) => {
-    if (hasChromeStorage()) {
+    } else if (!entries.length) {
       chrome.storage.local.remove(["pending_detection"], resolve);
     } else {
-      resolve();
+      chrome.storage.local.set({ pending_detection: entries }, resolve);
     }
   });
+}
+
+async function savePendingDetection(candidate, key) {
+  const entries = await readPendingDetections();
+  const others = entries.filter((entry) => entry.key !== key);
+
+  others.push({ candidate, key });
+  await writePendingDetections(others.slice(-PENDING_DETECTION_LIMIT));
+}
+
+async function getPendingDetection() {
+  const entries = await readPendingDetections();
+
+  return entries[0] || null;
+}
+
+async function countPendingDetections() {
+  return (await readPendingDetections()).length;
+}
+
+async function hasPendingDetection(key) {
+  const entries = await readPendingDetections();
+
+  return entries.some((entry) => entry.key === key);
+}
+
+async function clearPendingDetection(key) {
+  if (key === undefined || key === null) {
+    await writePendingDetections([]);
+    return;
+  }
+
+  const entries = await readPendingDetections();
+  await writePendingDetections(entries.filter((entry) => entry.key !== key));
 }

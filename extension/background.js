@@ -1,21 +1,19 @@
 /* global chrome */
 
-// Ikona jest teraz zielona litera bez tla, wiec zielony badge zlewalby sie z nia
-// w jedna plame. Ciemne tlo badge to ta sama barwa co "track" w wordmarku.
 const BADGE_COLOR = "#0f172a";
 const BADGE_TEXT_COLOR = "#ffffff";
 const BLINK_PATTERN = [true, false, true, false, true];
 const BLINK_STEP_MS = 300;
 
-function flashBadge() {
+function flashBadge(count) {
+  const label = count > 1 ? String(count) : "1";
+
   chrome.action.setBadgeBackgroundColor({ color: BADGE_COLOR });
-  // setBadgeTextColor istnieje dopiero od Chrome 110. Gdyby go nie bylo,
-  // Chrome i tak dobierze kolor tekstu pod kontrast z tlem, wiec pomijamy.
   chrome.action.setBadgeTextColor?.({ color: BADGE_TEXT_COLOR });
 
   BLINK_PATTERN.forEach((visible, index) => {
     setTimeout(() => {
-      chrome.action.setBadgeText({ text: visible ? "1" : "" });
+      chrome.action.setBadgeText({ text: visible ? label : "" });
     }, index * BLINK_STEP_MS);
   });
 }
@@ -26,7 +24,7 @@ function clearBadge() {
 
 chrome.runtime.onMessage.addListener((message) => {
   if (message?.type === "TRACKLY_DETECTION_PENDING") {
-    flashBadge();
+    flashBadge(message.count);
   }
 
   if (message?.type === "TRACKLY_DETECTION_CLEARED") {

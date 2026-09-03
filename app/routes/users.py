@@ -10,7 +10,6 @@ import os
 import httpx
 
 router = APIRouter()
-print("Users router loaded")
 
 @router.get("/users/me", response_model=schemas.UserMeResponse)
 def read_users_me(current_user: models.Users = Depends(get_current_user)):

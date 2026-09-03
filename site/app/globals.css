@@ -210,8 +210,6 @@ a {
   background: rgba(255, 255, 255, 0.09);
 }
 
-/* Informacja o stanie, nie przycisk. Zielony przycisk, ktory nic nie robi,
-   obiecuje klikniecie, ktorego jeszcze nie ma. */
 .soon {
   display: inline-flex;
   align-items: center;
@@ -240,8 +238,6 @@ a {
   border-top: 1px solid var(--line);
 }
 
-/* Naglowek i wprowadzenie obok siebie. W jednej kolumnie zostawialy pusta
-   prawa polowe ekranu, co przy szerokim monitorze wygladalo na niedokonczone. */
 .band-head {
   margin-bottom: 56px;
   display: grid;
@@ -284,8 +280,6 @@ a {
   border-radius: 4px;
 }
 
-/* Skrot dla osob poruszajacych sie klawiatura - pozwala pominac nawigacje
-   i wskoczyc od razu w tresc. Widoczny dopiero po otrzymaniu focusu. */
 .skip {
   position: absolute;
   left: -9999px;
@@ -375,8 +369,6 @@ a {
   height: 22px;
 }
 
-/* Podswietlenie neutralne, nie zielone. Ikona jest teraz zielona litera bez
-   tla, wiec zielona poswiata pod nia tylko ja rozmywala. */
 .demo-ext.is-alert {
   background: rgba(148, 163, 184, 0.16);
   animation: extPulse 0.9s ease-in-out 2;
@@ -387,8 +379,6 @@ a {
   50% { transform: scale(1.14); }
 }
 
-/* Ciemne tlo, bo w pasku badge lezy na zielonej literze - patrz BADGE_COLOR
-   w extension/background.js. Makieta ma pokazywac to, co widac naprawde. */
 .demo-badge {
   position: absolute;
   right: -1px;
@@ -675,9 +665,6 @@ a {
   margin-top: 12px;
 }
 
-/* Bez flexa. Jako element flex kropka byla osobnym dzieckiem i przy waskim
-   ekranie tekst zawijal sie pod nia, zostawiajac ja sama w linii. Inline-block
-   plynie razem z pierwszym wierszem. */
 .hero-note {
   font-size: 14.5px;
   color: var(--dim);

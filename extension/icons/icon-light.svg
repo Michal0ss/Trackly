@@ -1,15 +1,7 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="512" height="512" viewBox="179.9 209.9 236.3 236.3">
   <desc>
-    Wariant ikony na JASNY pasek narzedzi. Ta sama litera i ten sam kadr co icon.svg,
-    tylko ciemniejsza zielen - dokladnie ta sama zaleznosc, co miedzy wordmark.svg
-    a wordmark-light.svg. #22c55e ma na jasnym tle kontrast 1,8:1, #15803d ma 3,8:1.
-
-    Ten plik NIE jest obecnie uzywany przez rozszerzenie. Chrome nie umie wybrac ikony
-    zaleznie od motywu - klucz theme_icons obsluguje tylko Firefox. Zeby to wlaczyc,
-    trzeba by wolac chrome.action.setIcon() z popupu po sprawdzeniu prefers-color-scheme.
-    Trzymamy plik gotowy na wypadek, gdybysmy sie na to zdecydowali.
-
-    Render tak samo jak icon.svg, tylko nazwy plikow z przyrostkiem -light.
+    Wariant na jasny pasek narzedzi, nieuzywany - Chrome nie wybiera ikony
+    zaleznie od motywu. Render jak w icon.svg, nazwy plikow z przyrostkiem -light.
   </desc>
   <text x="300" y="420" font-family="Avenir Next" font-weight="600" font-size="300"
         letter-spacing="-1" fill="#15803d" text-anchor="middle">t</text>

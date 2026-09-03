@@ -96,7 +96,12 @@ async function isServiceAlreadySaved(serviceKey) {
 
 async function queueDetection(serviceKey, candidate) {
   await savePendingDetection(candidate, serviceKey);
-  chrome.runtime.sendMessage({ type: "TRACKLY_DETECTION_PENDING" }).catch(() => {});
+
+  const pending = await countPendingDetections();
+
+  chrome.runtime
+    .sendMessage({ type: "TRACKLY_DETECTION_PENDING", count: pending })
+    .catch(() => {});
   debugLog("Kandydat czeka w popupie:", serviceKey, candidate);
 }
 
@@ -197,12 +202,12 @@ async function handlePossiblePurchaseClick(event) {
 
   const candidate = buildCandidate(await getJourneyData(serviceKey), serviceKey, pageUrl);
 
-  const alreadyPending = await getPendingDetection();
+  const alreadyPending = await hasPendingDetection(serviceKey);
 
   await queueDetection(serviceKey, candidate);
   hideDetectionToast();
 
-  if (!alreadyPending || alreadyPending.key !== serviceKey) {
+  if (!alreadyPending) {
     showPageToast(
         `Zapisaliśmy ${candidate.service_name}. Otwórz Trackly z paska narzędzi, aby dokończyć.`,
         {variant: "success"}
