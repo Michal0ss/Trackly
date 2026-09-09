@@ -10,7 +10,7 @@
     "128": "icons/icon128.png"
   },
   "permissions": ["activeTab","storage","identity"],
-  "host_permissions": ["http://127.0.0.1:8000/*"],
+  "host_permissions": ["https://trackly-api-michal-team00.vercel.app/*"],
   "oauth2": {
     "client_id": "575055537719-i5gev08155b989197ngk12air2eelspv.apps.googleusercontent.com",
     "scopes": ["https://www.googleapis.com/auth/userinfo.email"]

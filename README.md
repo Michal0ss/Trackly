@@ -42,6 +42,9 @@ Copy `.env.example` to `.env` and fill in:
   `python3 -c "import secrets; print(secrets.token_urlsafe(48))"`
 - `GOOGLE_CLIENT_ID` - OAuth client id from the Google Cloud Console
 - `ALLOWED_ORIGINS` - `chrome-extension://<id>`, already filled in with the pinned id
+- `DATABASE_URL` - optional. Defaults to a local SQLite file. Point it at a Postgres
+  connection string (Supabase or otherwise) to use that instead - `app/database/db.py`
+  switches pooling behaviour automatically based on the scheme.
 
 ```bash
 .venv/bin/python -m uvicorn app.main:app --reload
@@ -86,6 +89,18 @@ npm run dev
 | GET | `/subscriptions/summary/expiring` |
 
 Everything except the login endpoint expects a bearer token.
+
+## Deployment
+
+| What | Where |
+| --- | --- |
+| Site | Vercel, git-linked to `main` - https://trackly-swart.vercel.app |
+| Backend | Vercel (Python serverless, `api/index.py` + `vercel.json`) - https://trackly-api-michal-team00.vercel.app |
+| Database | Supabase Postgres, reached through its connection pooler (`*.pooler.supabase.com:6543`) - the direct host doesn't resolve from Vercel's network |
+
+The backend isn't git-linked yet - it's redeployed manually, so a new deploy needs the same
+`SECRET_KEY` / `GOOGLE_CLIENT_ID` / `ALLOWED_ORIGINS` / `DATABASE_URL` set again in the
+Vercel project's environment variables (Production and Preview are separate scopes there).
 
 ## Status
 
