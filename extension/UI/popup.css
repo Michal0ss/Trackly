@@ -250,19 +250,12 @@ h1 {
   color: var(--muted);
 }
 
-.info-hint {
-  margin: 0;
-  font-size: 13px;
-  line-height: 1.5;
-  color: #94a3b8;
-}
-
 .info-link {
   display: inline-block;
   margin-top: 12px;
   font-size: 13px;
   font-weight: 600;
-  color: #67e8f9;
+  color: #86efac;
   text-decoration: none;
 }
 
