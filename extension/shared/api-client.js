@@ -1,7 +1,29 @@
-const API_BASE_URL = "https://trackly-api-michal-team00.vercel.app";
+const PRODUCTION_API_BASE_URL = "https://trackly-api-michal-team00.vercel.app";
+
+let cachedApiBaseUrl = null;
+
+function getApiBaseUrl() {
+  if (cachedApiBaseUrl) {
+    return Promise.resolve(cachedApiBaseUrl);
+  }
+
+  return new Promise((resolve) => {
+    if (typeof chrome === "undefined" || !chrome.storage || !chrome.storage.local) {
+      cachedApiBaseUrl = PRODUCTION_API_BASE_URL;
+      resolve(cachedApiBaseUrl);
+      return;
+    }
+
+    chrome.storage.local.get(["api_base_url"], (result) => {
+      cachedApiBaseUrl = result.api_base_url || PRODUCTION_API_BASE_URL;
+      resolve(cachedApiBaseUrl);
+    });
+  });
+}
 
 async function apiRequest(path, options = {}) {
-  const response = await fetch(`${API_BASE_URL}${path}`, options);
+  const baseUrl = await getApiBaseUrl();
+  const response = await fetch(`${baseUrl}${path}`, options);
 
   const rawText = await response.text();
   let data = null;

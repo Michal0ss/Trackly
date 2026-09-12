@@ -70,10 +70,7 @@ export default function Home() {
                 <a className="btn btn-primary" href="#jak-to-dziala">
                   Zobacz, jak działa
                 </a>
-                <span className="soon">
-                  <span className="soon-dot" aria-hidden="true" />
-                  Wkrótce w Chrome Web Store
-                </span>
+                <span className="soon">Wkrótce w Chrome Web Store</span>
               </div>
               <p className="hero-note">
                 <span className="dot-live" aria-hidden="true" />

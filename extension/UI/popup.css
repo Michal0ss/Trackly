@@ -510,6 +510,24 @@ h1 {
   margin-top: 18px;
 }
 
+.popup-footer {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+  margin: 16px 0 0;
+  font-size: 12px;
+}
+
+.popup-footer a {
+  color: #7c8ba1;
+  text-decoration: none;
+}
+
+.popup-footer a:hover {
+  color: #cbd5e1;
+  text-decoration: underline;
+}
+
 #expiringList {
   margin-top: 14px;
 }

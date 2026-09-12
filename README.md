@@ -60,6 +60,23 @@ Open `chrome://extensions`, turn on Developer mode, choose Load unpacked and poi
 The extension id is pinned by the `key` field in the manifest, so it is identical on every
 machine. That matters because the Google OAuth client is registered against one id.
 
+It talks to the deployed API by default. To point it at a backend running on your own
+machine, open the popup, then its devtools console, and run:
+
+```js
+chrome.storage.local.set({ api_base_url: "http://127.0.0.1:8000" })
+```
+
+Reload the extension afterwards. Remove the key to go back to production:
+
+```js
+chrome.storage.local.remove("api_base_url")
+```
+
+Chrome only waives CORS for hosts listed in `host_permissions`, which now covers the
+deployed API alone. If local calls get blocked, add `"http://127.0.0.1:8000/*"` to that
+list while you work, and take it out before packaging for the store.
+
 ### Site
 
 ```bash
