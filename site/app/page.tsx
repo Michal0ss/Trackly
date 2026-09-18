@@ -188,7 +188,7 @@ export default function Home() {
                 </div>
                 <div className="flow-row yes">
                   <span aria-hidden="true">✓</span>
-                  <span>Logowanie przez Google - pobieramy tylko adres e-mail</span>
+                  <span>Logowanie przez Google - tylko adres e-mail i numer konta</span>
                 </div>
                 <div className="flow-row no">
                   <span aria-hidden="true">✕</span>
@@ -219,7 +219,6 @@ export default function Home() {
           </div>
           <nav className="footer-links" aria-label="Stopka">
             <a href="/privacy">Polityka prywatności</a>
-            <a href="mailto:kontakt@trackly.pl">Kontakt</a>
           </nav>
         </div>
       </footer>

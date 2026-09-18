@@ -27,7 +27,7 @@ function isJourneyFresh(entry) {
   return Boolean(entry) && Date.now() - entry.updated_at <= JOURNEY_TTL_MS;
 }
 
-async function rememberJourneyData(serviceKey, detected, pageUrl) {
+async function rememberJourneyData(serviceKey, detected) {
   const state = await getJourneyState();
   const merged = isJourneyFresh(state[serviceKey]) ? { ...state[serviceKey].data } : {};
 
@@ -38,8 +38,6 @@ async function rememberJourneyData(serviceKey, detected, pageUrl) {
       merged[field] = value;
     }
   }
-
-  merged.source_url = pageUrl;
 
   state[serviceKey] = { data: merged, updated_at: Date.now() };
   await saveJourneyState(state);
