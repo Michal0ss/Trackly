@@ -69,7 +69,7 @@ function hasAnythingWorthSaving(detected) {
   );
 }
 
-function buildCandidate(journeyData, serviceKey, pageUrl) {
+function buildCandidate(journeyData, serviceKey) {
   const data = journeyData || {};
 
   return {
@@ -83,7 +83,7 @@ function buildCandidate(journeyData, serviceKey, pageUrl) {
     end_date: null,
     status: "confirmed",
     source: "detected",
-    source_url: pageUrl,
+    source_url: "",
     auto_renew: true
   };
 }
@@ -122,7 +122,7 @@ async function collectAndMaybeOfferToast() {
   const serviceKey = getServiceKey(detected, pageUrl);
 
   if (hasAnythingWorthSaving(detected)) {
-    await rememberJourneyData(serviceKey, detected, pageUrl);
+    await rememberJourneyData(serviceKey, detected);
     debugLog("Zebrano dane:", serviceKey, detected);
   }
 
@@ -135,7 +135,7 @@ async function collectAndMaybeOfferToast() {
     return;
   }
 
-  const candidate = buildCandidate(await getJourneyData(serviceKey), serviceKey, pageUrl);
+  const candidate = buildCandidate(await getJourneyData(serviceKey), serviceKey);
 
   showDetectionToast(candidate, {
     onAccept: async () => {
@@ -190,7 +190,7 @@ async function handlePossiblePurchaseClick(event) {
   const serviceKey = getServiceKey(detected, pageUrl);
 
   if (hasAnythingWorthSaving(detected)) {
-    await rememberJourneyData(serviceKey, detected, pageUrl);
+    await rememberJourneyData(serviceKey, detected);
   }
 
   if (await isServiceAlreadySaved(serviceKey)) {
@@ -200,7 +200,7 @@ async function handlePossiblePurchaseClick(event) {
 
   debugLog("Wykryto klikniecie zakupu:", serviceKey);
 
-  const candidate = buildCandidate(await getJourneyData(serviceKey), serviceKey, pageUrl);
+  const candidate = buildCandidate(await getJourneyData(serviceKey), serviceKey);
 
   const alreadyPending = await hasPendingDetection(serviceKey);
 

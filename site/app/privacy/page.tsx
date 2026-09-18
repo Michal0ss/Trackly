@@ -30,7 +30,7 @@ export default function Privacy() {
         </a>
 
         <h1>Polityka prywatności</h1>
-        <p className="doc-updated">Ostatnia aktualizacja: 26 sierpnia 2026</p>
+        <p className="doc-updated">Ostatnia aktualizacja: 18 września 2026</p>
 
         <p>
           Trackly to rozszerzenie do przeglądarki, które pomaga śledzić subskrypcje.
@@ -68,8 +68,8 @@ export default function Privacy() {
         <p>
           <strong>Subskrypcje, które sam zapiszesz.</strong> Gdy potwierdzisz dodanie
           subskrypcji, zapisujemy nazwę serwisu, nazwę planu, cenę, walutę, cykl rozliczenia,
-          datę odnowienia, adres strony, z której pochodzi wpis, oraz informację, czy odnawia
-          się automatycznie. Nic ponadto.
+          datę odnowienia oraz informację, czy odnawia się automatycznie. Nic ponadto. Adres
+          strony, na której wykryliśmy subskrypcję, zostaje w Twojej przeglądarce.
         </p>
         <p>
           <strong>Dane przechowywane lokalnie w przeglądarce.</strong> Token sesji, informacje
@@ -122,8 +122,8 @@ export default function Privacy() {
 
         <h2>Kontakt</h2>
         <p>
-          Pytania dotyczące prywatności kieruj na{" "}
-          <strong>kontakt@trackly.pl</strong>.
+          Adres kontaktowy podamy w tym miejscu przed publikacją rozszerzenia. Do tego czasu
+          Trackly nie jest dostępne publicznie i nie zbiera danych osób spoza zespołu.
         </p>
       </main>
 

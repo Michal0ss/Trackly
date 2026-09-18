@@ -172,15 +172,23 @@ async function checkSession() {
 
   try {
     await getCurrentUserRequest(token);
-    await loadSubscriptions();
-    showSubscriptionsView();
-    await maybeShowPendingDetection();
   } catch (error) {
-    await removeToken();
-    await refreshTokenPreview();
     showAuthView();
-    showStatus("Sesja wygasła. Zaloguj się ponownie.", "error");
+
+    if (error.status === 401 || error.status === 403) {
+      await removeToken();
+      await refreshTokenPreview();
+      showStatus("Sesja wygasła. Zaloguj się ponownie.", "error");
+    } else {
+      showStatus("Nie udało się połączyć z serwerem. Spróbuj ponownie za chwilę.", "error");
+    }
+
+    return;
   }
+
+  await loadSubscriptions();
+  showSubscriptionsView();
+  await maybeShowPendingDetection();
 }
 
 document.addEventListener("DOMContentLoaded", () => {
