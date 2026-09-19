@@ -111,7 +111,7 @@ Everything except the login endpoint expects a bearer token.
 
 | What | Where |
 | --- | --- |
-| Site | Vercel, git-linked to `main` - https://trackly-swart.vercel.app |
+| Site | Vercel, git-linked to `main` - https://tracklyapp.pl |
 | Backend | Vercel (Python serverless, `api/index.py` + `vercel.json`) - https://trackly-api-michal-team00.vercel.app |
 | Database | Supabase Postgres, reached through its connection pooler (`*.pooler.supabase.com:6543`) - the direct host doesn't resolve from Vercel's network |
 
