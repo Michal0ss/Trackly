@@ -112,12 +112,19 @@ Everything except the login endpoint expects a bearer token.
 | What | Where |
 | --- | --- |
 | Site | Vercel, git-linked to `main` - https://tracklyapp.pl |
-| Backend | Vercel (Python serverless, `api/index.py` + `vercel.json`) - https://trackly-api-michal-team00.vercel.app |
-| Database | Supabase Postgres, reached through its connection pooler (`*.pooler.supabase.com:6543`) - the direct host doesn't resolve from Vercel's network |
+| Backend | Vercel, git-linked to `main` (Python serverless, zero-config `api/index.py`, no `vercel.json`) - https://trackly-api-git-main-michal-team00.vercel.app |
+| Database | Supabase Postgres, reached through its connection pooler (`*.pooler.supabase.com:6543`) - the direct host doesn't resolve from Vercel's network. Free tier: pauses after a week idle, `restore_project` (Supabase MCP) or the dashboard brings it back in a minute or two. |
 
-The backend isn't git-linked yet - it's redeployed manually, so a new deploy needs the same
-`SECRET_KEY` / `GOOGLE_CLIENT_ID` / `ALLOWED_ORIGINS` / `DATABASE_URL` set again in the
-Vercel project's environment variables (Production and Preview are separate scopes there).
+Every FastAPI route lives under `/api/*` - that's the one thing Vercel's zero-config Python
+detection actually routes to `api/index.py`; nothing outside `/api` reaches it. There's
+deliberately no `vercel.json` anywhere in the repo: an earlier one at the repo root (meant
+only for the backend) got read by the site project too, since Vercel resolves `vercel.json`
+from the repository root regardless of a project's own Root Directory setting - it broke
+every route on the site until it was removed.
+
+Push to `main` and both Vercel projects redeploy on their own. `SECRET_KEY` / `GOOGLE_CLIENT_ID`
+/ `ALLOWED_ORIGINS` / `DATABASE_URL` live in the backend project's environment variables
+(Production and Preview are separate scopes there).
 
 ## Status
 
