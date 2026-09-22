@@ -452,6 +452,14 @@ h1 {
   color: #e2e8f0;
 }
 
+.subscription-service + .subscription-meta {
+  margin-top: 10px;
+}
+
+#expiringList .subscription-meta {
+  gap: 8px;
+}
+
 .subscription-actions-row {
   display: flex;
   justify-content: flex-end;
