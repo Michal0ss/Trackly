@@ -23,7 +23,7 @@ function getApiBaseUrl() {
 
 async function apiRequest(path, options = {}) {
   const baseUrl = await getApiBaseUrl();
-  const response = await fetch(`${baseUrl}${path}`, options);
+  const response = await fetch(`${baseUrl}/api${path}`, options);
 
   const rawText = await response.text();
   let data = null;
