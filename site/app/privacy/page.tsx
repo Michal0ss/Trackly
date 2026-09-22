@@ -30,7 +30,7 @@ export default function Privacy() {
         </a>
 
         <h1>Polityka prywatności</h1>
-        <p className="doc-updated">Ostatnia aktualizacja: 18 września 2026</p>
+        <p className="doc-updated">Ostatnia aktualizacja: 19 września 2026</p>
 
         <p>
           Trackly to rozszerzenie do przeglądarki, które pomaga śledzić subskrypcje.
@@ -122,8 +122,8 @@ export default function Privacy() {
 
         <h2>Kontakt</h2>
         <p>
-          Adres kontaktowy podamy w tym miejscu przed publikacją rozszerzenia. Do tego czasu
-          Trackly nie jest dostępne publicznie i nie zbiera danych osób spoza zespołu.
+          Pytania dotyczące prywatności kieruj na{" "}
+          <a href="mailto:kontakt@tracklyapp.pl">kontakt@tracklyapp.pl</a>.
         </p>
       </main>
 

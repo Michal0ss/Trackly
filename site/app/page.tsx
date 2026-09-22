@@ -219,6 +219,7 @@ export default function Home() {
           </div>
           <nav className="footer-links" aria-label="Stopka">
             <a href="/privacy">Polityka prywatności</a>
+            <a href="mailto:kontakt@tracklyapp.pl">Kontakt</a>
           </nav>
         </div>
       </footer>
