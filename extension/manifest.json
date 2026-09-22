@@ -9,11 +9,18 @@
     "48": "icons/icon48.png",
     "128": "icons/icon128.png"
   },
-  "permissions": ["storage", "identity"],
-  "host_permissions": ["https://trackly-api-git-main-michal-team00.vercel.app/*"],
+  "permissions": [
+    "storage",
+    "identity"
+  ],
+  "host_permissions": [
+    "https://trackly-api-git-main-michal-team00.vercel.app/*"
+  ],
   "oauth2": {
     "client_id": "575055537719-i5gev08155b989197ngk12air2eelspv.apps.googleusercontent.com",
-    "scopes": ["https://www.googleapis.com/auth/userinfo.email"]
+    "scopes": [
+      "https://www.googleapis.com/auth/userinfo.email"
+    ]
   },
   "background": {
     "service_worker": "background.js"
@@ -29,7 +36,9 @@
   },
   "web_accessible_resources": [
     {
-      "resources": ["logo/wordmark.png"],
+      "resources": [
+        "logo/wordmark.png"
+      ],
       "matches": [
         "*://*.netflix.com/*",
         "*://*.spotify.com/*",
@@ -48,18 +57,18 @@
   "content_scripts": [
     {
       "matches": [
-                  "*://*.netflix.com/*",
-                  "*://*.spotify.com/*",
-                  "*://*.youtube.com/*",
-                  "*://*.disneyplus.com/*",
-                  "*://*.hbomax.com/*",
-                  "*://*.max.com/*",
-                  "*://*.apple.com/*",
-                  "*://*.icloud.com/*",
-                  "*://*.adobe.com/*",
-                  "*://*.microsoft.com/*",
-                  "*://*.github.com/*"
-                ],
+        "*://*.netflix.com/*",
+        "*://*.spotify.com/*",
+        "*://*.youtube.com/*",
+        "*://*.disneyplus.com/*",
+        "*://*.hbomax.com/*",
+        "*://*.max.com/*",
+        "*://*.apple.com/*",
+        "*://*.icloud.com/*",
+        "*://*.adobe.com/*",
+        "*://*.microsoft.com/*",
+        "*://*.github.com/*"
+      ],
       "js": [
         "shared/storage.js",
         "shared/detector.js",
@@ -70,5 +79,5 @@
       ]
     }
   ],
-  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEA0BS+Xch3M3ltAEHMvNOXbrqP3uQ4d4Pk4MSjlatbOEGPb/LXqa9k/JZrCeZcUCWfvUjK90E2lpuS3O7EPobxtvdwu/cWwDPV5ag/LOVU+GcveVhAON/Q0PknQxFEXOJjd6INNmAIfqEXIEpZ5ukQCnQT/iRaSoX/+USEJFFSwIHlwjP/kVsJFk3XUx50uL43dIv98PHMjHUvqU6/9+FBNr2iDPdXKma8o6Ov7pqWORj08Wpyq9DwNuZDTj1kvHlJrIMuLlep9Rh/uBLSbACsFTvTMnSgn0xLThJmuCiy3n8r4mld5kZg7sgwCVDPpJOm3MBQSyM8txpZvo2qLBCNEwIDAQAB"
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEArdLYjQcHrrd6ihh0e1lJgtawp9Myz1rTMtOaPc0OoHzDSDBWkyRnM37f5g9ddMFnAl5AnGkMRfJ1wkGJ08FSKWFlcPbeeRSHvTsok730X7xCxrtVWyVPoYNep+6sjAhpOoYnCi7K1tBXz1ccSApe+O/O7T8vaHpFjetWxqWKCemilZ7gD46KXRbRiwZ/bazFpFitFW/wTaj/CIvZEeLW61lqdJfuctKESCfXIuOK9QFYiGV3eUvBUZ+Wkpg97y3Nc8WEl3367Ttd8m6hlpbk9EdPvprpbxYKS+86Mr9LoEFdhhxR89LtdE+T8yefGhJo1oGFvd5sDogVT7vDOSTT+QIDAQAB"
 }
