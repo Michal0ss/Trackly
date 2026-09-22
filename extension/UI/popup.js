@@ -162,7 +162,14 @@ async function maybeShowPendingDetection() {
   );
 }
 
+function hideBothViews() {
+  authView.style.display = "none";
+  subscriptionsView.style.display = "none";
+}
+
 async function checkSession() {
+  hideBothViews();
+
   const token = await getToken();
 
   if (!token) {
@@ -186,8 +193,8 @@ async function checkSession() {
     return;
   }
 
-  await loadSubscriptions();
   showSubscriptionsView();
+  await loadSubscriptions();
   await maybeShowPendingDetection();
 }
 
