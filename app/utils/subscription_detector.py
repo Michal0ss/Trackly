@@ -8,12 +8,41 @@ SERVICE_HINTS = {
     "youtube": "YouTube Premium",
     "disney": "Disney+",
     "hbo": "HBO Max",
-    "max.com": "Max",
+    "max.com": "HBO Max",
+    "skyshowtime": "SkyShowtime",
+    "canalplus": "Canal+",
+    "player.pl": "Player",
+    "polsatboxgo": "Polsat Box Go",
+    "crunchyroll": "Crunchyroll",
+    "primevideo": "Prime Video",
+    "amazon": "Amazon Prime",
+    "music.apple": "Apple Music",
     "icloud": "iCloud",
     "apple": "Apple",
+    "tidal": "TIDAL",
+    "deezer": "Deezer",
+    "storytel": "Storytel",
+    "bookbeat": "BookBeat",
+    "legimi": "Legimi",
+    "empik.com/go": "Empik Go",
+    "empik.com/premium": "Empik Premium",
+    "openai": "ChatGPT",
+    "claude": "Claude",
+    "canva": "Canva",
+    "notion": "Notion",
+    "dropbox": "Dropbox",
+    "one.google": "Google One",
+    "duolingo": "Duolingo",
     "adobe": "Adobe",
-    "microsoft": "Microsoft",
+    "microsoft": "Microsoft 365",
     "github": "GitHub",
+    "nordvpn": "NordVPN",
+    "surfshark": "Surfshark",
+    "proton": "Proton",
+    "playstation": "PlayStation Plus",
+    "xbox": "Xbox Game Pass",
+    "nintendo": "Nintendo Switch Online",
+    "allegro": "Allegro Smart!",
 }
 
 PLAN_KEYWORDS = [
@@ -38,8 +67,8 @@ PLAN_KEYWORDS = [
 ]
 
 BILLING_CYCLE_HINTS = {
-    "monthly": ["monthly", "per month", "/month", "/mies", "miesięcznie", "co miesiąc"],
-    "yearly": ["yearly", "annually", "per year", "/year", "/rok", "rocznie", "co rok"],
+    "monthly": ["monthly", "per month", "/month", "/mies", "miesięcznie", "co miesiąc", "za miesiąc"],
+    "yearly": ["yearly", "annually", "per year", "/year", "/rok", "rocznie", "co rok", "za rok"],
 }
 
 CURRENCY_MAP = {
@@ -51,7 +80,7 @@ CURRENCY_MAP = {
 }
 
 PRICE_PATTERN = re.compile(
-    r"(?:(?<!\w)(?P<cur_before>zł|zl|PLN|USD|EUR|GBP|€|\$|£)\s*)?(?P<amount>\d{1,4}[,.]\d{2})(?:\s*(?P<cur_after>zł|zl|PLN|USD|EUR|GBP|€|\$|£)(?!\w))?",
+    r"(?:(?<!\w)(?P<cur_before>zł|zl|PLN|USD|EUR|GBP|€|\$|£)\s*)?(?<![\d.,])(?P<amount>\d{1,4}(?:[,.]\d{2})?)(?!\d)(?:\s*(?P<cur_after>zł|zl|PLN|USD|EUR|GBP|€|\$|£)(?!\w))?",
     re.IGNORECASE,
 )
 
@@ -60,18 +89,33 @@ def normalize_text(text: str) -> str:
     return " ".join(text.lower().split())
 
 
+def path_contains(path: str, rule: str) -> bool:
+    segments = "/".join(part for part in path.lower().split("/") if part)
+    return f"/{rule}/" in f"/{segments}/"
+
+
+def hint_matches_url(hint: str, hostname: str, path: str) -> bool:
+    host, slash, rule = hint.partition("/")
+
+    if not slash:
+        return hint in hostname
+
+    return host in hostname and path_contains(path, rule)
+
+
 def detect_service(text: str, url: str | None = None) -> str | None:
     if url:
-        hostname = (urlparse(url).hostname or "").lower()
+        parsed = urlparse(url)
+        hostname = (parsed.hostname or "").lower()
 
         for hint, service_name in SERVICE_HINTS.items():
-            if hint in hostname:
+            if hint_matches_url(hint, hostname, parsed.path):
                 return service_name
 
     lowered = text.lower()
 
     for hint, service_name in SERVICE_HINTS.items():
-        if hint in lowered:
+        if "/" not in hint and hint in lowered:
             return service_name
 
     return None
@@ -94,7 +138,8 @@ def find_price_match(text: str):
     trafiały jako "cena" przy naiwnym pierwszym dopasowaniu."""
     candidates = [
         match for match in PRICE_PATTERN.finditer(text)
-        if match.group("cur_before") or match.group("cur_after")
+        if (match.group("cur_before") or match.group("cur_after"))
+        and float(match.group("amount").replace(",", ".")) > 0
     ]
 
     if not candidates:
@@ -183,7 +228,7 @@ def detect_subscription_from_text(text: str, url: str | None = None) -> dict:
         billing_cycle,
     )
 
-    is_subscription = confidence >= 0.5
+    is_subscription = bool(price) and confidence >= 0.5
 
     return {
         "is_subscription": is_subscription,
