@@ -1,22 +1,25 @@
 import Image from "next/image";
 import CountUp from "@/components/CountUp";
-import HeroDemo from "@/components/HeroDemo";
+import Demo from "@/components/Demo";
 import Reveal from "@/components/Reveal";
+import SiteShell from "@/components/SiteShell";
+import site from "@/components/site.module.css";
 import { storeUrl } from "@/lib/site";
+import styles from "./home.module.css";
 
 const STEPS = [
   {
-    num: "1",
+    num: "01",
     title: "Przeglądasz serwis",
     text: "Na stronie z cennikiem Trackly rozpoznaje nazwę, plan, cenę i cykl rozliczenia, a potem pokazuje dyskretne powiadomienie.",
   },
   {
-    num: "2",
+    num: "02",
     title: "Potwierdzasz",
-    text: "Klikasz Dodaj w powiadomieniu albo przycisk zakupu w serwisie. Formularz jest już wypełniony - poprawiasz, co trzeba, i zapisujesz.",
+    text: "Klikasz Dodaj w powiadomieniu albo przycisk zakupu w serwisie. Formularz jest już wypełniony\u00a0- poprawiasz, co trzeba, i zapisujesz.",
   },
   {
-    num: "3",
+    num: "03",
     title: "Masz wszystko pod ręką",
     text: "Koszty, daty odnowień i pełna lista czekają w panelu, zawsze o jedno kliknięcie od paska narzędzi.",
   },
@@ -26,86 +29,172 @@ const FEATURES = [
   {
     title: "Wkrótce odnawiane",
     text: "Osobna sekcja pokazuje subskrypcje, które odnowią się w najbliższych dniach.",
+    icon: (
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" />
+        <polyline points="12 6 12 12 16 14" />
+      </svg>
+    ),
   },
   {
     title: "Edytujesz i usuwasz",
     text: "Cena poszła w górę albo rezygnujesz? Poprawiasz wpis w kilka sekund.",
+    icon: (
+      <svg viewBox="0 0 24 24">
+        <path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+      </svg>
+    ),
   },
   {
     title: "Kilka walut naraz",
     text: "Złotówki, euro i dolary liczone osobno, bez zmyślonych przeliczników.",
+    icon: (
+      <svg viewBox="0 0 24 24">
+        <polygon points="12 2 2 7 12 12 22 7 12 2" />
+        <polyline points="2 17 12 22 22 17" />
+        <polyline points="2 12 12 17 22 12" />
+      </svg>
+    ),
   },
   {
     title: "Dodajesz ręcznie",
     text: "Subskrypcje sprzed instalacji wpiszesz sam, w tym samym formularzu.",
+    icon: (
+      <svg viewBox="0 0 24 24">
+        <circle cx="12" cy="12" r="10" />
+        <line x1="12" y1="8" x2="12" y2="16" />
+        <line x1="8" y1="12" x2="16" y2="12" />
+      </svg>
+    ),
   },
 ];
 
+const FLOW = [
+  {
+    allowed: true,
+    content: (
+      <>
+        Wykrywanie subskrypcji&nbsp;- <strong>lokalnie w przeglądarce</strong>
+      </>
+    ),
+  },
+  { allowed: true, content: "Zapisane subskrypcje\u00a0- na serwerze, dostępne z każdego urządzenia" },
+  { allowed: true, content: "Logowanie przez Google\u00a0- tylko adres e-mail i numer konta" },
+  { allowed: false, content: "Historia przeglądania" },
+  { allowed: false, content: "Treść odwiedzanych stron" },
+  { allowed: false, content: "Reklamy i sprzedaż danych" },
+];
+
+function StoreIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <line x1="7" y1="17" x2="17" y2="7" />
+      <polyline points="7 7 17 7 17 17" />
+    </svg>
+  );
+}
+
+function StepVisual({ index }: { index: number }) {
+  if (index === 0) {
+    return (
+      <div className={styles.mini}>
+        <span className={styles.scan} />
+        <p className={styles.miniLabel}>serwis.com/premium</p>
+        <span className={styles.miniStrong}>Premium</span>
+        <p className={styles.miniMuted}>26,99 zł / miesiąc</p>
+      </div>
+    );
+  }
+
+  if (index === 1) {
+    return (
+      <div className={`${styles.mini} ${styles.miniToast}`}>
+        <span className={styles.miniStrong}>Wykryto: Serwis</span>
+        <p className={styles.miniMuted}>Premium · 26,99 PLN / miesiąc</p>
+        <div className={styles.miniActions}>
+          <span>Nie teraz</span>
+          <span>Dodaj</span>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className={styles.mini}>
+      <p className={styles.miniLabel}>Koszt miesięczny</p>
+      <span className={styles.miniStrong}>88,97 PLN</span>
+      <div className={styles.miniRow}>
+        <strong>Serwis</strong>
+        <span>odnowienie 22.10</span>
+      </div>
+    </div>
+  );
+}
+
 export default function Home() {
   return (
-    <>
-      <header className="topbar">
-        <div className="shell topbar-inner">
-          <Image src="/wordmark.png" alt="Trackly" width={588} height={210} className="topbar-logo" priority />
-          <nav>
-            <a href="#jak-to-dziala">Jak to działa</a>
-            <a href="#panel">Panel</a>
-            <a href="#prywatnosc">Prywatność</a>
-            <a className="btn btn-primary" href="#instalacja">
-              Wypróbuj
+    <SiteShell>
+      <main id="tresc" className={site.main}>
+        <section className={`${site.shell} ${styles.hero}`}>
+          <h1 className={`${styles.heroTitle} ${styles.rise}`}>
+            Wszystkie subskrypcje
+            <br />
+            <span className={styles.accent}>w jednym miejscu</span>
+          </h1>
+          <p className={`${styles.heroLede} ${styles.rise} ${styles.delay1}`}>
+            Trackly rozpoznaje subskrypcję w chwili, gdy ją kupujesz, i pokazuje Ci koszty oraz daty
+            odnowień&nbsp;- zanim zaskoczy Cię przelew.
+          </p>
+          <div className={`${styles.heroActions} ${styles.rise} ${styles.delay2}`} id="instalacja">
+            <a
+              className={`${site.btn} ${site.btnPrimary}`}
+              href={storeUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Zobacz w Chrome Web Store
+              <StoreIcon />
             </a>
-          </nav>
-        </div>
-      </header>
+            <a className={`${site.btn} ${site.btnGhost}`} href="#jak-to-dziala">
+              Zobacz, jak działa
+            </a>
+          </div>
+          <p className={`${styles.heroNote} ${styles.rise} ${styles.delay2}`}>
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <rect x="5" y="11" width="14" height="10" rx="2" />
+              <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+            </svg>
+            Wtyczka do przeglądarki. Wykrywanie działa lokalnie na Twoim komputerze.
+          </p>
 
-      <main id="tresc">
-        <section className="hero">
-          <div className="shell hero-grid">
-            <div className="hero-copy">
-              <h1>Wszystkie subskrypcje w jednym miejscu</h1>
-              <p className="hero-lede">
-                Trackly rozpoznaje subskrypcję w chwili, gdy ją kupujesz, i pokazuje Ci koszty
-                oraz daty odnowień - zanim zaskoczy Cię przelew.
-              </p>
-              <div className="hero-actions" id="instalacja">
-                <a className="btn btn-primary" href="#jak-to-dziala">
-                  Zobacz, jak działa
-                </a>
-                <a className="btn btn-ghost" href={storeUrl} target="_blank" rel="noopener noreferrer">
-                  Zobacz w Chrome Web Store
-                </a>
-              </div>
-              <p className="hero-note">
-                <span className="dot-live" aria-hidden="true" />
-                Wtyczka do przeglądarki. Wykrywanie działa lokalnie na Twoim komputerze.
-              </p>
-            </div>
-
-            <div className="hero-demo-wrap">
-              <HeroDemo />
-            </div>
+          <div className={`${styles.demoWrap} ${styles.appear} ${styles.delay3}`}>
+            <Demo />
           </div>
         </section>
 
-        <section className="band" id="jak-to-dziala">
-          <div className="shell">
+        <section className={`${styles.section} ${styles.anchor}`} id="jak-to-dziala">
+          <div className={site.shell}>
             <Reveal>
-              <div className="band-head">
-                <h2>Trzy kroki, z czego dwa robi wtyczka</h2>
-                <p>
+              <div className={`${styles.sectionHead} ${styles.center}`}>
+                <span className={styles.eyebrow}>Jak to działa</span>
+                <h2 className={styles.h2}>Trzy kroki, z czego dwa robi wtyczka</h2>
+                <p className={styles.lead}>
                   Nie musisz niczego wpisywać z pamięci ani pilnować terminów. Trackly włącza się
                   dokładnie wtedy, kiedy powstaje nowa subskrypcja.
                 </p>
               </div>
             </Reveal>
 
-            <div className="steps">
+            <div className={styles.steps}>
               {STEPS.map((step, index) => (
                 <Reveal key={step.num} delay={index * 110}>
-                  <article className="step">
-                    <span className="step-num">{step.num}</span>
-                    <h3>{step.title}</h3>
-                    <p>{step.text}</p>
+                  <article className={`${styles.card} ${styles.step}`}>
+                    <span className={styles.stepNum}>{step.num}</span>
+                    <h3 className={styles.stepTitle}>{step.title}</h3>
+                    <p className={styles.stepText}>{step.text}</p>
+                    <div className={styles.stepVisual} aria-hidden="true">
+                      <StepVisual index={index} />
+                    </div>
                   </article>
                 </Reveal>
               ))}
@@ -113,47 +202,60 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="band" id="panel">
-          <div className="shell">
+        <section className={`${styles.section} ${styles.anchor}`} id="panel">
+          <div className={site.shell}>
             <Reveal>
-              <div className="band-head">
-                <h2>Liczby, które faktycznie coś znaczą</h2>
-                <p>
+              <div className={styles.sectionHead}>
+                <span className={styles.eyebrow}>Panel</span>
+                <h2 className={styles.h2}>Liczby, które faktycznie coś znaczą</h2>
+                <p className={styles.lead}>
                   Subskrypcje miesięczne i roczne pokazujemy osobno, zamiast dzielić roczne przez
-                  dwanaście. Widzisz to, co realnie schodzi z konta.
+                  dwanaście. Widzisz to, co realnie schodzi z&nbsp;konta.
                 </p>
               </div>
             </Reveal>
 
-            <Reveal>
-              <div className="stats">
-                <div className="stat">
-                  <p className="stat-label">Koszt miesięczny</p>
-                  <p className="stat-value">
-                    <CountUp to={88.97} /> <span>zł</span>
-                  </p>
+            <div className={styles.bento}>
+              <Reveal className={styles.statsCell}>
+                <div className={`${styles.card} ${styles.statsCard}`}>
+                  <div className={styles.statsHead}>
+                    <Image src="/icon.png" alt="" width={128} height={128} />
+                    <span>Twoje subskrypcje</span>
+                  </div>
+                  <div className={styles.statsGrid}>
+                    <div className={styles.stat}>
+                      <p className={styles.statLabel}>Koszt miesięczny</p>
+                      <p className={styles.statValue}>
+                        <CountUp to={88.97} />
+                        <small>zł</small>
+                      </p>
+                    </div>
+                    <div className={styles.stat}>
+                      <p className={styles.statLabel}>Koszt roczny</p>
+                      <p className={styles.statValue}>
+                        <CountUp to={199} />
+                        <small>zł</small>
+                      </p>
+                    </div>
+                    <div className={`${styles.stat} ${styles.statAccent}`}>
+                      <p className={styles.statLabel}>Rocznie łącznie</p>
+                      <p className={styles.statValue}>
+                        <CountUp to={1266.64} />
+                        <small>zł</small>
+                      </p>
+                    </div>
+                  </div>
                 </div>
-                <div className="stat">
-                  <p className="stat-label">Koszt roczny</p>
-                  <p className="stat-value">
-                    <CountUp to={199} /> <span>zł</span>
-                  </p>
-                </div>
-                <div className="stat stat-accent">
-                  <p className="stat-label">Rocznie łącznie</p>
-                  <p className="stat-value">
-                    <CountUp to={1266.64} /> <span>zł</span>
-                  </p>
-                </div>
-              </div>
-            </Reveal>
+              </Reveal>
 
-            <div className="features">
               {FEATURES.map((feature, index) => (
-                <Reveal key={feature.title} delay={index * 90}>
-                  <div className="feature">
-                    <h3>{feature.title}</h3>
-                    <p>{feature.text}</p>
+                <Reveal key={feature.title} delay={(index + 1) * 90}>
+                  <div className={`${styles.card} ${styles.feature}`}>
+                    <span className={styles.featureIcon} aria-hidden="true">
+                      {feature.icon}
+                    </span>
+                    <h3 className={styles.featureTitle}>{feature.title}</h3>
+                    <p className={styles.featureText}>{feature.text}</p>
                   </div>
                 </Reveal>
               ))}
@@ -161,16 +263,17 @@ export default function Home() {
           </div>
         </section>
 
-        <section className="band" id="prywatnosc">
-          <div className="shell privacy-grid">
+        <section className={`${styles.section} ${styles.anchor}`} id="prywatnosc">
+          <div className={`${site.shell} ${styles.privacy}`}>
             <Reveal>
               <div>
-                <h2>Treść stron nie opuszcza Twojej przeglądarki</h2>
-                <p className="privacy-text">
+                <span className={styles.eyebrow}>Prywatność</span>
+                <h2 className={styles.h2}>Treść stron nie opuszcza Twojej przeglądarki</h2>
+                <p className={styles.privacyText}>
                   Rozpoznawanie subskrypcji dzieje się w całości na Twoim komputerze. Trackly nie
-                  wysyła nigdzie tego, co przeglądasz - ani adresów stron, ani ich zawartości.
+                  wysyła nigdzie tego, co przeglądasz&nbsp;- ani adresów stron, ani ich zawartości.
                 </p>
-                <p className="privacy-text">
+                <p className={styles.privacyText}>
                   Na serwer trafia wyłącznie to, co sam świadomie zapiszesz: nazwa serwisu, plan,
                   cena i data odnowienia.
                 </p>
@@ -178,54 +281,57 @@ export default function Home() {
             </Reveal>
 
             <Reveal delay={120}>
-              <div className="flow">
-                <div className="flow-row yes">
-                  <span aria-hidden="true">✓</span>
-                  <span>
-                    Wykrywanie subskrypcji - <strong>lokalnie w przeglądarce</strong>
-                  </span>
-                </div>
-                <div className="flow-row yes">
-                  <span aria-hidden="true">✓</span>
-                  <span>Zapisane subskrypcje - na serwerze, dostępne z każdego urządzenia</span>
-                </div>
-                <div className="flow-row yes">
-                  <span aria-hidden="true">✓</span>
-                  <span>Logowanie przez Google - tylko adres e-mail i numer konta</span>
-                </div>
-                <div className="flow-row no">
-                  <span aria-hidden="true">✕</span>
-                  <span>Historia przeglądania</span>
-                </div>
-                <div className="flow-row no">
-                  <span aria-hidden="true">✕</span>
-                  <span>Treść odwiedzanych stron</span>
-                </div>
-                <div className="flow-row no">
-                  <span aria-hidden="true">✕</span>
-                  <span>Reklamy i sprzedaż danych</span>
+              <div className={`${styles.card} ${styles.flow}`}>
+                {FLOW.map((row, index) => (
+                  <div
+                    key={index}
+                    className={`${styles.flowRow} ${row.allowed ? styles.flowYes : styles.flowNo}`}
+                  >
+                    <span className={styles.flowIcon} aria-hidden="true">
+                      {row.allowed ? (
+                        <svg viewBox="0 0 24 24">
+                          <polyline points="20 6 9 17 4 12" />
+                        </svg>
+                      ) : (
+                        <svg viewBox="0 0 24 24">
+                          <line x1="18" y1="6" x2="6" y2="18" />
+                          <line x1="6" y1="6" x2="18" y2="18" />
+                        </svg>
+                      )}
+                    </span>
+                    <span>{row.content}</span>
+                  </div>
+                ))}
+              </div>
+            </Reveal>
+          </div>
+        </section>
+
+        <section className={styles.section}>
+          <div className={site.shell}>
+            <Reveal>
+              <div className={styles.cta}>
+                <Image className={styles.ctaIcon} src="/icon.png" alt="" width={128} height={128} />
+                <h2 className={styles.ctaTitle}>Wszystkie subskrypcje w&nbsp;jednym miejscu</h2>
+                <p className={styles.ctaNote}>
+                  Wtyczka do przeglądarki. Wykrywanie działa lokalnie na Twoim komputerze.
+                </p>
+                <div className={styles.ctaActions}>
+                  <a
+                    className={`${site.btn} ${site.btnPrimary}`}
+                    href={storeUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Zobacz w Chrome Web Store
+                    <StoreIcon />
+                  </a>
                 </div>
               </div>
             </Reveal>
           </div>
         </section>
       </main>
-
-      <footer className="site-footer">
-        <div className="shell footer-inner">
-          <div>
-            <Image src="/wordmark.png" alt="Trackly" width={588} height={210} className="footer-logo" />
-            <p className="footer-note">
-              Projekt tworzony przez dwie osoby. Trackly nie jest powiązane z serwisami, których
-              subskrypcje pomaga śledzić.
-            </p>
-          </div>
-          <nav className="footer-links" aria-label="Stopka">
-            <a href="/privacy">Polityka prywatności</a>
-            <a href="mailto:kontakt@tracklyapp.pl">Kontakt</a>
-          </nav>
-        </div>
-      </footer>
-    </>
+    </SiteShell>
   );
 }

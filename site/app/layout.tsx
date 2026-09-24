@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, Source_Sans_3 } from "next/font/google";
+import ScrollToHash from "@/components/ScrollToHash";
 import { siteUrl } from "@/lib/site";
 import "./globals.css";
 
@@ -63,12 +64,8 @@ export default function RootLayout({
         <a className="skip" href="#tresc">
           Przejdź do treści
         </a>
-        <div className="aurora" aria-hidden="true">
-          <span />
-          <span />
-          <span />
-        </div>
-        <div className="page">{children}</div>
+        {children}
+        <ScrollToHash />
       </body>
     </html>
   );
