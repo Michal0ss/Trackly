@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.database.db import engine, Base
-from app.routes import subscriptions, users
+from app.routes import health, subscriptions, users
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.utils.security import cors_config
@@ -18,3 +18,4 @@ Base.metadata.create_all(bind=engine)
 # niezaleznie od Root Directory kazdego projektu).
 app.include_router(subscriptions.router, prefix="/api")
 app.include_router(users.router, prefix="/api")
+app.include_router(health.router, prefix="/api")

@@ -2,17 +2,18 @@ import Image from "next/image";
 import CountUp from "@/components/CountUp";
 import HeroDemo from "@/components/HeroDemo";
 import Reveal from "@/components/Reveal";
+import { storeUrl } from "@/lib/site";
 
 const STEPS = [
   {
     num: "1",
     title: "Przeglądasz serwis",
-    text: "Trackly po cichu rozpoznaje nazwę, plan, cenę i cykl rozliczenia. Nic nie wyskakuje i nic Ci nie przeszkadza.",
+    text: "Na stronie z cennikiem Trackly rozpoznaje nazwę, plan, cenę i cykl rozliczenia, a potem pokazuje dyskretne powiadomienie.",
   },
   {
     num: "2",
-    title: "Klikasz zakup",
-    text: "Dopiero wtedy pojawia się dyskretne powiadomienie. Formularz jest już wypełniony - poprawiasz, co trzeba, i zapisujesz.",
+    title: "Potwierdzasz",
+    text: "Klikasz Dodaj w powiadomieniu albo przycisk zakupu w serwisie. Formularz jest już wypełniony - poprawiasz, co trzeba, i zapisujesz.",
   },
   {
     num: "3",
@@ -70,7 +71,9 @@ export default function Home() {
                 <a className="btn btn-primary" href="#jak-to-dziala">
                   Zobacz, jak działa
                 </a>
-                <span className="soon">Wkrótce w Chrome Web Store</span>
+                <a className="btn btn-ghost" href={storeUrl} target="_blank" rel="noopener noreferrer">
+                  Zobacz w Chrome Web Store
+                </a>
               </div>
               <p className="hero-note">
                 <span className="dot-live" aria-hidden="true" />

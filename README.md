@@ -104,8 +104,9 @@ npm run dev
 | DELETE | `/subscriptions/{id}` |
 | GET | `/subscriptions/summary/budget` |
 | GET | `/subscriptions/summary/expiring` |
+| GET | `/health` |
 
-Everything except the login endpoint expects a bearer token.
+Everything except the login and health endpoints expects a bearer token.
 
 ## Deployment
 
@@ -121,6 +122,11 @@ deliberately no `vercel.json` anywhere in the repo: an earlier one at the repo r
 only for the backend) got read by the site project too, since Vercel resolves `vercel.json`
 from the repository root regardless of a project's own Root Directory setting - it broke
 every route on the site until it was removed.
+
+A scheduled GitHub Actions workflow (`.github/workflows/keepalive.yml`) calls `/api/health` once a
+day. The endpoint reads from the users table, which counts as database activity, so the Supabase
+free tier doesn't pause the project after a week without users. A failed run means the backend or
+the database is down.
 
 Push to `main` and both Vercel projects redeploy on their own. `SECRET_KEY` / `GOOGLE_CLIENT_ID`
 / `ALLOWED_ORIGINS` / `DATABASE_URL` live in the backend project's environment variables
