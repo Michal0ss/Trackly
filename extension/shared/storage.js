@@ -28,9 +28,52 @@ function getToken() {
 function removeToken() {
   return new Promise((resolve) => {
     if (hasChromeStorage()) {
-      chrome.storage.local.remove(["access_token"], resolve);
+      chrome.storage.local.remove(["access_token", "panel_cache"], resolve);
     } else {
       localStorage.removeItem("access_token");
+      resolve();
+    }
+  });
+}
+
+function readPanelCache() {
+  return new Promise((resolve) => {
+    if (!hasChromeStorage()) {
+      resolve(null);
+      return;
+    }
+
+    chrome.storage.local.get(["panel_cache"], (result) => {
+      const panel = result.panel_cache;
+      const valid = panel && panel.user && Array.isArray(panel.subscriptions) && Array.isArray(panel.expiring);
+
+      resolve(valid ? panel : null);
+    });
+  });
+}
+
+function normalizeServiceName(value) {
+  return String(value || "").toLowerCase().replace(/[^\p{L}\p{N}]+/gu, " ").trim();
+}
+
+async function isServiceInPanel(serviceName) {
+  const panel = await readPanelCache();
+  const name = normalizeServiceName(serviceName);
+
+  if (!panel || !name) {
+    return false;
+  }
+
+  return panel.subscriptions.some(
+    (sub) => sub.status !== "cancelled" && ` ${normalizeServiceName(sub.service_name)} `.includes(` ${name} `)
+  );
+}
+
+function writePanelCache(panel) {
+  return new Promise((resolve) => {
+    if (hasChromeStorage()) {
+      chrome.storage.local.set({ panel_cache: panel }, resolve);
+    } else {
       resolve();
     }
   });

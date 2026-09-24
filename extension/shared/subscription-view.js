@@ -52,6 +52,49 @@ function showConfirm(message) {
   });
 }
 
+let panelRendered = false;
+
+function renderPanel({ user, subscriptions, expiring }) {
+  renderUserInfo(user);
+  renderSubscriptionsSummary(subscriptions);
+  renderSubscriptionsList(subscriptions);
+  renderExpiringList(expiring);
+  bindSubscriptionActions();
+  document.getElementById("subscriptionsView").classList.remove("is-loading");
+  panelRendered = true;
+}
+
+function renderPanelLoading() {
+  document.getElementById("subscriptionsView").classList.add("is-loading");
+  document.getElementById("expiringList").innerHTML = `
+    <div class="subscription-empty-state">
+      Ładowanie…
+    </div>
+  `;
+  renderListLoading();
+}
+
+function renderPanelError() {
+  document.getElementById("subscriptionsView").classList.remove("is-loading");
+  document.querySelectorAll("#subscriptionsView .summary-value").forEach((value) => {
+    value.textContent = "-";
+  });
+  document.getElementById("expiringList").innerHTML = `
+    <div class="subscription-empty-state">
+      Brak danych.
+    </div>
+  `;
+  document.getElementById("subscriptionsList").innerHTML = `
+    <div class="subscription-empty-state">
+      Nie udało się pobrać subskrypcji.
+    </div>
+  `;
+}
+
+function resetPanel() {
+  panelRendered = false;
+}
+
 async function loadSubscriptions() {
   const token = await getToken();
 
@@ -59,7 +102,9 @@ async function loadSubscriptions() {
     return;
   }
 
-  renderListLoading();
+  if (!panelRendered) {
+    renderPanelLoading();
+  }
 
   try {
     const [user, subscriptions, expiring] = await Promise.all([
@@ -67,17 +112,16 @@ async function loadSubscriptions() {
       getSubscriptionsRequest(token),
       getExpiringSubscriptionsRequest(token, 7)
     ]);
+    const panel = { user, subscriptions, expiring };
 
-    renderUserInfo(user);
-    renderSubscriptionsSummary(subscriptions);
-    renderSubscriptionsList(subscriptions);
-    renderExpiringList(expiring);
-    bindSubscriptionActions();
+    renderPanel(panel);
+    await writePanelCache(panel);
   } catch (error) {
     console.error("Failed to load subscriptions:", error);
 
-    if (error.status === 401) {
+    if (error.status === 401 || error.status === 403) {
       await removeToken();
+      resetPanel();
 
       if (typeof showAuthView === "function") {
         showAuthView();
@@ -85,6 +129,19 @@ async function loadSubscriptions() {
       if (typeof showStatus === "function") {
         showStatus("Sesja wygasła. Zaloguj się ponownie.", "error");
       }
+      return;
+    }
+
+    if (!panelRendered) {
+      renderPanelError();
+    }
+    if (typeof showStatus === "function") {
+      showStatus(
+        panelRendered
+          ? "Brak połączenia z serwerem. Widzisz ostatnio pobrane dane."
+          : "Nie udało się połączyć z serwerem. Spróbuj ponownie za chwilę.",
+        "error"
+      );
     }
   }
 }
@@ -219,6 +276,15 @@ function renderSubscriptionsSummary(subscriptions) {
   document.getElementById("annualTotal").textContent = formatMoney(annual);
 }
 
+function formatAmount(value) {
+  const amount = Math.round(Number(value) * 100) / 100;
+
+  return amount.toLocaleString("pl-PL", {
+    minimumFractionDigits: Number.isInteger(amount) ? 0 : 2,
+    maximumFractionDigits: 2
+  });
+}
+
 function formatMoney(totalsByCurrency) {
   const entries = Object.entries(totalsByCurrency);
 
@@ -227,8 +293,26 @@ function formatMoney(totalsByCurrency) {
   }
 
   return entries
-    .map(([currency, total]) => `${Math.round(total * 100) / 100} ${currency}`)
-    .join(" / ");
+    .map(([currency, total]) => `${formatAmount(total)} ${currency}`)
+    .join("\n");
+}
+
+const ACTION_ICONS = {
+  manage: `<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10"></circle><line x1="2" y1="12" x2="22" y2="12"></line><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path></svg>`,
+  edit: `<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z"></path></svg>`,
+  delete: `<svg viewBox="0 0 24 24" aria-hidden="true"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><line x1="10" y1="11" x2="10" y2="17"></line><line x1="14" y1="11" x2="14" y2="17"></line></svg>`
+};
+
+function renderManageLink(sub, className) {
+  const url = findServiceLink(sub.service_name);
+
+  if (!url) {
+    return "";
+  }
+
+  return `<a class="${className}" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer"
+    aria-label="Zarządzaj subskrypcją"
+    title="Otwiera stronę serwisu z ustawieniami subskrypcji albo instrukcją rezygnacji">${ACTION_ICONS.manage}</a>`;
 }
 
 function renderSubscriptionItem(sub) {
@@ -242,19 +326,18 @@ function renderSubscriptionItem(sub) {
       <p class="subscription-plan">Plan: ${escapeHtml(sub.plan_name)}</p>
 
       <div class="subscription-meta">
-        <span>Cena: ${sub.price} ${escapeHtml(sub.currency)}</span>
+        <span>Cena: ${formatAmount(sub.price)} ${escapeHtml(sub.currency)}</span>
         <span>Cykl: ${BILLING_CYCLE_LABELS[sub.billing_cycle] || escapeHtml(sub.billing_cycle)}</span>
         <span>Odnowienie: ${sub.renewal_date || "brak danych"}</span>
         <span>Automatyczne odnawianie: ${sub.auto_renew ? "tak" : "nie"}</span>
       </div>
 
       <div class="subscription-actions-row">
-      <button class="sub-action-btn sub-edit-btn" data-action="edit" data-id="${sub.id}" type="button">
-          Edytuj
-        </button>
-        <button class="sub-action-btn sub-delete-btn" data-action="delete" data-id="${sub.id}" type="button">
-          Usuń
-        </button>
+        ${renderManageLink(sub, "sub-action-btn sub-manage-btn")}
+        <button class="sub-action-btn sub-edit-btn" data-action="edit" data-id="${sub.id}" type="button"
+          aria-label="Edytuj" title="Edytuj">${ACTION_ICONS.edit}</button>
+        <button class="sub-action-btn sub-delete-btn" data-action="delete" data-id="${sub.id}" type="button"
+          aria-label="Usuń" title="Usuń">${ACTION_ICONS.delete}</button>
       </div>
     </div>
   `;
@@ -306,10 +389,13 @@ function renderExpiringList(subscriptions) {
   listElement.innerHTML = subscriptions
     .map((sub) => `
       <div class="subscription-item">
-        <p class="subscription-service">${escapeHtml(sub.service_name)}</p>
+        <div class="subscription-item-header">
+          <p class="subscription-service">${escapeHtml(sub.service_name)}</p>
+          ${renderManageLink(sub, "expiring-manage")}
+        </div>
         <div class="subscription-meta">
           <span>Plan: ${escapeHtml(sub.plan_name)}</span>
-          <span>Cena: ${sub.price} ${escapeHtml(sub.currency)}</span>
+          <span>Cena: ${formatAmount(sub.price)} ${escapeHtml(sub.currency)}</span>
           <span>Odnowienie: ${sub.renewal_date}</span>
         </div>
       </div>

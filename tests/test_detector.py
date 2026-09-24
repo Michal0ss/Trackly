@@ -124,3 +124,68 @@ def test_page_without_subscription_data():
         url="https://www.netflix.com/legal",
     )
     assert result["is_subscription"] is False
+
+def test_whole_zloty_price_is_detected():
+    text = "Standardowy: 37 zł/miesiąc, Premium: 75 zł/miesiąc"
+    assert detect_price(text) == 37.0
+    assert detect_currency(text) == "PLN"
+
+
+def test_yearly_price_written_with_za_rok():
+    assert detect_billing_cycle("plan roczny 69 zł za rok") == "yearly"
+    assert detect_price("plan roczny 69 zł za rok") == 69.0
+
+
+def test_zero_price_of_a_trial_is_skipped():
+    assert detect_price("0 zł za 1 miesiąc, potem 26,99 zł/mies.") == 26.99
+
+
+def test_free_plan_alone_gives_no_price():
+    assert detect_price("Canva Free 0 zł") is None
+
+
+def test_part_of_a_longer_number_is_not_a_price():
+    assert detect_price("zamówienie 12345 zł") is None
+
+
+def test_service_and_plan_without_price_is_not_a_subscription():
+    result = detect_subscription_from_text(
+        "YouTube Premium Subskrypcje Historia",
+        url="https://www.youtube.com/watch?v=abc",
+    )
+    assert result["service_name"] == "YouTube Premium"
+    assert result["plan_name"] == "Premium"
+    assert result["is_subscription"] is False
+
+
+def test_empik_services_are_told_apart_by_path():
+    assert detect_service("", "https://www.empik.com/go/abonament") == "Empik Go"
+    assert detect_service("", "https://www.empik.com/premium") == "Empik Premium"
+    assert detect_service("", "https://www.empik.com/gotowanie") is None
+
+
+def test_apple_music_before_apple():
+    assert detect_service("", "https://music.apple.com/pl/subscribe") == "Apple Music"
+    assert detect_service("", "https://www.apple.com/pl/apple-one/") == "Apple"
+
+
+def test_max_domains_share_one_name():
+    assert detect_service("", "https://www.hbomax.com/pl/pl") == "HBO Max"
+    assert detect_service("", "https://www.max.com/") == "HBO Max"
+
+
+def test_new_services_are_named_from_the_hostname():
+    assert detect_service("", "https://pay.openai.com/c/pay/cs_live_1") == "ChatGPT"
+    assert detect_service("", "https://one.google.com/about/plans") == "Google One"
+    assert detect_service("", "https://player.pl/pakiety") == "Player"
+    assert detect_service("", "https://allegro.pl/smart") == "Allegro Smart!"
+
+
+def test_full_detection_netflix_whole_price():
+    result = detect_subscription_from_text(
+        "Standardowy 37 zł/miesiąc",
+        url="https://www.netflix.com/pl/",
+    )
+    assert result["is_subscription"] is True
+    assert result["price"] == 37.0
+    assert result["billing_cycle"] == "monthly"

@@ -30,7 +30,7 @@ export default function Privacy() {
         </a>
 
         <h1>Polityka prywatności</h1>
-        <p className="doc-updated">Ostatnia aktualizacja: 19 września 2026</p>
+        <p className="doc-updated">Ostatnia aktualizacja: 24 września 2026</p>
 
         <p>
           Trackly to rozszerzenie do przeglądarki, które pomaga śledzić subskrypcje.
@@ -72,10 +72,12 @@ export default function Privacy() {
           strony, na której wykryliśmy subskrypcję, zostaje w Twojej przeglądarce.
         </p>
         <p>
-          <strong>Dane przechowywane lokalnie w przeglądarce.</strong> Token sesji, informacje
-          o wykrytych subskrypcjach czekających na potwierdzenie oraz zapis, dla których
-          serwisów już pytaliśmy. Te dane nie trafiają na nasz serwer i znikają przy usunięciu
-          rozszerzenia.
+          <strong>Dane przechowywane lokalnie w przeglądarce.</strong> Token sesji, kopia Twojej
+          listy subskrypcji, dzięki której panel otwiera się od razu, informacje o wykrytych
+          subskrypcjach czekających na potwierdzenie oraz zapis, dla których serwisów już
+          pytaliśmy. Na serwer trafia z nich tylko token, dołączany do zapytań, żeby serwer
+          wiedział, że to Ty. Token i kopia listy znikają po wylogowaniu, a wszystko razem przy
+          usunięciu rozszerzenia.
         </p>
 
         <h2>Dlaczego rozszerzenie prosi o uprawnienia</h2>

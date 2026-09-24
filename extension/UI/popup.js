@@ -1,4 +1,5 @@
 const statusBox = document.getElementById("statusBox");
+const panelStatusBox = document.getElementById("panelStatusBox");
 const tokenValue = document.getElementById("tokenValue");
 const refreshTokenBtn = document.getElementById("refreshTokenBtn");
 const logoutBtn = document.getElementById("logoutBtn");
@@ -51,14 +52,27 @@ async function loginWithGoogle() {
   }
 }
 
+let statusTimer = null;
+
 function showStatus(message, type = "info") {
-  statusBox.textContent = message;
-  statusBox.className = `status show ${type}`;
+  clearStatus();
+
+  const box = subscriptionsView.style.display === "block" ? panelStatusBox : statusBox;
+  box.textContent = message;
+  box.className = `status show ${type}`;
+
+  if (type === "success") {
+    statusTimer = setTimeout(clearStatus, 4000);
+  }
 }
 
 function clearStatus() {
-  statusBox.textContent = "";
-  statusBox.className = "status";
+  clearTimeout(statusTimer);
+
+  [statusBox, panelStatusBox].forEach((box) => {
+    box.textContent = "";
+    box.className = "status";
+  });
 }
 
 function showAuthView() {
@@ -78,6 +92,7 @@ async function refreshTokenPreview() {
 
 async function logoutUser() {
   await removeToken();
+  resetPanel();
   await refreshTokenPreview();
   showAuthView();
   showStatus("Wylogowano.");
@@ -126,6 +141,13 @@ async function maybeShowPendingDetection() {
     return;
   }
 
+  if (await isServiceInPanel(pending.candidate.service_name)) {
+    await markKeyAsSubmitted(pending.key);
+    await clearPendingDetection(pending.key);
+    await syncPendingBadge();
+    return;
+  }
+
   showSubscriptionForm(
     pending.candidate,
     async (payload) => {
@@ -149,6 +171,13 @@ async function maybeShowPendingDetection() {
         showStatus(`Subskrypcja ${payload.service_name} została dodana.`, "success");
       } catch (error) {
         console.error("Failed to create subscription:", error);
+
+        if (error.status === 409 && pending.key) {
+          await markKeyAsSubmitted(pending.key);
+          await clearPendingDetection(pending.key);
+          await syncPendingBadge();
+        }
+
         showStatus(`Nie udało się dodać subskrypcji: ${error.message}`, "error");
       }
     },
@@ -162,40 +191,24 @@ async function maybeShowPendingDetection() {
   );
 }
 
-function hideBothViews() {
-  authView.style.display = "none";
-  subscriptionsView.style.display = "none";
-}
-
 async function checkSession() {
-  hideBothViews();
-
-  const token = await getToken();
+  const [token, cached] = await Promise.all([getToken(), readPanelCache()]);
 
   if (!token) {
     showAuthView();
     return;
   }
 
-  try {
-    await getCurrentUserRequest(token);
-  } catch (error) {
-    showAuthView();
+  showSubscriptionsView();
 
-    if (error.status === 401 || error.status === 403) {
-      await removeToken();
-      await refreshTokenPreview();
-      showStatus("Sesja wygasła. Zaloguj się ponownie.", "error");
-    } else {
-      showStatus("Nie udało się połączyć z serwerem. Spróbuj ponownie za chwilę.", "error");
-    }
-
-    return;
+  if (cached) {
+    renderPanel(cached);
+  } else {
+    renderPanelLoading();
   }
 
-  showSubscriptionsView();
-  await loadSubscriptions();
   await maybeShowPendingDetection();
+  await loadSubscriptions();
 }
 
 document.addEventListener("DOMContentLoaded", () => {

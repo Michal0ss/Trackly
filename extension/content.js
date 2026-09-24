@@ -32,6 +32,44 @@ const PURCHASE_KEYWORDS = [
   "try free"
 ];
 
+const DETECTION_PATHS = {
+  "youtube.com": ["premium", "musicpremium", "paid_memberships"],
+  "github.com": ["account/upgrade", "settings/billing", "settings/copilot", "github-copilot/signup"],
+  "www.apple.com": ["apple-one", "apple-music", "apple-tv-plus", "apple-arcade", "icloud"],
+  "microsoft.com": ["microsoft-365"],
+  "xbox.com": ["xbox-game-pass", "xbox-game-pass-ultimate", "xbox-game-pass-standard", "xbox-game-pass-core", "pc-game-pass"],
+  "playstation.com": ["ps-plus"],
+  "nintendo.com": ["nintendo-switch-online", "membership"],
+  "amazon.pl": ["amazonprime", "gp/primecentral"],
+  "primevideo.com": ["prime", "addons", "offers", "signup", "settings"],
+  "polsatboxgo.pl": ["pakiety"],
+  "legimi.pl": ["cennik", "konto/subskrypcja"],
+  "empik.com": ["go", "premium"],
+  "allegro.pl": ["smart"],
+  "canva.com": ["pricing", "pro", "settings/billing-and-teams"],
+  "notion.com": ["pricing"],
+  "dropbox.com": ["plans", "buy", "upgrade", "account/plan"],
+  "duolingo.com": ["super", "max", "settings/super"],
+  "claude.ai": ["upgrade", "settings/billing"]
+};
+
+function isDetectionPage(url) {
+  let parsed;
+
+  try {
+    parsed = new URL(url);
+  } catch {
+    return false;
+  }
+
+  const hostname = parsed.hostname.toLowerCase();
+  const domain = Object.keys(DETECTION_PATHS).find(
+    (key) => hostname === key || hostname.endsWith(`.${key}`)
+  );
+
+  return !domain || DETECTION_PATHS[domain].some((rule) => pathContains(parsed.pathname, rule));
+}
+
 function debugLog(...args) {
   if (DEBUG) {
     console.log("[Trackly]", ...args);
@@ -106,6 +144,10 @@ async function queueDetection(serviceKey, candidate) {
 }
 
 async function collectAndMaybeOfferToast() {
+  if (!isDetectionPage(window.location.href)) {
+    return;
+  }
+
   const token = await getToken();
 
   if (!token) {
@@ -127,6 +169,11 @@ async function collectAndMaybeOfferToast() {
   }
 
   if (!detected.is_subscription) {
+    return;
+  }
+
+  if (await isServiceInPanel(detected.service_name)) {
+    debugLog("Toast pominiety, serwis jest juz w panelu:", serviceKey);
     return;
   }
 
@@ -175,7 +222,7 @@ async function handlePossiblePurchaseClick(event) {
       "button, a, [role='button'], input[type='submit'], input[type='button']"
   );
 
-  if (!control || !looksLikePurchaseControl(control)) {
+  if (!control || !looksLikePurchaseControl(control) || !isDetectionPage(window.location.href)) {
     return;
   }
 
@@ -187,13 +234,18 @@ async function handlePossiblePurchaseClick(event) {
 
   const pageUrl = window.location.href;
   const detected = detectCurrentPage() || {};
+
+  if (!detected.price) {
+    return;
+  }
+
   const serviceKey = getServiceKey(detected, pageUrl);
 
   if (hasAnythingWorthSaving(detected)) {
     await rememberJourneyData(serviceKey, detected);
   }
 
-  if (await isServiceAlreadySaved(serviceKey)) {
+  if (await isServiceAlreadySaved(serviceKey) || await isServiceInPanel(detected.service_name)) {
     debugLog("Zakup pominiety, serwis juz zapisany:", serviceKey);
     return;
   }
