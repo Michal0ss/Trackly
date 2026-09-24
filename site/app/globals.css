@@ -210,19 +210,6 @@ a {
   background: rgba(255, 255, 255, 0.09);
 }
 
-.soon {
-  display: inline-flex;
-  align-items: center;
-  font-family: var(--font-display), sans-serif;
-  font-size: 15px;
-  font-weight: 700;
-  color: var(--muted);
-  background: rgba(148, 163, 184, 0.07);
-  border: 1px dashed var(--line-strong);
-  border-radius: 12px;
-  padding: 13px 22px;
-}
-
 /* ---------- sekcje ---------- */
 
 .band {
