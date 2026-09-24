@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import styles from "./nowa.module.css";
+import styles from "./demo.module.css";
 
 const TIMINGS = [1400, 1500, 950, 450, 1300, 950, 450, 3800, 700];
 const PANEL_STEP = 7;
@@ -92,7 +92,7 @@ export default function Demo() {
             <rect x="5" y="11" width="14" height="10" rx="2" />
             <path d="M8 11V7a4 4 0 0 1 8 0v4" />
           </svg>
-          spotify.com/premium
+          serwis.com/premium
         </div>
         <span
           ref={iconRef}
@@ -108,11 +108,11 @@ export default function Demo() {
       <div className={styles.stage}>
         <div className={styles.svcArt} />
         <p className={styles.svcLabel}>Plan</p>
-        <p className={styles.svcPlan}>Premium Individual</p>
+        <p className={styles.svcPlan}>Premium</p>
         <p className={styles.svcPrice}>
           26,99 zł <span>/ miesiąc</span>
         </p>
-        <span className={styles.svcCta}>Kup Premium Individual</span>
+        <span className={styles.svcCta}>Kup Premium</span>
         <div className={styles.svcLines}>
           <i />
           <i />
@@ -124,12 +124,12 @@ export default function Demo() {
             <Image className={styles.toastLogo} src="/wordmark.png" alt="" width={588} height={210} />
             {saved ? (
               <>
-                <p className={styles.toastTitle}>Zapisaliśmy Spotify</p>
+                <p className={styles.toastTitle}>Zapisaliśmy Serwis</p>
                 <p className={styles.toastSub}>Otwórz Trackly z paska narzędzi, aby dokończyć.</p>
               </>
             ) : (
               <>
-                <p className={styles.toastTitle}>Wykryto: Spotify</p>
+                <p className={styles.toastTitle}>Wykryto: Serwis</p>
                 <p className={styles.toastSub}>Premium · 26,99 PLN / miesiąc</p>
                 <div className={styles.toastActions}>
                   <span className={styles.tbtn}>Nie teraz</span>
@@ -171,7 +171,7 @@ export default function Demo() {
             </div>
             <div className={styles.panelRow}>
               <div>
-                <strong>Spotify</strong>
+                <strong>Serwis</strong>
                 <p>Premium · 26,99 PLN</p>
               </div>
               <span className={styles.statusPill}>Aktywna</span>
