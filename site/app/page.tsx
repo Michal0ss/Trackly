@@ -11,7 +11,7 @@ const STEPS = [
   {
     num: "01",
     title: "Przeglądasz serwis",
-    text: "Na stronie z cennikiem Trackly rozpoznaje nazwę, plan, cenę i cykl rozliczenia, a potem pokazuje dyskretne powiadomienie.",
+    text: "Na stronie z cennikiem jednego z ponad 35 serwisów Trackly rozpoznaje nazwę, plan, cenę i cykl rozliczenia, a potem pokazuje dyskretne powiadomienie.",
   },
   {
     num: "02",
@@ -37,11 +37,13 @@ const FEATURES = [
     ),
   },
   {
-    title: "Edytujesz i usuwasz",
-    text: "Cena poszła w górę albo rezygnujesz? Poprawiasz wpis w kilka sekund.",
+    title: "Rezygnujesz bez szukania",
+    text: "Przy większości serwisów jedno kliknięcie otwiera stronę, na której zmienisz albo anulujesz plan.",
     icon: (
       <svg viewBox="0 0 24 24">
-        <path d="M17 3a2.83 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5L17 3z" />
+        <circle cx="12" cy="12" r="10" />
+        <line x1="2" y1="12" x2="22" y2="12" />
+        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z" />
       </svg>
     ),
   },
@@ -57,8 +59,8 @@ const FEATURES = [
     ),
   },
   {
-    title: "Dodajesz ręcznie",
-    text: "Subskrypcje sprzed instalacji wpiszesz sam, w tym samym formularzu.",
+    title: "Dodajesz i poprawiasz",
+    text: "Subskrypcje sprzed instalacji wpiszesz sam, a każdy wpis poprawisz albo usuniesz w kilka sekund.",
     icon: (
       <svg viewBox="0 0 24 24">
         <circle cx="12" cy="12" r="10" />
