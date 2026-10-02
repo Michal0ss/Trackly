@@ -10,7 +10,7 @@ function formatToastSubtitle(candidate) {
   }
 
   if (candidate.price) {
-    parts.push(`${candidate.price} ${candidate.currency || ""}`.trim());
+    parts.push(`${formatAmount(candidate.price)} ${candidate.currency || ""}`.trim());
   }
 
   return parts.join(" · ");
@@ -35,12 +35,14 @@ function showDetectionToast(candidate, { onAccept, onDismiss } = {}) {
       <p class="trackly-toast-title"></p>
       <p class="trackly-toast-subtitle"></p>
       <div class="trackly-toast-actions">
-        <button type="button" class="trackly-toast-btn trackly-toast-dismiss">Nie teraz</button>
-        <button type="button" class="trackly-toast-btn trackly-toast-accept">Dodaj</button>
+        <button type="button" class="trackly-toast-btn trackly-toast-dismiss"></button>
+        <button type="button" class="trackly-toast-btn trackly-toast-accept"></button>
       </div>
     `;
 
-    card.querySelector(".trackly-toast-title").textContent = `Wykryto: ${candidate.service_name}`;
+    card.querySelector(".trackly-toast-title").textContent = t("toastDetected", [candidate.service_name]);
+    card.querySelector(".trackly-toast-dismiss").textContent = t("notNow");
+    card.querySelector(".trackly-toast-accept").textContent = t("add");
 
     const subtitle = formatToastSubtitle(candidate);
     const subtitleEl = card.querySelector(".trackly-toast-subtitle");
@@ -74,9 +76,11 @@ function showDetectionToast(candidate, { onAccept, onDismiss } = {}) {
   function renderConfirmation() {
     card.innerHTML = `
       <img class="trackly-toast-logo" src="${chrome.runtime.getURL("logo/wordmark.png")}" alt="Trackly" />
-      <p class="trackly-toast-title">Zapisano ✓</p>
-      <p class="trackly-toast-subtitle">Otwórz Trackly z paska narzędzi, aby dokończyć dodawanie.</p>
+      <p class="trackly-toast-title"></p>
+      <p class="trackly-toast-subtitle"></p>
     `;
+    card.querySelector(".trackly-toast-title").textContent = t("toastSaved");
+    card.querySelector(".trackly-toast-subtitle").textContent = t("toastFinishInPopup");
     setTimeout(() => toast.remove(), TRACKLY_TOAST_CONFIRM_MS);
   }
 

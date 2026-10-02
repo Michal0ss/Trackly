@@ -48,6 +48,20 @@ def test_google_login_rejects_token_from_another_app(client, monkeypatch):
     assert response.status_code == 401
 
 
+def test_google_login_accepts_any_listed_client(client, monkeypatch):
+    monkeypatch.setenv("GOOGLE_CLIENT_ID", "chrome-client-id, edge-web-client-id")
+    fake_google(monkeypatch, 200, {
+        "aud": "edge-web-client-id",
+        "email": "edge@example.com",
+        "email_verified": "true",
+        "sub": "google-edge",
+    })
+
+    response = client.post("/api/users/google-login", json={"access_token": "cokolwiek"})
+
+    assert response.status_code == 200
+
+
 def test_google_login_rejects_invalid_token(client, monkeypatch):
     monkeypatch.setenv("GOOGLE_CLIENT_ID", "trackly-client-id")
     fake_google(monkeypatch, 400, {"error": "invalid_token"})

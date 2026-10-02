@@ -5,9 +5,11 @@ import { useEffect, useRef, useState } from "react";
 export default function CountUp({
   to,
   decimals = 2,
+  locale = "pl-PL",
 }: {
   to: number;
   decimals?: number;
+  locale?: string;
 }) {
   const ref = useRef<HTMLSpanElement>(null);
   const [value, setValue] = useState(to);
@@ -51,7 +53,7 @@ export default function CountUp({
 
   return (
     <span ref={ref}>
-      {value.toLocaleString("pl-PL", {
+      {value.toLocaleString(locale, {
         minimumFractionDigits: decimals,
         maximumFractionDigits: decimals,
       })}

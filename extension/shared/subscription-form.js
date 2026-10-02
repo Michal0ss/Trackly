@@ -18,8 +18,8 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
     return;
   }
 
-  const title = options.title || "Dodaj subskrypcję";
-  const submitLabel = options.submitLabel || "Dodaj";
+  const title = options.title || t("addSubscription");
+  const submitLabel = options.submitLabel || t("add");
 
   const modal = document.createElement("div");
   modal.id = TRACKLY_FORM_ID;
@@ -29,30 +29,30 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
     <div class="trackly-top">
       <div>
         <img class="trackly-logo" src="${chrome.runtime.getURL("logo/wordmark.png")}" alt="Trackly" />
-        <h2>Dodaj subskrypcję</h2>
-        <p class="trackly-subtitle">Uzupełnij dane wykrytej subskrypcji przed zapisaniem.</p>
+        <h2></h2>
+        <p class="trackly-subtitle">${t("formSubtitle")}</p>
       </div>
       <button id="trackly-close-btn" class="trackly-icon-btn" type="button">×</button>
     </div>
 
     <div class="trackly-field">
-      <label for="trackly-service-name">Serwis</label>
+      <label for="trackly-service-name">${t("formService")}</label>
       <input id="trackly-service-name" type="text" value="" />
     </div>
 
     <div class="trackly-field">
-      <label for="trackly-plan-name">Plan</label>
-      <input id="trackly-plan-name" type="text" placeholder="np. Premium" />
+      <label for="trackly-plan-name">${t("formPlan")}</label>
+      <input id="trackly-plan-name" type="text" placeholder="${t("formPlanPlaceholder")}" />
     </div>
 
     <div class="trackly-grid">
       <div class="trackly-field">
-        <label for="trackly-price">Cena</label>
+        <label for="trackly-price">${t("formPrice")}</label>
         <input id="trackly-price" type="number" step="0.01" placeholder="29.99" />
       </div>
 
       <div class="trackly-field">
-        <label for="trackly-currency">Waluta</label>
+        <label for="trackly-currency">${t("formCurrency")}</label>
         <select id="trackly-currency">
           <option value="PLN">PLN</option>
           <option value="EUR">EUR</option>
@@ -63,28 +63,28 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
     </div>
 
     <div class="trackly-field">
-      <label for="trackly-billing-cycle">Cykl rozliczenia</label>
+      <label for="trackly-billing-cycle">${t("formCycle")}</label>
       <select id="trackly-billing-cycle">
-        <option value="monthly">Miesięcznie</option>
-        <option value="yearly">Rocznie</option>
+        <option value="monthly">${t("cycleMonthly")}</option>
+        <option value="yearly">${t("cycleYearly")}</option>
       </select>
     </div>
 
     <div class="trackly-field">
-      <label for="trackly-renewal-date">Data odnowienia</label>
+      <label for="trackly-renewal-date">${t("formRenewalDate")}</label>
       <input id="trackly-renewal-date" type="date" />
     </div>
 
     <label class="trackly-check">
       <input id="trackly-auto-renew" type="checkbox" checked />
-      <span>Odnawia się automatycznie</span>
+      <span>${t("formAutoRenew")}</span>
     </label>
 
     <p id="trackly-form-error"></p>
 
     <div class="trackly-actions">
-      <button id="trackly-cancel-btn" class="trackly-btn trackly-secondary" type="button">Anuluj</button>
-      <button id="trackly-save-btn" class="trackly-btn trackly-primary" type="button">Dodaj</button>
+      <button id="trackly-cancel-btn" class="trackly-btn trackly-secondary" type="button">${t("cancel")}</button>
+      <button id="trackly-save-btn" class="trackly-btn trackly-primary" type="button"></button>
     </div>
   </div>
 `;
@@ -98,7 +98,7 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
   document.getElementById("trackly-plan-name").value = candidate.plan_name || "";
   document.getElementById("trackly-price").value = candidate.price ?? "";
   document.getElementById("trackly-billing-cycle").value = candidate.billing_cycle || "monthly";
-  document.getElementById("trackly-currency").value = candidate.currency || "PLN";
+  document.getElementById("trackly-currency").value = candidate.currency || defaultCurrency();
   document.getElementById("trackly-auto-renew").checked = candidate.auto_renew ?? true;
 
   const billingCycleSelect = document.getElementById("trackly-billing-cycle");
@@ -130,7 +130,7 @@ function showSubscriptionForm(candidate, onSubmit, options = {}) {
   document.getElementById("trackly-close-btn").addEventListener("click", closeForm);
 
   const saveBtn = document.getElementById("trackly-save-btn");
-  const savingLabel = "Zapisywanie…";
+  const savingLabel = t("saving");
 
   saveBtn.addEventListener("click", async () => {
     const payload = buildSubscriptionPayload(candidate);
@@ -174,19 +174,19 @@ function buildSubscriptionPayload(candidate) {
 
 function validateSubscriptionPayload(payload) {
   if (!payload.service_name) {
-    return "Podaj nazwę serwisu.";
+    return t("formErrorService");
   }
 
   if (!payload.plan_name) {
-    return "Podaj nazwę planu.";
+    return t("formErrorPlan");
   }
 
   if (!payload.price || payload.price <= 0) {
-    return "Podaj poprawną cenę.";
+    return t("formErrorPrice");
   }
 
   if (!payload.currency || payload.currency.length !== 3) {
-    return "Podaj walutę, np. PLN.";
+    return t("formErrorCurrency");
   }
 
   return null;
