@@ -21,9 +21,6 @@ const COPY = {
     brand: "Serwis",
     menu: ["Filmy", "Seriale", "Dla dzieci"],
     choose: "Wybierz plan",
-    perks: ["Filmy i seriale w 4K", "4 ekrany jednocześnie", "Pobieranie offline"],
-    price: "26,99 zł",
-    period: "/ miesiąc",
     buy: "Kup Premium",
     savedTitle: "Zapisaliśmy Serwis",
     savedSub: "Otwórz Trackly z paska narzędzi, aby dokończyć.",
@@ -48,9 +45,6 @@ const COPY = {
     brand: "Service",
     menu: ["Movies", "Series", "Kids"],
     choose: "Choose your plan",
-    perks: ["Movies and series in 4K", "4 screens at once", "Offline downloads"],
-    price: "$9.99",
-    period: "/ month",
     buy: "Get Premium",
     savedTitle: "Saved Service",
     savedSub: "Open Trackly from the toolbar to finish.",
@@ -165,50 +159,54 @@ export default function Demo({ lang }: { lang: Lang }) {
       </div>
 
       <div className={styles.stage}>
-        <div className={styles.svcNav}>
-          <span className={styles.svcBrand}>
-            <span className={styles.svcMark}>
-              <svg viewBox="0 0 24 24">
-                <path d="M8 5.5v13l10.5-6.5z" />
-              </svg>
+        <div className={styles.svcPage}>
+          <div className={styles.svcNav}>
+            <span className={styles.svcBrand}>
+              <span className={styles.svcMark}>
+                <svg viewBox="0 0 24 24">
+                  <path d="M8 5.5v13l10.5-6.5z" />
+                </svg>
+              </span>
+              {copy.brand}
             </span>
-            {copy.brand}
-          </span>
-          <span className={styles.svcMenu}>
-            {copy.menu.map((item) => (
-              <span key={item}>{item}</span>
-            ))}
-          </span>
-          <span className={styles.svcUser} />
+            <span className={styles.svcMenu}>
+              {copy.menu.map((item) => (
+                <span key={item}>{item}</span>
+              ))}
+            </span>
+            <span className={styles.svcUser} />
+          </div>
+          <div className={styles.svcShelf}>
+            <span className={styles.svcFeatured}>
+              <span className={styles.svcPlay}>
+                <svg viewBox="0 0 24 24">
+                  <path d="M8 5.5v13l10.5-6.5z" />
+                </svg>
+              </span>
+            </span>
+            <span />
+            <span />
+            <span />
+          </div>
+          <div className={styles.svcPlanCard}>
+            <p className={styles.svcLabel}>{copy.choose}</p>
+            <p className={styles.svcPlan}>Premium</p>
+            <span className={styles.svcPrice} />
+            <div className={styles.svcLines}>
+              <span />
+              <span />
+              <span />
+            </div>
+            <span className={styles.svcCta}>{copy.buy}</span>
+          </div>
         </div>
-        <div className={styles.svcShelf}>
-          <span className={styles.svcFeatured}>
-            <span className={styles.svcPlay}>
-              <svg viewBox="0 0 24 24">
-                <path d="M8 5.5v13l10.5-6.5z" />
-              </svg>
-            </span>
-          </span>
+        <div className={styles.svcFog}>
           <span />
           <span />
           <span />
+          <span />
+          <span />
         </div>
-        <p className={styles.svcLabel}>{copy.choose}</p>
-        <p className={styles.svcPlan}>Premium</p>
-        <p className={styles.svcPrice}>
-          {copy.price} <span>{copy.period}</span>
-        </p>
-        <div className={styles.svcPerks}>
-          {copy.perks.map((perk) => (
-            <span key={perk}>
-              <svg viewBox="0 0 24 24">
-                <polyline points="20 6 9 17 4 12" />
-              </svg>
-              {perk}
-            </span>
-          ))}
-        </div>
-        <span className={styles.svcCta}>{copy.buy}</span>
         {toastVisible && (
           <div className={styles.toast} key={saved ? "saved" : "prompt"}>
             <Image className={styles.toastLogo} src="/wordmark.png" alt="" width={588} height={210} />
