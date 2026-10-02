@@ -97,10 +97,70 @@
 .stage {
   position: relative;
   height: clamp(390px, 46vw, 470px);
-  padding: 22px 48px 44px;
   background:
     radial-gradient(520px 280px at 22% 0%, rgba(168, 85, 247, 0.13), transparent 70%),
     #0a1019;
+}
+
+.svcPage {
+  position: absolute;
+  inset: 0;
+  padding: 22px 48px 44px;
+}
+
+.svcFog {
+  --fog-start: 26%;
+  --fog-step: 12%;
+
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.svcFog span,
+.svcFog::after {
+  position: absolute;
+  inset: 0;
+}
+
+.svcFog span:nth-child(1) {
+  -webkit-backdrop-filter: blur(1px);
+  backdrop-filter: blur(1px);
+  -webkit-mask-image: linear-gradient(180deg, transparent var(--fog-start), #000 calc(var(--fog-start) + var(--fog-step)), #000 calc(var(--fog-start) + var(--fog-step) * 2), transparent calc(var(--fog-start) + var(--fog-step) * 3));
+  mask-image: linear-gradient(180deg, transparent var(--fog-start), #000 calc(var(--fog-start) + var(--fog-step)), #000 calc(var(--fog-start) + var(--fog-step) * 2), transparent calc(var(--fog-start) + var(--fog-step) * 3));
+}
+
+.svcFog span:nth-child(2) {
+  -webkit-backdrop-filter: blur(2.5px);
+  backdrop-filter: blur(2.5px);
+  -webkit-mask-image: linear-gradient(180deg, transparent calc(var(--fog-start) + var(--fog-step)), #000 calc(var(--fog-start) + var(--fog-step) * 2), #000 calc(var(--fog-start) + var(--fog-step) * 3), transparent calc(var(--fog-start) + var(--fog-step) * 4));
+  mask-image: linear-gradient(180deg, transparent calc(var(--fog-start) + var(--fog-step)), #000 calc(var(--fog-start) + var(--fog-step) * 2), #000 calc(var(--fog-start) + var(--fog-step) * 3), transparent calc(var(--fog-start) + var(--fog-step) * 4));
+}
+
+.svcFog span:nth-child(3) {
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  -webkit-mask-image: linear-gradient(180deg, transparent calc(var(--fog-start) + var(--fog-step) * 2), #000 calc(var(--fog-start) + var(--fog-step) * 3), #000 calc(var(--fog-start) + var(--fog-step) * 4), transparent calc(var(--fog-start) + var(--fog-step) * 5));
+  mask-image: linear-gradient(180deg, transparent calc(var(--fog-start) + var(--fog-step) * 2), #000 calc(var(--fog-start) + var(--fog-step) * 3), #000 calc(var(--fog-start) + var(--fog-step) * 4), transparent calc(var(--fog-start) + var(--fog-step) * 5));
+}
+
+.svcFog span:nth-child(4) {
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
+  -webkit-mask-image: linear-gradient(180deg, transparent calc(var(--fog-start) + var(--fog-step) * 3), #000 calc(var(--fog-start) + var(--fog-step) * 4));
+  mask-image: linear-gradient(180deg, transparent calc(var(--fog-start) + var(--fog-step) * 3), #000 calc(var(--fog-start) + var(--fog-step) * 4));
+}
+
+.svcFog span:nth-child(5) {
+  -webkit-backdrop-filter: blur(18px);
+  backdrop-filter: blur(18px);
+  -webkit-mask-image: linear-gradient(180deg, transparent calc(var(--fog-start) + var(--fog-step) * 4), #000 calc(var(--fog-start) + var(--fog-step) * 5.3));
+  mask-image: linear-gradient(180deg, transparent calc(var(--fog-start) + var(--fog-step) * 4), #000 calc(var(--fog-start) + var(--fog-step) * 5.3));
+}
+
+.svcFog::after {
+  content: "";
+  background: linear-gradient(180deg, transparent calc(var(--fog-start) + 6%), rgba(10, 16, 25, 0.28) 70%, rgba(10, 16, 25, 0.62));
 }
 
 .svcNav {
@@ -256,40 +316,66 @@
 }
 
 .svcPrice {
-  margin-top: 8px;
-  font-size: 20px;
-  font-weight: 600;
-}
-
-.svcPrice span {
-  font-size: 15px;
-  font-weight: 400;
-  color: var(--dim);
-}
-
-.svcPerks {
-  display: grid;
-  gap: 8px;
-  margin-top: 18px;
-  font-size: 14px;
-  color: var(--muted);
-}
-
-.svcPerks span {
   display: flex;
   align-items: center;
-  gap: 9px;
+  gap: 8px;
+  margin-top: 14px;
 }
 
-.svcPerks svg {
-  flex: none;
-  width: 15px;
-  height: 15px;
-  fill: none;
-  stroke: #c084fc;
-  stroke-width: 2.6;
-  stroke-linecap: round;
-  stroke-linejoin: round;
+.svcPrice::before,
+.svcPrice::after {
+  content: "";
+  border-radius: 6px;
+}
+
+.svcPrice::before {
+  width: 92px;
+  height: 16px;
+  background: rgba(241, 245, 249, 0.7);
+}
+
+.svcPrice::after {
+  width: 56px;
+  height: 9px;
+  background: rgba(148, 163, 184, 0.3);
+}
+
+.svcLines {
+  display: grid;
+  gap: 13px;
+  margin-top: 24px;
+}
+
+.svcLines span {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.svcLines span::before,
+.svcLines span::after {
+  content: "";
+  border-radius: 999px;
+}
+
+.svcLines span::before {
+  width: 13px;
+  height: 13px;
+  background: rgba(192, 132, 252, 0.55);
+}
+
+.svcLines span::after {
+  width: 168px;
+  height: 8px;
+  background: rgba(148, 163, 184, 0.22);
+}
+
+.svcLines span:nth-child(2)::after {
+  width: 136px;
+}
+
+.svcLines span:nth-child(3)::after {
+  width: 112px;
 }
 
 .svcCta {
@@ -566,18 +652,57 @@
 
 @media (max-width: 640px) {
   .stage {
-    height: 470px;
+    height: 510px;
+  }
+
+  .svcPage {
     padding: 18px 22px 26px;
   }
 
+  .svcFog {
+    --fog-start: 45%;
+    --fog-step: 8%;
+  }
+
   .svcNav {
-    margin-bottom: 26px;
+    margin-bottom: 16px;
   }
 
   .svcMenu,
-  .svcShelf,
-  .svcPerks {
+  .svcLines,
+  .svcShelf > span:not(.svcFeatured) {
     display: none;
+  }
+
+  .svcShelf {
+    position: static;
+    display: block;
+    width: auto;
+    height: 96px;
+    margin-bottom: 14px;
+  }
+
+  .svcFeatured {
+    display: block;
+    height: 100%;
+  }
+
+  .svcPlanCard {
+    padding: 16px;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.07);
+  }
+
+  .svcPlan {
+    margin-top: 6px;
+    font-size: 24px;
+  }
+
+  .svcCta {
+    display: block;
+    margin-top: 16px;
+    text-align: center;
   }
 
   .browserBar {
