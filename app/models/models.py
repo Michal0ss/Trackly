@@ -38,3 +38,12 @@ class Users(Base):
     created_at = Column(DateTime, default=datetime.now(UTC))
 
     subscriptions = relationship("Subscription", back_populates="user")
+
+
+class WaitlistEntry(Base):
+    __tablename__ = "waitlist"
+
+    id = Column(Integer, primary_key=True)
+    email = Column(String, unique=True, nullable=False)
+    language = Column(String(2))
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))

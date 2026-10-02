@@ -53,6 +53,10 @@ a {
   transform: none;
 }
 
+.reveal.reveal-fade {
+  transform: none;
+}
+
 .skip {
   position: absolute;
   left: -9999px;

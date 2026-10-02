@@ -1,0 +1,432 @@
+{
+  "extName": {
+    "message": "Trackly"
+  },
+  "extDescription": {
+    "message": "Spots your subscriptions automatically and keeps their costs and renewal dates in one place."
+  },
+  "websiteUrl": {
+    "message": "https://tracklyapp.pl/en"
+  },
+  "privacyUrl": {
+    "message": "https://tracklyapp.pl/en/privacy"
+  },
+  "greeting1": {
+    "message": "Welcome"
+  },
+  "greeting2": {
+    "message": "Hi there"
+  },
+  "greeting3": {
+    "message": "Good to see you"
+  },
+  "greeting4": {
+    "message": "Nice to see you"
+  },
+  "authSubtitle": {
+    "message": "Sign in with Google to keep all your subscriptions in one place."
+  },
+  "signInWithGoogle": {
+    "message": "Sign in with Google"
+  },
+  "aboutTitle": {
+    "message": "What is Trackly?"
+  },
+  "aboutText": {
+    "message": "Trackly spots your subscriptions automatically and keeps them in one place, so you always see what they cost and when they renew."
+  },
+  "aboutLink": {
+    "message": "Visit the Trackly website"
+  },
+  "panelTitle": {
+    "message": "Your subscriptions"
+  },
+  "signedInUser": {
+    "message": "Signed-in user"
+  },
+  "summaryActive": {
+    "message": "Active subscriptions"
+  },
+  "summaryMonthly": {
+    "message": "Monthly cost"
+  },
+  "summaryYearly": {
+    "message": "Yearly cost"
+  },
+  "summaryAnnualTotal": {
+    "message": "Total per year"
+  },
+  "renewingSoonTitle": {
+    "message": "Renewing soon"
+  },
+  "renewingSoonEmpty": {
+    "message": "Nothing renews in the next few days."
+  },
+  "listTitle": {
+    "message": "All subscriptions"
+  },
+  "refresh": {
+    "message": "Refresh"
+  },
+  "addSubscription": {
+    "message": "Add subscription"
+  },
+  "listEmpty": {
+    "message": "You don't have any subscriptions yet."
+  },
+  "signOut": {
+    "message": "Sign out"
+  },
+  "footerWebsite": {
+    "message": "Website"
+  },
+  "footerPrivacy": {
+    "message": "Privacy policy"
+  },
+  "statusConfirmed": {
+    "message": "Active"
+  },
+  "statusCancelled": {
+    "message": "Cancelled"
+  },
+  "statusExpired": {
+    "message": "Expired"
+  },
+  "cycleMonthly": {
+    "message": "Monthly"
+  },
+  "cycleYearly": {
+    "message": "Yearly"
+  },
+  "itemPlan": {
+    "message": "Plan: $FIRST$",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemPrice": {
+    "message": "Price: $FIRST$",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemCycle": {
+    "message": "Billing: $FIRST$",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemRenewal": {
+    "message": "Renews: $FIRST$",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemRenewalUnknown": {
+    "message": "not set"
+  },
+  "itemAutoRenewOn": {
+    "message": "Auto-renew: on"
+  },
+  "itemAutoRenewOff": {
+    "message": "Auto-renew: off"
+  },
+  "manageSubscription": {
+    "message": "Manage subscription"
+  },
+  "manageSubscriptionHint": {
+    "message": "Opens the service's subscription settings or its cancellation guide"
+  },
+  "edit": {
+    "message": "Edit"
+  },
+  "delete": {
+    "message": "Delete"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "save": {
+    "message": "Save"
+  },
+  "add": {
+    "message": "Add"
+  },
+  "notNow": {
+    "message": "Not now"
+  },
+  "loading": {
+    "message": "Loading…"
+  },
+  "loadingSubscriptions": {
+    "message": "Loading subscriptions…"
+  },
+  "noData": {
+    "message": "No data."
+  },
+  "loadFailed": {
+    "message": "Couldn't load your subscriptions."
+  },
+  "sessionExpired": {
+    "message": "Your session has expired. Please sign in again."
+  },
+  "offlineShowingCache": {
+    "message": "Can't reach the server. You're seeing the last saved data."
+  },
+  "serverUnavailable": {
+    "message": "Couldn't connect to the server. Please try again in a moment."
+  },
+  "deleteConfirm": {
+    "message": "Delete $FIRST$? This can't be undone.",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteFallbackName": {
+    "message": "this subscription"
+  },
+  "deleteFailed": {
+    "message": "Couldn't delete the subscription: $FIRST$",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "editTitle": {
+    "message": "Edit subscription"
+  },
+  "saveFailed": {
+    "message": "Couldn't save the changes: $FIRST$",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorAlreadyAdded": {
+    "message": "This subscription is already on your list."
+  },
+  "errorInvalidData": {
+    "message": "Check the details and try again."
+  },
+  "errorServer": {
+    "message": "The server isn't responding right now."
+  },
+  "errorNetwork": {
+    "message": "Can't reach the server."
+  },
+  "formSubtitle": {
+    "message": "Check the details before you save."
+  },
+  "formService": {
+    "message": "Service"
+  },
+  "formPlan": {
+    "message": "Plan"
+  },
+  "formPlanPlaceholder": {
+    "message": "e.g. Premium"
+  },
+  "formPrice": {
+    "message": "Price"
+  },
+  "formCurrency": {
+    "message": "Currency"
+  },
+  "formCycle": {
+    "message": "Billing cycle"
+  },
+  "formRenewalDate": {
+    "message": "Renewal date"
+  },
+  "formAutoRenew": {
+    "message": "Renews automatically"
+  },
+  "saving": {
+    "message": "Saving…"
+  },
+  "formErrorService": {
+    "message": "Enter the service name."
+  },
+  "formErrorPlan": {
+    "message": "Enter the plan name."
+  },
+  "formErrorPrice": {
+    "message": "Enter a valid price."
+  },
+  "formErrorCurrency": {
+    "message": "Enter a currency, e.g. USD."
+  },
+  "googleTokenFailed": {
+    "message": "Couldn't get a sign-in token from Google"
+  },
+  "connectingGoogle": {
+    "message": "Connecting to Google…"
+  },
+  "signedIn": {
+    "message": "Signed in."
+  },
+  "signInFailed": {
+    "message": "Sign-in failed: $FIRST$",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "signedOut": {
+    "message": "Signed out."
+  },
+  "signInToAdd": {
+    "message": "Sign in to add a subscription."
+  },
+  "subscriptionAdded": {
+    "message": "Subscription added."
+  },
+  "subscriptionAddedNamed": {
+    "message": "$FIRST$ has been added.",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "addFailed": {
+    "message": "Couldn't add the subscription: $FIRST$",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "detectedTitle": {
+    "message": "Subscription detected"
+  },
+  "webSignInStarted": {
+    "message": "Finish signing in in the Google window, then open Trackly again."
+  },
+  "webSignInUnavailable": {
+    "message": "Signing in isn't available in this browser yet."
+  },
+  "toastDetected": {
+    "message": "Detected: $FIRST$",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "toastSaved": {
+    "message": "Saved ✓"
+  },
+  "toastFinishInPopup": {
+    "message": "Open Trackly from the toolbar to finish adding it."
+  },
+  "purchaseSaved": {
+    "message": "Saved $FIRST$. Open Trackly from the toolbar to finish.",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "remindersDays1": {
+    "message": "1 day before"
+  },
+  "remindersDays3": {
+    "message": "3 days before"
+  },
+  "remindersDays7": {
+    "message": "7 days before"
+  },
+  "remindersHint": {
+    "message": "You'll get a notification in the morning while your browser is open."
+  },
+  "remindersOn": {
+    "message": "Reminders are on: $FIRST$.",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "remindersOff": {
+    "message": "Reminders are off."
+  },
+  "remindersDenied": {
+    "message": "Reminders need permission to show notifications."
+  },
+  "reminderToday": {
+    "message": "$FIRST$ renews today",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "reminderTomorrow": {
+    "message": "$FIRST$ renews tomorrow",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "reminderInDays": {
+    "message": "$FIRST$ renews in $SECOND$ days",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      },
+      "second": {
+        "content": "$2"
+      }
+    }
+  },
+  "reminderManageHint": {
+    "message": "Click to manage the subscription."
+  },
+  "rateTitle": {
+    "message": "Enjoying Trackly?"
+  },
+  "rateText": {
+    "message": "A rating in the store helps us a lot."
+  },
+  "rateAction": {
+    "message": "Rate it"
+  },
+  "remindersTitle": {
+    "message": "Renewal reminders"
+  },
+  "remindersOptionOff": {
+    "message": "Off"
+  },
+  "remindersButtonOn": {
+    "message": "Reminders: $FIRST$",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "remindersPreviewTitle": {
+    "message": "Reminders are on"
+  },
+  "remindersPreviewText": {
+    "message": "This is how a reminder before a renewal will look."
+  },
+  "remindersMenuTitle": {
+    "message": "Remind me"
+  }
+}

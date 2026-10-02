@@ -1,13 +1,41 @@
-const STATUS_LABELS = {
-  confirmed: "Aktywna",
-  cancelled: "Anulowana",
-  expired: "Wygasła"
+const STATUS_LABEL_KEYS = {
+  confirmed: "statusConfirmed",
+  cancelled: "statusCancelled",
+  expired: "statusExpired"
 };
 
-const BILLING_CYCLE_LABELS = {
-  monthly: "Miesięcznie",
-  yearly: "Rocznie"
+const BILLING_CYCLE_LABEL_KEYS = {
+  monthly: "cycleMonthly",
+  yearly: "cycleYearly"
 };
+
+function statusLabel(status) {
+  return STATUS_LABEL_KEYS[status] ? t(STATUS_LABEL_KEYS[status]) : escapeHtml(status);
+}
+
+function billingCycleLabel(cycle) {
+  return BILLING_CYCLE_LABEL_KEYS[cycle] ? t(BILLING_CYCLE_LABEL_KEYS[cycle]) : escapeHtml(cycle);
+}
+
+function describeError(error) {
+  if (!error || error.status === undefined) {
+    return t("errorNetwork");
+  }
+
+  if (error.status === 409) {
+    return t("errorAlreadyAdded");
+  }
+
+  if (error.status === 422) {
+    return t("errorInvalidData");
+  }
+
+  if (error.status >= 500) {
+    return t("errorServer");
+  }
+
+  return error.message;
+}
 
 //neutralizowanie mylacych znakow, zamiana na bezpieczne odpowiedniki
 //przydatne do pozniejszego scrapowania z ML
@@ -28,13 +56,15 @@ function showConfirm(message) {
       <div class="trackly-confirm-card">
         <p class="trackly-confirm-message"></p>
         <div class="trackly-confirm-actions">
-          <button type="button" class="trackly-confirm-cancel">Anuluj</button>
-          <button type="button" class="trackly-confirm-ok">Usuń</button>
+          <button type="button" class="trackly-confirm-cancel"></button>
+          <button type="button" class="trackly-confirm-ok"></button>
         </div>
       </div>
     `;
 
     overlay.querySelector(".trackly-confirm-message").textContent = message;
+    overlay.querySelector(".trackly-confirm-cancel").textContent = t("cancel");
+    overlay.querySelector(".trackly-confirm-ok").textContent = t("delete");
     document.body.appendChild(overlay);
 
     const close = (result) => {
@@ -68,7 +98,7 @@ function renderPanelLoading() {
   document.getElementById("subscriptionsView").classList.add("is-loading");
   document.getElementById("expiringList").innerHTML = `
     <div class="subscription-empty-state">
-      Ładowanie…
+      ${t("loading")}
     </div>
   `;
   renderListLoading();
@@ -81,12 +111,12 @@ function renderPanelError() {
   });
   document.getElementById("expiringList").innerHTML = `
     <div class="subscription-empty-state">
-      Brak danych.
+      ${t("noData")}
     </div>
   `;
   document.getElementById("subscriptionsList").innerHTML = `
     <div class="subscription-empty-state">
-      Nie udało się pobrać subskrypcji.
+      ${t("loadFailed")}
     </div>
   `;
 }
@@ -116,6 +146,10 @@ async function loadSubscriptions() {
 
     renderPanel(panel);
     await writePanelCache(panel);
+
+    if (typeof notifyDueRenewals === "function") {
+      notifyDueRenewals(subscriptions);
+    }
   } catch (error) {
     console.error("Failed to load subscriptions:", error);
 
@@ -127,7 +161,7 @@ async function loadSubscriptions() {
         showAuthView();
       }
       if (typeof showStatus === "function") {
-        showStatus("Sesja wygasła. Zaloguj się ponownie.", "error");
+        showStatus(t("sessionExpired"), "error");
       }
       return;
     }
@@ -137,9 +171,7 @@ async function loadSubscriptions() {
     }
     if (typeof showStatus === "function") {
       showStatus(
-        panelRendered
-          ? "Brak połączenia z serwerem. Widzisz ostatnio pobrane dane."
-          : "Nie udało się połączyć z serwerem. Spróbuj ponownie za chwilę.",
+        panelRendered ? t("offlineShowingCache") : t("serverUnavailable"),
         "error"
       );
     }
@@ -182,9 +214,9 @@ async function handleSubscriptionListClick(event) {
   const item = deleteBtn.closest(".subscription-item");
   const serviceName = item
     ? item.querySelector(".subscription-service").textContent
-    : "tę subskrypcję";
+    : t("deleteFallbackName");
 
-  const confirmed = await showConfirm(`Usunąć subskrypcję: ${serviceName}? Tej operacji nie można cofnąć.`);
+  const confirmed = await showConfirm(t("deleteConfirm", [serviceName]));
   if (!confirmed) {
     return;
   }
@@ -201,7 +233,7 @@ async function handleSubscriptionListClick(event) {
   } catch (error) {
     console.error("Failed to delete subscription:", error);
     if (typeof showStatus === "function") {
-      showStatus(`Nie udało się usunąć subskrypcji: ${error.message}`, "error");
+      showStatus(t("deleteFailed", [describeError(error)]), "error");
     }
   }
 }
@@ -229,11 +261,11 @@ function handleEditClick(editBtn) {
       } catch (error) {
         console.error("Failed to update subscription:", error);
         if (typeof showStatus === "function") {
-          showStatus(`Nie udało się zapisać zmian: ${error.message}`, "error");
+          showStatus(t("saveFailed", [describeError(error)]), "error");
         }
       }
     },
-    { title: "Edytuj subskrypcję", submitLabel: "Zapisz" }
+    { title: t("editTitle"), submitLabel: t("save") }
   );
 }
 
@@ -276,20 +308,11 @@ function renderSubscriptionsSummary(subscriptions) {
   document.getElementById("annualTotal").textContent = formatMoney(annual);
 }
 
-function formatAmount(value) {
-  const amount = Math.round(Number(value) * 100) / 100;
-
-  return amount.toLocaleString("pl-PL", {
-    minimumFractionDigits: Number.isInteger(amount) ? 0 : 2,
-    maximumFractionDigits: 2
-  });
-}
-
 function formatMoney(totalsByCurrency) {
   const entries = Object.entries(totalsByCurrency);
 
   if (!entries.length) {
-    return "0 PLN";
+    return `${formatAmount(0)} ${defaultCurrency()}`;
   }
 
   return entries
@@ -311,8 +334,8 @@ function renderManageLink(sub, className) {
   }
 
   return `<a class="${className}" href="${escapeHtml(url)}" target="_blank" rel="noopener noreferrer"
-    aria-label="Zarządzaj subskrypcją"
-    title="Otwiera stronę serwisu z ustawieniami subskrypcji albo instrukcją rezygnacji">${ACTION_ICONS.manage}</a>`;
+    aria-label="${escapeHtml(t("manageSubscription"))}"
+    title="${escapeHtml(t("manageSubscriptionHint"))}">${ACTION_ICONS.manage}</a>`;
 }
 
 function renderSubscriptionItem(sub) {
@@ -320,24 +343,24 @@ function renderSubscriptionItem(sub) {
     <div class="subscription-item">
       <div class="subscription-item-header">
          <p class="subscription-service">${escapeHtml(sub.service_name)}</p>
-            <span class="subscription-status status-${sub.status}">${STATUS_LABELS[sub.status] || escapeHtml(sub.status)}</span>
+            <span class="subscription-status status-${sub.status}">${statusLabel(sub.status)}</span>
       </div>
 
-      <p class="subscription-plan">Plan: ${escapeHtml(sub.plan_name)}</p>
+      <p class="subscription-plan">${t("itemPlan", [escapeHtml(sub.plan_name)])}</p>
 
       <div class="subscription-meta">
-        <span>Cena: ${formatAmount(sub.price)} ${escapeHtml(sub.currency)}</span>
-        <span>Cykl: ${BILLING_CYCLE_LABELS[sub.billing_cycle] || escapeHtml(sub.billing_cycle)}</span>
-        <span>Odnowienie: ${sub.renewal_date || "brak danych"}</span>
-        <span>Automatyczne odnawianie: ${sub.auto_renew ? "tak" : "nie"}</span>
+        <span>${t("itemPrice", [`${formatAmount(sub.price)} ${escapeHtml(sub.currency)}`])}</span>
+        <span>${t("itemCycle", [billingCycleLabel(sub.billing_cycle)])}</span>
+        <span>${t("itemRenewal", [sub.renewal_date || t("itemRenewalUnknown")])}</span>
+        <span>${t(sub.auto_renew ? "itemAutoRenewOn" : "itemAutoRenewOff")}</span>
       </div>
 
       <div class="subscription-actions-row">
         ${renderManageLink(sub, "sub-action-btn sub-manage-btn")}
         <button class="sub-action-btn sub-edit-btn" data-action="edit" data-id="${sub.id}" type="button"
-          aria-label="Edytuj" title="Edytuj">${ACTION_ICONS.edit}</button>
+          aria-label="${t("edit")}" title="${t("edit")}">${ACTION_ICONS.edit}</button>
         <button class="sub-action-btn sub-delete-btn" data-action="delete" data-id="${sub.id}" type="button"
-          aria-label="Usuń" title="Usuń">${ACTION_ICONS.delete}</button>
+          aria-label="${t("delete")}" title="${t("delete")}">${ACTION_ICONS.delete}</button>
       </div>
     </div>
   `;
@@ -352,7 +375,7 @@ function renderListLoading() {
 
   listElement.innerHTML = `
     <div class="subscription-empty-state">
-      Ładowanie subskrypcji…
+      ${t("loadingSubscriptions")}
     </div>
   `;
 }
@@ -364,7 +387,7 @@ function renderSubscriptionsList(subscriptions) {
   if (!subscriptions.length) {
     listElement.innerHTML = `
       <div class="subscription-empty-state">
-        Nie masz jeszcze żadnych subskrypcji.
+        ${t("listEmpty")}
       </div>
     `;
     return;
@@ -380,7 +403,7 @@ function renderExpiringList(subscriptions) {
   if (!subscriptions.length) {
     listElement.innerHTML = `
       <div class="subscription-empty-state">
-        Brak subskrypcji odnawiających się wkrótce.
+        ${t("renewingSoonEmpty")}
       </div>
     `;
     return;
@@ -394,9 +417,9 @@ function renderExpiringList(subscriptions) {
           ${renderManageLink(sub, "expiring-manage")}
         </div>
         <div class="subscription-meta">
-          <span>Plan: ${escapeHtml(sub.plan_name)}</span>
-          <span>Cena: ${formatAmount(sub.price)} ${escapeHtml(sub.currency)}</span>
-          <span>Odnowienie: ${sub.renewal_date}</span>
+          <span>${t("itemPlan", [escapeHtml(sub.plan_name)])}</span>
+          <span>${t("itemPrice", [`${formatAmount(sub.price)} ${escapeHtml(sub.currency)}`])}</span>
+          <span>${t("itemRenewal", [sub.renewal_date])}</span>
         </div>
       </div>
     `)

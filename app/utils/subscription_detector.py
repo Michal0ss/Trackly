@@ -67,8 +67,8 @@ PLAN_KEYWORDS = [
 ]
 
 BILLING_CYCLE_HINTS = {
-    "monthly": ["monthly", "per month", "/month", "/mies", "miesięcznie", "co miesiąc", "za miesiąc"],
-    "yearly": ["yearly", "annually", "per year", "/year", "/rok", "rocznie", "co rok", "za rok"],
+    "monthly": ["monthly", "per month", "/month", "/ month", "/mo", "a month", "/mies", "miesięcznie", "co miesiąc", "za miesiąc"],
+    "yearly": ["yearly", "annually", "annual", "per year", "/year", "/ year", "/yr", "a year", "/rok", "rocznie", "co rok", "za rok"],
 }
 
 CURRENCY_MAP = {

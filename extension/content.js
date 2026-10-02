@@ -114,7 +114,7 @@ function buildCandidate(journeyData, serviceKey) {
     service_name: data.service_name || serviceKey,
     plan_name: data.plan_name || "",
     price: data.price ?? null,
-    currency: data.currency || "PLN",
+    currency: data.currency || defaultCurrency(),
     billing_cycle: data.billing_cycle || "monthly",
     start_date: new Date().toISOString().split("T")[0],
     renewal_date: null,
@@ -260,10 +260,7 @@ async function handlePossiblePurchaseClick(event) {
   hideDetectionToast();
 
   if (!alreadyPending) {
-    showPageToast(
-        `Zapisaliśmy ${candidate.service_name}. Otwórz Trackly z paska narzędzi, aby dokończyć.`,
-        {variant: "success"}
-    );
+    showPageToast(t("purchaseSaved", [candidate.service_name]), {variant: "success"});
   }
 }
 

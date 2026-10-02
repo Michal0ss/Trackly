@@ -89,6 +89,14 @@ def test_english_cycles():
     assert detect_billing_cycle("$99 per year") == "yearly"
 
 
+def test_us_price_abbreviations():
+    assert detect_billing_cycle("$9.99/mo") == "monthly"
+    assert detect_billing_cycle("$11.99 a month") == "monthly"
+    assert detect_billing_cycle("$17.99 / month") == "monthly"
+    assert detect_billing_cycle("$99.99/yr") == "yearly"
+    assert detect_billing_cycle("Annual plan $99") == "yearly"
+
+
 #serwis
 
 def test_hostname_wins_over_text():
@@ -189,3 +197,14 @@ def test_full_detection_netflix_whole_price():
     assert result["is_subscription"] is True
     assert result["price"] == 37.0
     assert result["billing_cycle"] == "monthly"
+
+
+def test_full_detection_us_pricing_page():
+    result = detect_subscription_from_text("Standard $17.99/mo. Cancel anytime.", "https://www.netflix.com/signup/planform")
+
+    assert result["service_name"] == "Netflix"
+    assert result["plan_name"] == "Standard"
+    assert result["price"] == 17.99
+    assert result["currency"] == "USD"
+    assert result["billing_cycle"] == "monthly"
+    assert result["is_subscription"] is True

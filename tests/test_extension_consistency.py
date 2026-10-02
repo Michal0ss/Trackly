@@ -32,6 +32,8 @@ PARITY_CASES = [
     ("Abonament 39,99 zł miesięcznie", "https://www.empik.com/go/abonament"),
     ("Plus $20 per month", "https://pay.openai.com/c/pay/cs_live_1"),
     ("26.99zł Individual", "https://tidal.com/pricing"),
+    ("Premium Individual $11.99/mo after the offer period", "https://www.spotify.com/us/premium/"),
+    ("Ultimate Ad-Free $20.99 / month or $209.99/yr", "https://www.max.com/plans"),
     ("regulamin serwisu", None),
 ]
 

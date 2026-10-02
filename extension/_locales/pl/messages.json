@@ -1,0 +1,432 @@
+{
+  "extName": {
+    "message": "Trackly"
+  },
+  "extDescription": {
+    "message": "Automatycznie wykrywa Twoje subskrypcje i pokazuje koszty oraz daty odnowień w jednym miejscu."
+  },
+  "websiteUrl": {
+    "message": "https://tracklyapp.pl"
+  },
+  "privacyUrl": {
+    "message": "https://tracklyapp.pl/privacy"
+  },
+  "greeting1": {
+    "message": "Witaj"
+  },
+  "greeting2": {
+    "message": "Cześć"
+  },
+  "greeting3": {
+    "message": "Miło Cię widzieć"
+  },
+  "greeting4": {
+    "message": "Dobrze Cię widzieć"
+  },
+  "authSubtitle": {
+    "message": "Zaloguj się kontem Google, aby mieć wszystkie swoje subskrypcje w jednym miejscu."
+  },
+  "signInWithGoogle": {
+    "message": "Zaloguj się przez Google"
+  },
+  "aboutTitle": {
+    "message": "Czym jest Trackly?"
+  },
+  "aboutText": {
+    "message": "Trackly automatycznie wykrywa Twoje subskrypcje i zbiera je w jednym miejscu - widzisz koszty, daty odnowień i nic Cię już nie zaskoczy."
+  },
+  "aboutLink": {
+    "message": "Zobacz stronę Trackly"
+  },
+  "panelTitle": {
+    "message": "Twoje subskrypcje"
+  },
+  "signedInUser": {
+    "message": "Zalogowany użytkownik"
+  },
+  "summaryActive": {
+    "message": "Aktywne subskrypcje"
+  },
+  "summaryMonthly": {
+    "message": "Koszt miesięczny"
+  },
+  "summaryYearly": {
+    "message": "Koszt roczny"
+  },
+  "summaryAnnualTotal": {
+    "message": "Rocznie łącznie"
+  },
+  "renewingSoonTitle": {
+    "message": "Wkrótce odnawiane"
+  },
+  "renewingSoonEmpty": {
+    "message": "Brak subskrypcji odnawiających się wkrótce."
+  },
+  "listTitle": {
+    "message": "Lista subskrypcji"
+  },
+  "refresh": {
+    "message": "Odśwież"
+  },
+  "addSubscription": {
+    "message": "Dodaj subskrypcję"
+  },
+  "listEmpty": {
+    "message": "Nie masz jeszcze żadnych subskrypcji."
+  },
+  "signOut": {
+    "message": "Wyloguj"
+  },
+  "footerWebsite": {
+    "message": "Strona internetowa"
+  },
+  "footerPrivacy": {
+    "message": "Polityka prywatności"
+  },
+  "statusConfirmed": {
+    "message": "Aktywna"
+  },
+  "statusCancelled": {
+    "message": "Anulowana"
+  },
+  "statusExpired": {
+    "message": "Wygasła"
+  },
+  "cycleMonthly": {
+    "message": "Miesięcznie"
+  },
+  "cycleYearly": {
+    "message": "Rocznie"
+  },
+  "itemPlan": {
+    "message": "Plan: $FIRST$",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemPrice": {
+    "message": "Cena: $FIRST$",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemCycle": {
+    "message": "Cykl: $FIRST$",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemRenewal": {
+    "message": "Odnowienie: $FIRST$",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "itemRenewalUnknown": {
+    "message": "brak danych"
+  },
+  "itemAutoRenewOn": {
+    "message": "Automatyczne odnawianie: tak"
+  },
+  "itemAutoRenewOff": {
+    "message": "Automatyczne odnawianie: nie"
+  },
+  "manageSubscription": {
+    "message": "Zarządzaj subskrypcją"
+  },
+  "manageSubscriptionHint": {
+    "message": "Otwiera stronę serwisu z ustawieniami subskrypcji albo instrukcją rezygnacji"
+  },
+  "edit": {
+    "message": "Edytuj"
+  },
+  "delete": {
+    "message": "Usuń"
+  },
+  "cancel": {
+    "message": "Anuluj"
+  },
+  "save": {
+    "message": "Zapisz"
+  },
+  "add": {
+    "message": "Dodaj"
+  },
+  "notNow": {
+    "message": "Nie teraz"
+  },
+  "loading": {
+    "message": "Ładowanie…"
+  },
+  "loadingSubscriptions": {
+    "message": "Ładowanie subskrypcji…"
+  },
+  "noData": {
+    "message": "Brak danych."
+  },
+  "loadFailed": {
+    "message": "Nie udało się pobrać subskrypcji."
+  },
+  "sessionExpired": {
+    "message": "Sesja wygasła. Zaloguj się ponownie."
+  },
+  "offlineShowingCache": {
+    "message": "Brak połączenia z serwerem. Widzisz ostatnio pobrane dane."
+  },
+  "serverUnavailable": {
+    "message": "Nie udało się połączyć z serwerem. Spróbuj ponownie za chwilę."
+  },
+  "deleteConfirm": {
+    "message": "Usunąć subskrypcję: $FIRST$? Tej operacji nie można cofnąć.",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "deleteFallbackName": {
+    "message": "tę subskrypcję"
+  },
+  "deleteFailed": {
+    "message": "Nie udało się usunąć subskrypcji: $FIRST$",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "editTitle": {
+    "message": "Edytuj subskrypcję"
+  },
+  "saveFailed": {
+    "message": "Nie udało się zapisać zmian: $FIRST$",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "errorAlreadyAdded": {
+    "message": "Ta subskrypcja jest już na Twojej liście."
+  },
+  "errorInvalidData": {
+    "message": "Sprawdź dane i spróbuj jeszcze raz."
+  },
+  "errorServer": {
+    "message": "Serwer chwilowo nie odpowiada."
+  },
+  "errorNetwork": {
+    "message": "Brak połączenia z serwerem."
+  },
+  "formSubtitle": {
+    "message": "Uzupełnij dane wykrytej subskrypcji przed zapisaniem."
+  },
+  "formService": {
+    "message": "Serwis"
+  },
+  "formPlan": {
+    "message": "Plan"
+  },
+  "formPlanPlaceholder": {
+    "message": "np. Premium"
+  },
+  "formPrice": {
+    "message": "Cena"
+  },
+  "formCurrency": {
+    "message": "Waluta"
+  },
+  "formCycle": {
+    "message": "Cykl rozliczenia"
+  },
+  "formRenewalDate": {
+    "message": "Data odnowienia"
+  },
+  "formAutoRenew": {
+    "message": "Odnawia się automatycznie"
+  },
+  "saving": {
+    "message": "Zapisywanie…"
+  },
+  "formErrorService": {
+    "message": "Podaj nazwę serwisu."
+  },
+  "formErrorPlan": {
+    "message": "Podaj nazwę planu."
+  },
+  "formErrorPrice": {
+    "message": "Podaj poprawną cenę."
+  },
+  "formErrorCurrency": {
+    "message": "Podaj walutę, np. PLN."
+  },
+  "googleTokenFailed": {
+    "message": "Nie udało się pobrać tokenu Google"
+  },
+  "connectingGoogle": {
+    "message": "Łączenie z Google..."
+  },
+  "signedIn": {
+    "message": "Zalogowano pomyślnie."
+  },
+  "signInFailed": {
+    "message": "Błąd logowania: $FIRST$",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "signedOut": {
+    "message": "Wylogowano."
+  },
+  "signInToAdd": {
+    "message": "Zaloguj się we wtyczce, aby dodać subskrypcję."
+  },
+  "subscriptionAdded": {
+    "message": "Subskrypcja dodana."
+  },
+  "subscriptionAddedNamed": {
+    "message": "Subskrypcja $FIRST$ została dodana.",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "addFailed": {
+    "message": "Nie udało się dodać subskrypcji: $FIRST$",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "detectedTitle": {
+    "message": "Wykryto subskrypcję"
+  },
+  "webSignInStarted": {
+    "message": "Dokończ logowanie w oknie Google, a potem otwórz Trackly ponownie."
+  },
+  "webSignInUnavailable": {
+    "message": "Logowanie w tej przeglądarce nie jest jeszcze dostępne."
+  },
+  "toastDetected": {
+    "message": "Wykryto: $FIRST$",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "toastSaved": {
+    "message": "Zapisano ✓"
+  },
+  "toastFinishInPopup": {
+    "message": "Otwórz Trackly z paska narzędzi, aby dokończyć dodawanie."
+  },
+  "purchaseSaved": {
+    "message": "Zapisaliśmy $FIRST$. Otwórz Trackly z paska narzędzi, aby dokończyć.",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "remindersDays1": {
+    "message": "1 dzień przed"
+  },
+  "remindersDays3": {
+    "message": "3 dni przed"
+  },
+  "remindersDays7": {
+    "message": "7 dni przed"
+  },
+  "remindersHint": {
+    "message": "Powiadomienie pojawi się rano, gdy przeglądarka jest otwarta."
+  },
+  "remindersOn": {
+    "message": "Przypomnienia włączone: $FIRST$.",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "remindersOff": {
+    "message": "Przypomnienia wyłączone."
+  },
+  "remindersDenied": {
+    "message": "Bez zgody na powiadomienia przypomnienia nie zadziałają."
+  },
+  "reminderToday": {
+    "message": "$FIRST$ odnawia się dzisiaj",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "reminderTomorrow": {
+    "message": "$FIRST$ odnawia się jutro",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "reminderInDays": {
+    "message": "$FIRST$ odnawia się za $SECOND$ dni",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      },
+      "second": {
+        "content": "$2"
+      }
+    }
+  },
+  "reminderManageHint": {
+    "message": "Kliknij, aby zarządzać subskrypcją."
+  },
+  "rateTitle": {
+    "message": "Podoba Ci się Trackly?"
+  },
+  "rateText": {
+    "message": "Ocena w sklepie bardzo nam pomoże."
+  },
+  "rateAction": {
+    "message": "Oceń"
+  },
+  "remindersTitle": {
+    "message": "Przypomnienia o odnowieniach"
+  },
+  "remindersOptionOff": {
+    "message": "Wyłączone"
+  },
+  "remindersButtonOn": {
+    "message": "Przypomnienia: $FIRST$",
+    "placeholders": {
+      "first": {
+        "content": "$1"
+      }
+    }
+  },
+  "remindersPreviewTitle": {
+    "message": "Przypomnienia włączone"
+  },
+  "remindersPreviewText": {
+    "message": "Tak będzie wyglądać powiadomienie przed odnowieniem subskrypcji."
+  },
+  "remindersMenuTitle": {
+    "message": "Przypomnij mi"
+  }
+}

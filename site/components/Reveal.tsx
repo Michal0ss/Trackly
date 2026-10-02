@@ -5,10 +5,12 @@ import { useEffect, useRef, useState } from "react";
 export default function Reveal({
   children,
   delay = 0,
+  fade = false,
   className,
 }: {
   children: React.ReactNode;
   delay?: number;
+  fade?: boolean;
   className?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
@@ -35,7 +37,7 @@ export default function Reveal({
   return (
     <div
       ref={ref}
-      className={[visible ? "reveal is-in" : "reveal", className].filter(Boolean).join(" ")}
+      className={[visible ? "reveal is-in" : "reveal", fade && "reveal-fade", className].filter(Boolean).join(" ")}
       style={{ transitionDelay: `${delay}ms` }}
     >
       {children}

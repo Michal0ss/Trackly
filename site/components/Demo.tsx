@@ -2,6 +2,7 @@
 
 import Image from "next/image";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import type { Lang } from "@/lib/locale";
 import styles from "./demo.module.css";
 
 const TIMINGS = [1400, 1500, 950, 450, 1300, 950, 450, 3800, 700];
@@ -12,7 +13,57 @@ const CURSOR_TIP = { x: 4.5, y: 2.5 };
 type Anchor = "rest" | "add" | "icon";
 type Point = { x: number; y: number };
 
-export default function Demo() {
+const COPY = {
+  pl: {
+    label:
+      "Pokaz działania Trackly: na stronie serwisu pojawia się powiadomienie o wykrytej subskrypcji, po zatwierdzeniu subskrypcja trafia do panelu wtyczki",
+    url: "serwis.com/premium",
+    price: "26,99 zł",
+    period: "/ miesiąc",
+    buy: "Kup Premium",
+    savedTitle: "Zapisaliśmy Serwis",
+    savedSub: "Otwórz Trackly z paska narzędzi, aby dokończyć.",
+    detected: "Wykryto: Serwis",
+    detectedSub: "Premium · 26,99 PLN / miesiąc",
+    notNow: "Nie teraz",
+    add: "Dodaj",
+    panelTitle: "Twoje subskrypcje",
+    active: "Aktywne subskrypcje",
+    monthly: "Koszt miesięczny",
+    monthlyValue: "88,97 PLN",
+    yearly: "Koszt roczny",
+    yearlyValue: "199 PLN",
+    service: "Serwis",
+    rowSub: "Premium · 26,99 PLN",
+    status: "Aktywna",
+  },
+  en: {
+    label:
+      "Trackly in action: a prompt about a detected subscription appears on a service's page, and once confirmed the subscription lands in the extension panel",
+    url: "service.com/premium",
+    price: "$9.99",
+    period: "/ month",
+    buy: "Get Premium",
+    savedTitle: "Saved Service",
+    savedSub: "Open Trackly from the toolbar to finish.",
+    detected: "Detected: Service",
+    detectedSub: "Premium · 9.99 USD / month",
+    notNow: "Not now",
+    add: "Add",
+    panelTitle: "Your subscriptions",
+    active: "Active subscriptions",
+    monthly: "Monthly cost",
+    monthlyValue: "37.97 USD",
+    yearly: "Yearly cost",
+    yearlyValue: "84.99 USD",
+    service: "Service",
+    rowSub: "Premium · 9.99 USD",
+    status: "Active",
+  },
+};
+
+export default function Demo({ lang }: { lang: Lang }) {
+  const copy = COPY[lang];
   const [step, setStep] = useState(0);
   const [reduced, setReduced] = useState(false);
   const [cursor, setCursor] = useState<Point | null>(null);
@@ -79,7 +130,7 @@ export default function Demo() {
       ref={rootRef}
       className={styles.browser}
       role="img"
-      aria-label="Pokaz działania Trackly: na stronie serwisu pojawia się powiadomienie o wykrytej subskrypcji, po zatwierdzeniu subskrypcja trafia do panelu wtyczki"
+      aria-label={copy.label}
     >
       <div className={styles.browserBar}>
         <div className={styles.lights}>
@@ -92,7 +143,7 @@ export default function Demo() {
             <rect x="5" y="11" width="14" height="10" rx="2" />
             <path d="M8 11V7a4 4 0 0 1 8 0v4" />
           </svg>
-          serwis.com/premium
+          {copy.url}
         </div>
         <span
           ref={iconRef}
@@ -110,9 +161,9 @@ export default function Demo() {
         <p className={styles.svcLabel}>Plan</p>
         <p className={styles.svcPlan}>Premium</p>
         <p className={styles.svcPrice}>
-          26,99 zł <span>/ miesiąc</span>
+          {copy.price} <span>{copy.period}</span>
         </p>
-        <span className={styles.svcCta}>Kup Premium</span>
+        <span className={styles.svcCta}>{copy.buy}</span>
         <div className={styles.svcLines}>
           <i />
           <i />
@@ -124,15 +175,15 @@ export default function Demo() {
             <Image className={styles.toastLogo} src="/wordmark.png" alt="" width={588} height={210} />
             {saved ? (
               <>
-                <p className={styles.toastTitle}>Zapisaliśmy Serwis</p>
-                <p className={styles.toastSub}>Otwórz Trackly z paska narzędzi, aby dokończyć.</p>
+                <p className={styles.toastTitle}>{copy.savedTitle}</p>
+                <p className={styles.toastSub}>{copy.savedSub}</p>
               </>
             ) : (
               <>
-                <p className={styles.toastTitle}>Wykryto: Serwis</p>
-                <p className={styles.toastSub}>Premium · 26,99 PLN / miesiąc</p>
+                <p className={styles.toastTitle}>{copy.detected}</p>
+                <p className={styles.toastSub}>{copy.detectedSub}</p>
                 <div className={styles.toastActions}>
-                  <span className={styles.tbtn}>Nie teraz</span>
+                  <span className={styles.tbtn}>{copy.notNow}</span>
                   <span
                     ref={addRef}
                     className={
@@ -141,7 +192,7 @@ export default function Demo() {
                         : `${styles.tbtn} ${styles.tbtnPrimary}`
                     }
                   >
-                    Dodaj
+                    {copy.add}
                   </span>
                 </div>
               </>
@@ -154,27 +205,27 @@ export default function Demo() {
             className={step === RESET_STEP ? `${styles.panel} ${styles.panelClosing}` : styles.panel}
           >
             <Image className={styles.panelLogo} src="/wordmark.png" alt="" width={588} height={210} />
-            <p className={styles.panelTitle}>Twoje subskrypcje</p>
+            <p className={styles.panelTitle}>{copy.panelTitle}</p>
             <div className={styles.tiles}>
               <div className={`${styles.tile} ${styles.tileWide}`}>
-                <span>Aktywne subskrypcje</span>
+                <span>{copy.active}</span>
                 <strong>4</strong>
               </div>
               <div className={styles.tile}>
-                <span>Koszt miesięczny</span>
-                <strong>88,97 PLN</strong>
+                <span>{copy.monthly}</span>
+                <strong>{copy.monthlyValue}</strong>
               </div>
               <div className={styles.tile}>
-                <span>Koszt roczny</span>
-                <strong>199 PLN</strong>
+                <span>{copy.yearly}</span>
+                <strong>{copy.yearlyValue}</strong>
               </div>
             </div>
             <div className={styles.panelRow}>
               <div>
-                <strong>Serwis</strong>
-                <p>Premium · 26,99 PLN</p>
+                <strong>{copy.service}</strong>
+                <p>{copy.rowSub}</p>
               </div>
-              <span className={styles.statusPill}>Aktywna</span>
+              <span className={styles.statusPill}>{copy.status}</span>
             </div>
           </div>
         )}

@@ -21,9 +21,13 @@ GOOGLE_TOKENINFO_URL = "https://oauth2.googleapis.com/tokeninfo"
 
 @router.post("/users/google-login", response_model=schemas.TokenResponse)
 def google_login(payload: schemas.GoogleLoginRequest):
-    google_client_id = os.getenv("GOOGLE_CLIENT_ID")
+    google_client_ids = [
+        client_id.strip()
+        for client_id in os.getenv("GOOGLE_CLIENT_ID", "").split(",")
+        if client_id.strip()
+    ]
 
-    if not google_client_id:
+    if not google_client_ids:
         raise HTTPException(status_code=500, detail="GOOGLE_CLIENT_ID is not set")
 
     try:
@@ -40,7 +44,7 @@ def google_login(payload: schemas.GoogleLoginRequest):
 
     token_info = response.json()
 
-    if token_info.get("aud") != google_client_id:
+    if token_info.get("aud") not in google_client_ids:
         raise HTTPException(status_code=401, detail="Token was not issued for Trackly")
 
     email = token_info.get("email")

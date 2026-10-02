@@ -25,7 +25,6 @@ export const metadata: Metadata = {
   title,
   description,
   applicationName: "Trackly",
-  alternates: { canonical: "/" },
   icons: { icon: "/icon.png" },
   openGraph: {
     title,
@@ -61,9 +60,6 @@ export default function RootLayout({
   return (
     <html lang="pl" className={`${display.variable} ${body.variable}`}>
       <body style={{ fontFamily: "var(--font-body), system-ui, sans-serif" }}>
-        <a className="skip" href="#tresc">
-          Przejdź do treści
-        </a>
         {children}
         <ScrollToHash />
       </body>

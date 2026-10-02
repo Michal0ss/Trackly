@@ -1,4 +1,5 @@
 const PRODUCTION_API_BASE_URL = "https://trackly-api-git-main-michal-team00.vercel.app";
+const GOOGLE_WEB_CLIENT_ID = "";
 
 let cachedApiBaseUrl = null;
 

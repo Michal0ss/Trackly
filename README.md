@@ -24,23 +24,27 @@ the full list.
 
 Recognition runs locally in the browser. The server only gets what you confirm and save.
 
-The extension and the website are in Polish.
+The extension and the website are in Polish and English. The extension follows the browser's
+language, the website has a PL / EN switch.
 
 ## What it does
 
 - Recognises 35+ services: streaming, music and audiobooks, AI tools, cloud storage, VPNs,
   consoles and a few Polish shops. The full list is below.
-- Shows a small prompt on the pricing page. *Dodaj* (Add) passes it to the popup with the form
-  already filled in, *Nie teraz* (Not now) keeps that service quiet for an hour.
+- Shows a small prompt on the pricing page. *Add* passes it to the popup with the form already
+  filled in, *Not now* keeps that service quiet for an hour.
 - Also reacts to a click on the service's own buy or subscribe button, in case you skipped the
   prompt.
 - Sums up the monthly cost, the yearly cost and the total for a whole year, separately for each
   currency (PLN, EUR, USD, GBP).
-- Lists what renews in the next 7 days.
+- Lists what renews in the next 7 days. The bell next to that list turns on reminders, a
+  notification 1, 3 or 7 days before a renewal.
 - Lets you edit or delete any entry. For most services there's also a link to the page where
   you change or cancel the plan.
 - Lets you add older subscriptions by hand.
 - Signs in with Google, so the list is the same on every computer.
+- After you have used it for a while, asks whether you'd rate it in the store. *Not now*
+  brings the question back once, a month later.
 
 <details>
 <summary><b>Supported services</b></summary>
@@ -75,7 +79,7 @@ recognisers (JavaScript and Python) and, if the service has one, an account page
    seen on the next.
 3. A page counts as a subscription offer only if it has a price. The prompt appears when the
    service isn't on your list yet and you haven't dismissed it in the last hour.
-4. *Dodaj*, or a click on the service's buy button, puts the candidate in a queue and makes the
+4. *Add*, or a click on the service's buy button, puts the candidate in a queue and makes the
    toolbar badge blink. Next time you open the popup the form is waiting, filled in. Nothing is
    sent to the server until you save that form.
 5. The backend refuses a second active subscription for the same service with a 409, and the
@@ -90,7 +94,9 @@ drift apart.
 Page content, addresses of the pages you visit and your browsing history never leave the
 browser. The backend stores your Google account's email and id, and the subscriptions you
 saved: name, plan, price, currency, billing cycle and dates. No ads, no analytics, nothing is
-sold. The full policy, in Polish, is at [tracklyapp.pl/privacy](https://tracklyapp.pl/privacy).
+sold. Reminders are checked by the extension itself and shown by the browser, with no outside
+service involved. The full policy is at [tracklyapp.pl/privacy](https://tracklyapp.pl/privacy)
+and in English at [tracklyapp.pl/en/privacy](https://tracklyapp.pl/en/privacy).
 
 ## Repository layout
 
@@ -99,7 +105,7 @@ sold. The full policy, in Polish, is at [tracklyapp.pl/privacy](https://tracklya
 | `extension/` | Chrome extension, Manifest V3, plain JavaScript with no build step |
 | `app/` | FastAPI backend: Google sign-in, JWT, subscriptions, summaries, health check |
 | `api/index.py` | Entry point Vercel uses to serve the backend |
-| `site/` | [tracklyapp.pl](https://tracklyapp.pl), landing page and privacy policy, Next.js |
+| `site/` | [tracklyapp.pl](https://tracklyapp.pl), landing page, phone app waitlist and privacy policy in Polish and English, Next.js |
 | `tests/` | pytest suite |
 | `.github/workflows/` | `tests.yml` for CI, `keepalive.yml` for the daily health check |
 | `docs/` | Images for this README |
@@ -114,8 +120,11 @@ Inside `extension/`:
 | `shared/subscription-form.js` | The prefilled form in the popup |
 | `shared/subscription-view.js` | Summary, renewals and the list in the popup |
 | `shared/service-links.js` | Links to each service's account or billing page |
+| `shared/reminders.js` | When a renewal reminder is due |
+| `shared/i18n.js` | Translations and number formatting |
+| `_locales/` | Polish and English texts |
 | `UI/` | Popup markup, styles and logic |
-| `background.js` | Toolbar badge |
+| `background.js` | Toolbar badge, daily reminder check, sign-in for Edge |
 
 ## Running locally
 
@@ -131,7 +140,8 @@ Copy `.env.example` to `.env` and fill in:
 - `SECRET_KEY` signs the JWTs. Generate one with
   `python3 -c "import secrets; print(secrets.token_urlsafe(48))"`
 - `GOOGLE_CLIENT_ID` is the OAuth client from the Google Cloud Console, the same one as
-  `oauth2.client_id` in `extension/manifest.json`.
+  `oauth2.client_id` in `extension/manifest.json`. Several ids can be given, separated by
+  commas, which Edge needs because it signs in through a separate web client.
 - `ALLOWED_ORIGINS` is `chrome-extension://<id>`, already filled in with the store id.
 - `DATABASE_URL` is optional and defaults to a local SQLite file. Give it a Postgres
   connection string (Supabase or any other) to use that instead; `app/database/db.py` adjusts
@@ -178,6 +188,10 @@ npm install
 npm run dev
 ```
 
+The waitlist form on the home page posts to the API through a server action. It uses the
+deployed API unless `TRACKLY_API_URL` is set, so to try it against a local backend start the
+site with `TRACKLY_API_URL=http://127.0.0.1:8000 npm run dev`.
+
 CI builds it with Node 22.
 
 ## Tests
@@ -186,11 +200,13 @@ CI builds it with Node 22.
 .venv/bin/python -m pytest
 ```
 
-62 tests cover the API routes, sign-in and tokens, and the recogniser. A separate group keeps
-the extension and the backend in step: both recognisers have to give the same results, every
-host in the manifest needs a service hint, every service needs a manage link unless it
-deliberately has none, and the path rules have to let subscription pages through and block the
-rest. The checks that run JavaScript call `node` and are skipped when it isn't installed.
+83 tests cover the API routes, sign-in and tokens, the waitlist, the recogniser and the
+reminder rules. A separate group keeps the extension and the backend in step: both recognisers
+have to give the same results, every host in the manifest needs a service hint, every service
+needs a manage link unless it deliberately has none, the path rules have to let subscription
+pages through and block the rest, and both languages need the same set of texts, with every
+text the extension uses present. The checks that run JavaScript call `node` and are skipped when it isn't
+installed.
 
 CI runs the suite and a production build of the site on every push to `main` and on every
 pull request.
@@ -212,6 +228,7 @@ Every route sits under `/api`. All of them except sign-in and the health check n
 | GET | `/api/subscriptions/summary/budget` | Totals per currency |
 | GET | `/api/subscriptions/summary/expiring?days=7` | Renewals within `days`, 3 by default |
 | GET | `/api/health` | 200 when the database answers, 503 when it doesn't |
+| POST | `/api/waitlist` | Adds an email to the phone app waitlist, 422 without consent or with a malformed address |
 
 ## Deployment
 
@@ -250,7 +267,28 @@ repository; if that happens, turn it back on in the Actions tab.
 3. Zip the contents of that folder, not the folder itself, and upload the zip in the Chrome
    Web Store developer dashboard.
 
+The same zip goes to Microsoft Edge Add-ons. Edge can't use Chrome's sign-in, so there the
+extension signs in with `chrome.identity.launchWebAuthFlow` and a separate Google OAuth client
+of the "Web application" type. Before the first Edge release:
+
+1. Create that client and put its id in `GOOGLE_WEB_CLIENT_ID` in
+   `extension/shared/api-client.js`.
+2. Add the same id to the backend's `GOOGLE_CLIENT_ID`, after the Chrome one, separated by a
+   comma.
+3. Once Edge assigns the extension id, add `https://<edge-id>.chromiumapp.org/` to the
+   client's authorised redirect URIs and set `EDGE_STORE_URL` in
+   `extension/shared/store-links.js`, so the rating card points to the Edge store.
+
 ## Changelog
+
+**1.2.0**
+
+- English version of the extension, picked by the browser's language.
+- Optional reminders 1, 3 or 7 days before a renewal. The notification permission is only
+  requested when you turn them on.
+- Detection understands US price formats such as "$9.99/mo", "a month", "/yr" and "annual".
+- A one-time request to rate Trackly in the store.
+- Sign-in that works in Microsoft Edge.
 
 **1.1.0**
 
@@ -268,7 +306,7 @@ repository; if that happens, turn it back on in the Actions tab.
 ## Status
 
 Trackly is built by two people and started as a university project. Next up is a phone app
-that uses the same API.
+that uses the same API, and its waitlist is open on [tracklyapp.pl](https://tracklyapp.pl/#aplikacja).
 
 Found a bug or a service that isn't recognised? Open an issue or write to
 [kontakt@tracklyapp.pl](mailto:kontakt@tracklyapp.pl).

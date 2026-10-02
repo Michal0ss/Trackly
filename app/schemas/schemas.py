@@ -44,3 +44,9 @@ class UserMeResponse(BaseModel):
 
 class GoogleLoginRequest(BaseModel):
     access_token: str
+
+class WaitlistRequest(BaseModel):
+    email: str
+    language: Literal["pl", "en"] = "pl"
+    consent: bool
+    website: str = ""
