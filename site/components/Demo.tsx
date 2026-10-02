@@ -5,7 +5,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { Lang } from "@/lib/locale";
 import styles from "./demo.module.css";
 
-const TIMINGS = [1400, 1500, 950, 450, 1300, 950, 450, 3800, 700];
+const TIMINGS = [450, 1300, 850, 380, 1100, 850, 380, 3300, 600];
 const PANEL_STEP = 7;
 const RESET_STEP = 8;
 const CURSOR_TIP = { x: 4.5, y: 2.5 };
@@ -18,6 +18,10 @@ const COPY = {
     label:
       "Pokaz działania Trackly: na stronie serwisu pojawia się powiadomienie o wykrytej subskrypcji, po zatwierdzeniu subskrypcja trafia do panelu wtyczki",
     url: "serwis.com/premium",
+    brand: "Serwis",
+    menu: ["Filmy", "Seriale", "Dla dzieci"],
+    choose: "Wybierz plan",
+    perks: ["Filmy i seriale w 4K", "4 ekrany jednocześnie", "Pobieranie offline"],
     price: "26,99 zł",
     period: "/ miesiąc",
     buy: "Kup Premium",
@@ -41,6 +45,10 @@ const COPY = {
     label:
       "Trackly in action: a prompt about a detected subscription appears on a service's page, and once confirmed the subscription lands in the extension panel",
     url: "service.com/premium",
+    brand: "Service",
+    menu: ["Movies", "Series", "Kids"],
+    choose: "Choose your plan",
+    perks: ["Movies and series in 4K", "4 screens at once", "Offline downloads"],
     price: "$9.99",
     period: "/ month",
     buy: "Get Premium",
@@ -64,7 +72,7 @@ const COPY = {
 
 export default function Demo({ lang }: { lang: Lang }) {
   const copy = COPY[lang];
-  const [step, setStep] = useState(0);
+  const [step, setStep] = useState(1);
   const [reduced, setReduced] = useState(false);
   const [cursor, setCursor] = useState<Point | null>(null);
   const rootRef = useRef<HTMLDivElement>(null);
@@ -157,19 +165,50 @@ export default function Demo({ lang }: { lang: Lang }) {
       </div>
 
       <div className={styles.stage}>
-        <div className={styles.svcArt} />
-        <p className={styles.svcLabel}>Plan</p>
+        <div className={styles.svcNav}>
+          <span className={styles.svcBrand}>
+            <span className={styles.svcMark}>
+              <svg viewBox="0 0 24 24">
+                <path d="M8 5.5v13l10.5-6.5z" />
+              </svg>
+            </span>
+            {copy.brand}
+          </span>
+          <span className={styles.svcMenu}>
+            {copy.menu.map((item) => (
+              <span key={item}>{item}</span>
+            ))}
+          </span>
+          <span className={styles.svcUser} />
+        </div>
+        <div className={styles.svcShelf}>
+          <span className={styles.svcFeatured}>
+            <span className={styles.svcPlay}>
+              <svg viewBox="0 0 24 24">
+                <path d="M8 5.5v13l10.5-6.5z" />
+              </svg>
+            </span>
+          </span>
+          <span />
+          <span />
+          <span />
+        </div>
+        <p className={styles.svcLabel}>{copy.choose}</p>
         <p className={styles.svcPlan}>Premium</p>
         <p className={styles.svcPrice}>
           {copy.price} <span>{copy.period}</span>
         </p>
-        <span className={styles.svcCta}>{copy.buy}</span>
-        <div className={styles.svcLines}>
-          <i />
-          <i />
-          <i />
+        <div className={styles.svcPerks}>
+          {copy.perks.map((perk) => (
+            <span key={perk}>
+              <svg viewBox="0 0 24 24">
+                <polyline points="20 6 9 17 4 12" />
+              </svg>
+              {perk}
+            </span>
+          ))}
         </div>
-
+        <span className={styles.svcCta}>{copy.buy}</span>
         {toastVisible && (
           <div className={styles.toast} key={saved ? "saved" : "prompt"}>
             <Image className={styles.toastLogo} src="/wordmark.png" alt="" width={588} height={210} />
