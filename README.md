@@ -106,6 +106,7 @@ and in English at [tracklyapp.pl/en/privacy](https://tracklyapp.pl/en/privacy).
 | `app/` | FastAPI backend: Google sign-in, JWT, subscriptions, summaries, health check |
 | `api/index.py` | Entry point Vercel uses to serve the backend |
 | `site/` | [tracklyapp.pl](https://tracklyapp.pl), landing page, phone app waitlist and privacy policy in Polish and English, Next.js |
+| `mobile/` | Expo app preview: navigation, theme and saved PL / EN language settings; see [mobile setup](mobile/README.md) |
 | `tests/` | pytest suite |
 | `.github/workflows/` | `tests.yml` for CI, `keepalive.yml` for the daily health check |
 | `docs/` | Images for this README |
@@ -194,6 +195,12 @@ site with `TRACKLY_API_URL=http://127.0.0.1:8000 npm run dev`.
 
 CI builds it with Node 22.
 
+### Mobile preview
+
+The first mobile milestone runs in Expo Go with SDK 57. It contains navigation,
+the Trackly theme and language settings, with no backend connection yet.
+See [mobile/README.md](mobile/README.md) for iPhone setup and verification commands.
+
 ## Tests
 
 ```bash
@@ -209,7 +216,8 @@ text the extension uses present. The checks that run JavaScript call `node` and 
 installed.
 
 CI runs the suite and a production build of the site on every push to `main` and on every
-pull request.
+pull request. The mobile job also checks types, lint, unit tests and JavaScript exports
+for iOS, Android and the browser.
 
 ## API
 

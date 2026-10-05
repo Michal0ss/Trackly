@@ -1,0 +1,42 @@
+{
+  "expo": {
+    "name": "Trackly",
+    "slug": "trackly",
+    "version": "0.1.0",
+    "scheme": "trackly",
+    "orientation": "portrait",
+    "userInterfaceStyle": "dark",
+    "backgroundColor": "#070b14",
+    "icon": "./assets/icon.png",
+    "ios": {
+      "supportsTablet": false
+    },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#070b14"
+      }
+    },
+    "web": {
+      "bundler": "metro",
+      "output": "single",
+      "name": "Trackly",
+      "favicon": "./assets/icon.png"
+    },
+    "plugins": [
+      "expo-router",
+      "expo-localization",
+      "expo-font",
+      [
+        "expo-splash-screen",
+        {
+          "image": "./assets/icon.png",
+          "imageWidth": 80,
+          "resizeMode": "contain",
+          "backgroundColor": "#070b14"
+        }
+      ],
+      "expo-status-bar"
+    ]
+  }
+}
