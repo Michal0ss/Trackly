@@ -54,3 +54,10 @@ test('both languages provide nonempty text for every screen', () => {
     for (const text of Object.values(copy)) assert.ok(text.trim().length > 0);
   }
 });
+
+test('polish one-letter words stay on the same line as the next word', () => {
+  for (const text of Object.values(translations.pl)) {
+    assert.doesNotMatch(text, /(^|\s)[aiouwz] /i);
+  }
+  assert.equal(translations.pl.overviewTitle, 'Spokojnie. Wszystko w\u00a0jednym miejscu.');
+});

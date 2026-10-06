@@ -1,4 +1,10 @@
-const pl = {
+function bindShortWords<T extends Record<string, string>>(copy: T): T {
+  return Object.fromEntries(
+    Object.entries(copy).map(([key, text]) => [key, text.replace(/(?<=^|\s)([aiouwz]) /gi, '$1\u00a0')]),
+  ) as T;
+}
+
+const pl = bindShortWords({
   overviewTab: 'Przegląd',
   chatTab: 'Rozmowa',
   settingsTab: 'Ustawienia',
@@ -12,7 +18,7 @@ const pl = {
   upcomingEmpty: 'Tu pojawi się najbliższy termin',
   upcomingDescription: 'Zobaczysz, co jest do opłacenia i kiedy.',
   paymentsTitle: 'Twoje stałe płatności',
-  paymentsEmpty: 'Miejsce na Twoje codzienne sprawy',
+  paymentsEmpty: 'Na razie pusto',
   paymentsDescription: 'Stałe płatności i subskrypcje z rozszerzenia znajdziesz na wspólnej liście.',
   overviewNotice: 'Logowanie i dodawanie płatności będą dostępne w kolejnej wersji. Ten podgląd nie pobiera danych z Twojego konta.',
   chatTitle: 'Zacznij od kilku słów.',
@@ -21,10 +27,10 @@ const pl = {
   chatExampleLabel: 'Na przykład',
   chatExplanation: 'Trackly przygotuje wpis. Sprawdzisz kwotę i termin, a potem zdecydujesz, czy go zapisać.',
   chatNotice: 'Rozmowa będzie dostępna w kolejnej wersji. Na razie niczego tutaj nie wysyłasz ani nie zapisujesz.',
-  chatInput: 'Napisz o swojej płatności…',
+  chatInput: 'Napisz albo powiedz…',
   chatUnavailable: 'Wysyłanie wiadomości nie jest jeszcze dostępne',
   settingsTitle: 'Po Twojemu.',
-  settingsSubtitle: 'Małe ustawienia, wygodniejsze korzystanie.',
+  settingsSubtitle: 'Ustaw Trackly tak, jak lubisz.',
   languageTitle: 'Język aplikacji',
   languageDescription: 'Wybierz język albo pozostaw ten ustawiony w telefonie.',
   systemLanguage: 'Jak w telefonie',
@@ -38,7 +44,7 @@ const pl = {
   notFoundTitle: 'Nie ma tu takiej strony',
   notFoundDescription: 'Wróć do przeglądu swoich płatności.',
   backHome: 'Wróć do przeglądu',
-};
+});
 
 export type Copy = { [Key in keyof typeof pl]: string };
 
@@ -56,7 +62,7 @@ const en: Copy = {
   upcomingEmpty: 'Your next due date goes here',
   upcomingDescription: 'See what needs paying and when.',
   paymentsTitle: 'Your regular payments',
-  paymentsEmpty: 'Room for your everyday essentials',
+  paymentsEmpty: 'Nothing here yet',
   paymentsDescription: 'Find your regular payments and subscriptions from the extension together in one list.',
   overviewNotice: 'Sign-in and adding payments are coming in a future version. This preview does not access your account data.',
   chatTitle: 'Start with a few words.',
@@ -65,10 +71,10 @@ const en: Copy = {
   chatExampleLabel: 'For example',
   chatExplanation: 'Trackly will prepare an entry. Check the amount and due date, then choose whether to save it.',
   chatNotice: 'Chat is coming in a future version. Nothing you type is sent or saved in this preview.',
-  chatInput: 'Tell us about a payment…',
+  chatInput: 'Type or say it…',
   chatUnavailable: 'Sending messages is not available yet',
   settingsTitle: 'Make it yours.',
-  settingsSubtitle: 'A few small settings for a more comfortable day.',
+  settingsSubtitle: 'Set Trackly up the way you like.',
   languageTitle: 'App language',
   languageDescription: 'Choose a language or follow your phone’s settings.',
   systemLanguage: 'Follow my phone',
