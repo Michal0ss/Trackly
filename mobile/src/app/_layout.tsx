@@ -9,6 +9,7 @@ import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
 
 import { LanguageProvider, useLanguage } from '@/i18n/LanguageProvider';
+import { PaymentsProvider } from '@/payments/PaymentsProvider';
 import { colors } from '@/theme/theme';
 
 void SplashScreen.preventAutoHideAsync().catch(() => {});
@@ -50,6 +51,8 @@ function Navigation() {
       <StatusBar style="light" />
       <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: colors.background } }}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="payments" />
+        <Stack.Screen name="payment" />
         <Stack.Screen name="+not-found" />
       </Stack>
     </ThemeProvider>
@@ -57,5 +60,5 @@ function Navigation() {
 }
 
 export default function RootLayout() {
-  return <LanguageProvider><Navigation /></LanguageProvider>;
+  return <LanguageProvider><PaymentsProvider><Navigation /></PaymentsProvider></LanguageProvider>;
 }

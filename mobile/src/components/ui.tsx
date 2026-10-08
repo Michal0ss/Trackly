@@ -1,6 +1,6 @@
 import Feather from '@expo/vector-icons/Feather';
 import type { ComponentProps, ReactNode } from 'react';
-import { Image, ScrollView, StyleSheet, Text, View, type TextProps } from 'react-native';
+import { Image, KeyboardAvoidingView, Platform, ScrollView, StyleSheet, Text, View, type ScrollViewProps, type TextProps } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { useLanguage } from '@/i18n/LanguageProvider';
@@ -10,12 +10,14 @@ export function AppText({ style, ...props }: TextProps) {
   return <Text {...props} style={[styles.text, style]} />;
 }
 
-export function Screen({ children }: { children: ReactNode }) {
+export function Screen({ children, refreshControl }: { children: ReactNode; refreshControl?: ScrollViewProps['refreshControl'] }) {
   return (
     <SafeAreaView style={styles.safeArea} edges={['top', 'left', 'right']}>
-      <ScrollView contentContainerStyle={styles.scroll}>
-        <View style={styles.content}>{children}</View>
-      </ScrollView>
+      <KeyboardAvoidingView style={styles.safeArea} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView contentContainerStyle={styles.scroll} refreshControl={refreshControl} keyboardShouldPersistTaps="handled" keyboardDismissMode={Platform.OS === 'web' ? 'none' : 'on-drag'}>
+          <View style={styles.content}>{children}</View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
