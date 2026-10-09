@@ -47,3 +47,20 @@ class WaitlistEntry(Base):
     email = Column(String, unique=True, nullable=False)
     language = Column(String(2))
     created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+
+
+class Payment(Base):
+    __tablename__ = "payments"
+
+    id = Column(Integer, primary_key=True, index=True)
+    user_id = Column(Integer, ForeignKey("users.id"), index=True, nullable=False)
+    name = Column(String, nullable=False)
+    category = Column(String, nullable=False)
+    amount = Column(Float, nullable=False)
+    currency = Column(String(3), nullable=False)
+    interval_months = Column(Integer, nullable=False)
+    start_date = Column(Date, nullable=False)
+    end_date = Column(Date, nullable=True)
+    note = Column(String, nullable=True)
+    created_at = Column(DateTime, default=lambda: datetime.now(UTC))
+    updated_at = Column(DateTime, default=lambda: datetime.now(UTC), onupdate=lambda: datetime.now(UTC))

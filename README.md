@@ -106,7 +106,7 @@ and in English at [tracklyapp.pl/en/privacy](https://tracklyapp.pl/en/privacy).
 | `app/` | FastAPI backend: Google sign-in, JWT, subscriptions, summaries, health check |
 | `api/index.py` | Entry point Vercel uses to serve the backend |
 | `site/` | [tracklyapp.pl](https://tracklyapp.pl), landing page, phone app waitlist and privacy policy in Polish and English, Next.js |
-| `mobile/` | Expo app preview: navigation, theme and saved PL / EN language settings; see [mobile setup](mobile/README.md) |
+| `mobile/` | Expo app: recurring payments, monthly overview and read-only subscriptions in PL / EN; see [mobile setup](mobile/README.md) |
 | `tests/` | pytest suite |
 | `.github/workflows/` | `tests.yml` for CI, `keepalive.yml` for the daily health check |
 | `docs/` | Images for this README |
@@ -197,8 +197,9 @@ CI builds it with Node 22.
 
 ### Mobile preview
 
-The first mobile milestone runs in Expo Go with SDK 57. It contains navigation,
-the Trackly theme and language settings, with no backend connection yet.
+The mobile app runs in Expo Go with SDK 57. M1 connects to a local test account for
+recurring payments, monthly totals and read-only subscriptions. Sign-in, chat and
+reminders will follow.
 See [mobile/README.md](mobile/README.md) for iPhone setup and verification commands.
 
 ## Tests
