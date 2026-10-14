@@ -197,9 +197,10 @@ CI builds it with Node 22.
 
 ### Mobile preview
 
-The mobile app runs in Expo Go with SDK 57. M1 connects to a local test account for
-recurring payments, monthly totals and read-only subscriptions. Sign-in, chat and
-reminders will follow.
+The mobile app runs in Expo Go with SDK 57 and connects to a local test account for
+recurring payments, monthly totals and read-only subscriptions. The local chat
+prototype uses prepared examples, asks for missing details and saves only after
+confirmation. A model provider, production sign-in and reminders are not connected yet.
 See [mobile/README.md](mobile/README.md) for iPhone setup and verification commands.
 
 ## Tests

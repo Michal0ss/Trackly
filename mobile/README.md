@@ -1,8 +1,9 @@
 # Trackly mobile
 
 An Expo SDK 57 app for recurring payments and subscriptions saved by the Trackly
-extension. M1 connects to a local test account. Google/Apple sign-in, chat and
-reminders are not implemented yet.
+extension. It connects to a local test account and includes a local chat prototype
+with prepared examples. Google/Apple sign-in, a model provider and reminders are
+not implemented yet.
 
 ## Features
 
@@ -11,6 +12,7 @@ reminders are not implemented yet.
 - Payment creation, editing and confirmed deletion, with form validation.
 - Refresh, loading, empty, expired-session and connection-error states.
 - Polish and English, with a saved language preference.
+- Local test chat with follow-up questions, editable proposals and explicit confirmation.
 
 ## Run locally
 
@@ -28,7 +30,7 @@ once, without displaying it. Keep this key separate from production credentials:
 If the file already exists, reuse it. In one terminal, start the local API:
 
 ```bash
-DATABASE_URL=sqlite:////tmp/trackly-dev.db SECRET_KEY="$(cat /tmp/trackly-dev-secret)" ACCESS_TOKEN_EXPIRE_MINUTES=43200 ALLOWED_ORIGINS=http://localhost:8081 .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
+CHAT_TEST_MODE=1 DATABASE_URL=sqlite:////tmp/trackly-dev.db SECRET_KEY="$(cat /tmp/trackly-dev-secret)" ACCESS_TOKEN_EXPIRE_MINUTES=43200 ALLOWED_ORIGINS=http://localhost:8081 .venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8000
 ```
 
 In another terminal, create a local test user and print a 30-day development token:
@@ -90,7 +92,7 @@ Development sign-in only accepts localhost or private IPv4 addresses and is disa
 when `__DEV__` is false. `EXPO_PUBLIC_*` values are visible in development bundles,
 so this must never contain a production token or a token for a real account.
 Production exports remove the development sign-in code. Without this local setup,
-the app shows a disconnected state. There is no production sign-in in M1.
+the app shows a disconnected state. There is no production sign-in yet.
 
 Try adding a monthly payment, an annual payment and a second currency. Move between
 months, edit a payment, cancel a deletion and then confirm it. Check a payment due on
@@ -102,6 +104,49 @@ Switch languages in Settings. Stop the API and refresh to check the connection s
 previously loaded data is marked as potentially outdated. Restart the API and retry.
 A failed save is never retried automatically because the server may already have
 accepted it. Refresh the list before attempting another save.
+
+### Local chat
+
+The backend flag `CHAT_TEST_MODE=1` enables the prepared parser on SQLite only.
+It is disabled by default and always blocked on Vercel and PostgreSQL. Chat is
+also disabled in production mobile exports. No provider key, payment card or paid
+API calls are needed. The first request creates two small tables in the local
+database for request limits and confirmation receipts; it does not migrate the
+production database.
+
+Open Chat and try this sequence in Polish:
+
+1. Choose and send `Czynsz 2400 zł`. The app asks for frequency and the first date.
+2. Reply `Co miesiąc od 2026-10-31`. A proposal appears, with no payment saved yet.
+3. Tap `Zmień`, change the amount to `2500` and apply. This only changes the proposal.
+4. Tap `Zapisz`. Open the overview or commitments list and check that one payment
+   exists. The October total should include 2500 PLN.
+5. Ask `Ile płacę miesięcznie?` or `Kiedy mam najbliższą płatność?`. Answers use
+   the signed-in account's saved data and the phone's current date.
+6. Start a new conversation, send `Netflix 49 zł co miesiąc`, then `Od 2026-10-15`.
+   After confirmation, the subscription appears read-only in the commitments list.
+
+In English, try `Paid $1,850 for rent today`, then `Monthly`. Other supported
+follow-ups include `2500 PLN`, `Do 2027-10-31`, `Co rok` and `Co 3 miesiące`;
+English equivalents include `Until 2027-10-31`, `Yearly` and `Every 3 months`.
+First dates require a full `YYYY-MM-DD`; missing frequency is never assumed.
+Subscriptions support monthly and yearly schedules only.
+
+This is a fixture-based test, not general language understanding. Initial messages
+must match one of the prepared examples in `tests/fixtures/chat_cases.json`.
+Capitalization, extra whitespace and trailing sentence punctuation are ignored.
+An unknown message shows help. Try an invalid date such as `Od 2026-02-30` and
+then correct it; the previous draft should remain available.
+
+Parsing is limited to 60 requests per minute per account. Messages and the draft
+stay in memory and are lost on reload. If confirmation times out, use `Ponów
+potwierdzenie` / `Retry confirmation`: the same proposal cannot create a second
+entry, even after a backend restart. Keep that conversation open until the outcome
+is known. After reloading the app, check the list before starting another save.
+The chat retry safeguard does not apply to the separate manual payment form.
+
+The parser contract and offline evaluation command are described in
+[`docs/chat-contract.md`](../docs/chat-contract.md).
 
 ```bash
 npm run typecheck

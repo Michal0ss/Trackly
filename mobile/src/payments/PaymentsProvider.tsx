@@ -4,6 +4,7 @@ import { AppState } from 'react-native';
 import { ApiError } from '@/api/client';
 import { developmentApi } from '@/api/session';
 import type { Overview, Payment, PaymentInput, Subscription } from '@/api/types';
+import type { ChatRequest, ChatResponse, Confirmation, SavedEntry } from '@/chat/types';
 import { localDate } from '@/payments/model';
 
 type Snapshot = { overview: Overview; payments: Payment[]; subscriptions: Subscription[] };
@@ -18,6 +19,8 @@ type PaymentsContextValue = {
   refresh: () => Promise<void>;
   save: (value: PaymentInput, id?: number) => Promise<void>;
   remove: (id: number) => Promise<void>;
+  parseChat: (value: ChatRequest, signal?: AbortSignal) => Promise<ChatResponse>;
+  confirmChat: (value: Confirmation) => Promise<SavedEntry>;
 };
 
 const PaymentsContext = createContext<PaymentsContextValue | null>(null);
@@ -70,14 +73,18 @@ export function PaymentsProvider({ children }: { children: ReactNode }) {
     return () => { subscription.remove(); clearInterval(timer); };
   }, [refresh, today]);
 
-  async function mutate(action: () => Promise<unknown>) {
+  async function access<T>(action: () => Promise<T>) {
     if (!api) throw new ApiError('unauthorized');
     try {
-      await action();
+      return await action();
     } catch (cause) {
       if (cause instanceof ApiError && cause.kind === 'unauthorized') { setData(null); setError(cause); }
       throw cause;
     }
+  }
+
+  async function mutate(action: () => Promise<unknown>) {
+    await access(action);
     await refresh();
   }
 
@@ -85,6 +92,12 @@ export function PaymentsProvider({ children }: { children: ReactNode }) {
     month, setMonth, today, data, loading, error, connected: Boolean(api) && error?.kind !== 'unauthorized', refresh,
     save: (value, id) => mutate(() => api!.save(value, id)),
     remove: id => mutate(() => api!.remove(id)),
+    parseChat: (value, signal) => access(() => api!.parseChat(value, signal)),
+    confirmChat: async value => {
+      const saved = await access(() => api!.confirmChat(value));
+      await refresh();
+      return saved;
+    },
   }}>{children}</PaymentsContext.Provider>;
 }
 

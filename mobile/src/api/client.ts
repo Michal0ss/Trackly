@@ -1,6 +1,7 @@
 import type { Overview, Payment, PaymentInput, Subscription } from './types.ts';
+import type { ChatRequest, ChatResponse, Confirmation, SavedEntry } from '../chat/types.ts';
 
-export type ErrorKind = 'unauthorized' | 'network' | 'timeout' | 'validation' | 'notFound' | 'server' | 'cancelled';
+export type ErrorKind = 'unauthorized' | 'network' | 'timeout' | 'validation' | 'notFound' | 'server' | 'cancelled' | 'limited' | 'unavailable' | 'conflict';
 
 export class ApiError extends Error {
   readonly kind: ErrorKind;
@@ -25,7 +26,7 @@ export function validationFields(body: unknown): string[] {
 export function createApi(baseUrl: string, token: string, fetcher: typeof fetch = fetch, timeoutMs = 12000) {
   const base = baseUrl.replace(/\/+$/, '');
 
-  async function request<T>(path: string, method = 'GET', body?: PaymentInput, signal?: AbortSignal): Promise<T> {
+  async function request<T>(path: string, method = 'GET', body?: PaymentInput | ChatRequest | Confirmation, signal?: AbortSignal): Promise<T> {
     const controller = new AbortController();
     let timedOut = false;
     const cancel = () => controller.abort();
@@ -42,6 +43,10 @@ export function createApi(baseUrl: string, token: string, fetcher: typeof fetch 
       });
       if (response.status === 401 || response.status === 403) throw new ApiError('unauthorized');
       if (response.status === 404) throw new ApiError('notFound');
+      if (response.status === 409) throw new ApiError('conflict');
+      if (response.status === 429) throw new ApiError('limited');
+      if (response.status === 503) throw new ApiError('unavailable');
+      if (response.status === 504) throw new ApiError('timeout');
       if (response.status === 422) {
         const details: unknown = await response.json().catch(() => null);
         throw new ApiError('validation', validationFields(details));
@@ -66,6 +71,8 @@ export function createApi(baseUrl: string, token: string, fetcher: typeof fetch 
     payment: (id: number, signal?: AbortSignal) => request<Payment>(`/api/payments/${id}`, 'GET', undefined, signal),
     save: (value: PaymentInput, id?: number) => request<Payment>(id ? `/api/payments/${id}` : '/api/payments', id ? 'PUT' : 'POST', value),
     remove: (id: number) => request<{ message: string }>(`/api/payments/${id}`, 'DELETE'),
+    parseChat: (value: ChatRequest, signal?: AbortSignal) => request<ChatResponse>('/api/assistant/parse', 'POST', value, signal),
+    confirmChat: (value: Confirmation) => request<SavedEntry>('/api/assistant/confirm', 'POST', value),
   };
 }
 

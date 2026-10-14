@@ -96,11 +96,12 @@ export type PaymentRow = {
   end: string | null;
   status: Subscription['status'] | null;
   renews: boolean;
+  source?: string;
 };
 
 export function paymentRows(payments: Payment[], subscriptions: Subscription[]): PaymentRow[] {
   return [
     ...payments.map((payment): PaymentRow => ({ key: `payment-${payment.id}`, kind: 'payment', id: payment.id, name: payment.name, plan: null, category: payment.category, amount: payment.amount, currency: payment.currency, interval: payment.interval_months, start: payment.start_date, end: payment.end_date, status: null, renews: true })),
-    ...subscriptions.map((subscription): PaymentRow => ({ key: `subscription-${subscription.id}`, kind: 'subscription', id: subscription.id, name: subscription.service_name, plan: subscription.plan_name, category: 'subscription', amount: subscription.price, currency: subscription.currency, interval: subscription.billing_cycle === 'monthly' ? 1 : subscription.billing_cycle === 'yearly' ? 12 : null, start: subscription.renewal_date, end: subscription.end_date, status: subscription.status, renews: subscription.auto_renew })),
+    ...subscriptions.map((subscription): PaymentRow => ({ key: `subscription-${subscription.id}`, kind: 'subscription', id: subscription.id, name: subscription.service_name, plan: subscription.plan_name, category: 'subscription', amount: subscription.price, currency: subscription.currency, interval: subscription.billing_cycle === 'monthly' ? 1 : subscription.billing_cycle === 'yearly' ? 12 : null, start: subscription.renewal_date, end: subscription.end_date, status: subscription.status, renews: subscription.auto_renew, source: subscription.source })),
   ].sort((a, b) => a.name.localeCompare(b.name) || a.key.localeCompare(b.key));
 }

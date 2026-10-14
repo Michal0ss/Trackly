@@ -1,0 +1,970 @@
+{
+  "version": 1,
+  "today": "2026-10-07",
+  "default_currency": {
+    "pl": "PLN",
+    "en": "USD"
+  },
+  "rules": [
+    "Extract only facts present in the text or the explicit request context. Never infer recurrence from the name of a bill or service.",
+    "A past-tense payment without an explicit date does not mean today. Today is resolved only when the person says today.",
+    "Dates remain partial: preserve stated day, month and year. Calendar calculations and choosing the first full date belong to server code.",
+    "A non-monthly interval needs an anchor month. A quarterly bill due on the 15th still needs clarification about the first payment.",
+    "Missing contains every required unknown field, not just the first follow-up question. Its order is irrelevant.",
+    "The request supplies default_currency explicitly. Language alone does not determine currency in the application.",
+    "A proposal never authorizes a write, even when missing is empty. The person must confirm the complete resolved entry.",
+    "Question results classify the question only. Totals and dates must come from authenticated backend queries.",
+    "duration_months is not a number of payments and does not imply a monthly interval.",
+    "Only explicitly listed name and category alternatives are accepted. Numeric values and date parts must match exactly."
+  ],
+  "cases": [
+    {
+      "id": 1,
+      "language": "pl",
+      "text": "Zapłaciłem 2400 zł za czynsz",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Czynsz",
+          "category": "rent",
+          "amount": 2400,
+          "currency": "PLN"
+        },
+        "missing": [
+          "interval_months",
+          "first_due"
+        ]
+      }
+    },
+    {
+      "id": 2,
+      "language": "pl",
+      "text": "Czynsz 2400 zł, płacę do 10-go każdego miesiąca",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Czynsz",
+          "category": "rent",
+          "amount": 2400,
+          "currency": "PLN",
+          "interval_months": 1,
+          "first_due": {
+            "day": 10
+          }
+        },
+        "missing": []
+      }
+    },
+    {
+      "id": 3,
+      "language": "pl",
+      "text": "Płacę 1850 zł za wynajem mieszkania co miesiąc, do piątego",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Wynajem mieszkania",
+          "category": "rent",
+          "amount": 1850,
+          "currency": "PLN",
+          "interval_months": 1,
+          "first_due": {
+            "day": 5
+          }
+        },
+        "missing": []
+      },
+      "alternatives": {
+        "draft.name": [
+          "Czynsz"
+        ]
+      }
+    },
+    {
+      "id": 4,
+      "language": "pl",
+      "text": "Rata kredytu hipotecznego 3100 zł, 15-go, do grudnia 2045",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Kredyt hipoteczny",
+          "category": "loan",
+          "amount": 3100,
+          "currency": "PLN",
+          "first_due": {
+            "day": 15
+          },
+          "until": {
+            "year": 2045,
+            "month": 12
+          }
+        },
+        "missing": [
+          "interval_months"
+        ]
+      },
+      "alternatives": {
+        "draft.name": [
+          "Rata kredytu hipotecznego"
+        ]
+      }
+    },
+    {
+      "id": 5,
+      "language": "pl",
+      "text": "Rata za telefon 99 zł przez 24 miesiące, pierwsza 20 października",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Rata za telefon",
+          "category": "loan",
+          "amount": 99,
+          "currency": "PLN",
+          "first_due": {
+            "day": 20,
+            "month": 10
+          },
+          "duration_months": 24
+        },
+        "missing": [
+          "interval_months"
+        ]
+      },
+      "alternatives": {
+        "draft.category": [
+          "phone_internet"
+        ]
+      }
+    },
+    {
+      "id": 6,
+      "language": "pl",
+      "text": "Prąd około 180 zł co dwa miesiące",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Prąd",
+          "category": "utilities",
+          "amount": 180,
+          "currency": "PLN",
+          "interval_months": 2
+        },
+        "missing": [
+          "first_due"
+        ]
+      }
+    },
+    {
+      "id": 7,
+      "language": "pl",
+      "text": "Gaz 250 zł co 2 miesiące, następna płatność 20 listopada",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Gaz",
+          "category": "utilities",
+          "amount": 250,
+          "currency": "PLN",
+          "interval_months": 2,
+          "first_due": {
+            "day": 20,
+            "month": 11
+          }
+        },
+        "missing": []
+      }
+    },
+    {
+      "id": 8,
+      "language": "pl",
+      "text": "Woda 120 zł kwartalnie do 15-go",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Woda",
+          "category": "utilities",
+          "amount": 120,
+          "currency": "PLN",
+          "interval_months": 3,
+          "first_due": {
+            "day": 15
+          }
+        },
+        "missing": [
+          "first_due"
+        ]
+      }
+    },
+    {
+      "id": 9,
+      "language": "pl",
+      "text": "Wywóz śmieci 90 zł co kwartał",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Wywóz śmieci",
+          "category": "utilities",
+          "amount": 90,
+          "currency": "PLN",
+          "interval_months": 3
+        },
+        "missing": [
+          "first_due"
+        ]
+      },
+      "alternatives": {
+        "draft.name": [
+          "Śmieci"
+        ]
+      }
+    },
+    {
+      "id": 10,
+      "language": "pl",
+      "text": "OC samochodu 1200 zł raz w roku, w marcu",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "OC samochodu",
+          "category": "insurance",
+          "amount": 1200,
+          "currency": "PLN",
+          "interval_months": 12,
+          "first_due": {
+            "month": 3
+          }
+        },
+        "missing": [
+          "first_due"
+        ]
+      }
+    },
+    {
+      "id": 11,
+      "language": "pl",
+      "text": "Ubezpieczenie mieszkania 400 zł rocznie, płatne 1 lutego",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Ubezpieczenie mieszkania",
+          "category": "insurance",
+          "amount": 400,
+          "currency": "PLN",
+          "interval_months": 12,
+          "first_due": {
+            "day": 1,
+            "month": 2
+          }
+        },
+        "missing": []
+      }
+    },
+    {
+      "id": 12,
+      "language": "pl",
+      "text": "Internet 59,99 zł miesięcznie",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Internet",
+          "category": "phone_internet",
+          "amount": 59.99,
+          "currency": "PLN",
+          "interval_months": 1
+        },
+        "missing": [
+          "first_due"
+        ]
+      }
+    },
+    {
+      "id": 13,
+      "language": "pl",
+      "text": "Abonament w Play 45 zł do 20-go",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Abonament Play",
+          "category": "phone_internet",
+          "amount": 45,
+          "currency": "PLN",
+          "first_due": {
+            "day": 20
+          }
+        },
+        "missing": [
+          "interval_months"
+        ]
+      },
+      "alternatives": {
+        "draft.name": [
+          "Play"
+        ]
+      }
+    },
+    {
+      "id": 14,
+      "language": "pl",
+      "text": "Netflix 49 zł co miesiąc",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "subscription",
+          "name": "Netflix",
+          "category": "subscription",
+          "amount": 49,
+          "currency": "PLN",
+          "interval_months": 1
+        },
+        "missing": [
+          "first_due"
+        ]
+      }
+    },
+    {
+      "id": 15,
+      "language": "pl",
+      "text": "Spotify Premium 23,99 zł, odnawia się 3 listopada",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "subscription",
+          "name": "Spotify",
+          "category": "subscription",
+          "amount": 23.99,
+          "currency": "PLN",
+          "plan_name": "Premium",
+          "first_due": {
+            "day": 3,
+            "month": 11
+          }
+        },
+        "missing": [
+          "interval_months"
+        ]
+      }
+    },
+    {
+      "id": 16,
+      "language": "pl",
+      "text": "YouTube Premium rocznie 239,99 zł",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "subscription",
+          "name": "YouTube",
+          "category": "subscription",
+          "amount": 239.99,
+          "currency": "PLN",
+          "plan_name": "Premium",
+          "interval_months": 12
+        },
+        "missing": [
+          "first_due"
+        ]
+      }
+    },
+    {
+      "id": 17,
+      "language": "pl",
+      "text": "Siłownia 129 zł miesięcznie, karnet od 1-go",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Siłownia",
+          "category": "other",
+          "amount": 129,
+          "currency": "PLN",
+          "interval_months": 1,
+          "first_due": {
+            "day": 1
+          }
+        },
+        "missing": []
+      },
+      "alternatives": {
+        "draft.name": [
+          "Karnet na siłownię"
+        ]
+      }
+    },
+    {
+      "id": 18,
+      "language": "pl",
+      "text": "Przedszkole 900 zł do 10-go",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Przedszkole",
+          "category": "other",
+          "amount": 900,
+          "currency": "PLN",
+          "first_due": {
+            "day": 10
+          }
+        },
+        "missing": [
+          "interval_months"
+        ]
+      }
+    },
+    {
+      "id": 19,
+      "language": "pl",
+      "text": "Kieszonkowe dla syna 100 zł co tydzień",
+      "expected": {
+        "kind": "not_supported",
+        "reason": "weekly"
+      }
+    },
+    {
+      "id": 20,
+      "language": "pl",
+      "text": "Mieszkanie w Berlinie 950 euro co miesiąc, 1-go",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Mieszkanie w Berlinie",
+          "category": "rent",
+          "amount": 950,
+          "currency": "EUR",
+          "interval_months": 1,
+          "first_due": {
+            "day": 1
+          }
+        },
+        "missing": []
+      }
+    },
+    {
+      "id": 21,
+      "language": "pl",
+      "text": "Czynsz 2.400 zł",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Czynsz",
+          "category": "rent",
+          "amount": 2400,
+          "currency": "PLN"
+        },
+        "missing": [
+          "interval_months",
+          "first_due"
+        ]
+      }
+    },
+    {
+      "id": 22,
+      "language": "pl",
+      "text": "czynsz 2 400zł 10go",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Czynsz",
+          "category": "rent",
+          "amount": 2400,
+          "currency": "PLN",
+          "first_due": {
+            "day": 10
+          }
+        },
+        "missing": [
+          "interval_months"
+        ]
+      }
+    },
+    {
+      "id": 23,
+      "language": "pl",
+      "text": "Rata 1,5 tys. zł do 25-go",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Rata",
+          "category": "loan",
+          "amount": 1500,
+          "currency": "PLN",
+          "first_due": {
+            "day": 25
+          }
+        },
+        "missing": [
+          "interval_months"
+        ]
+      }
+    },
+    {
+      "id": 24,
+      "language": "pl",
+      "text": "Dwa tysiące czterysta złotych za czynsz",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Czynsz",
+          "category": "rent",
+          "amount": 2400,
+          "currency": "PLN"
+        },
+        "missing": [
+          "interval_months",
+          "first_due"
+        ]
+      }
+    },
+    {
+      "id": 25,
+      "language": "pl",
+      "text": "Zapłaciłam za wodę 120 zł",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Woda",
+          "category": "utilities",
+          "amount": 120,
+          "currency": "PLN"
+        },
+        "missing": [
+          "interval_months",
+          "first_due"
+        ]
+      }
+    },
+    {
+      "id": 26,
+      "language": "pl",
+      "text": "Zapłaciłem 300 zł",
+      "expected": {
+        "kind": "clarify",
+        "reason": "entry_type"
+      }
+    },
+    {
+      "id": 27,
+      "language": "pl",
+      "text": "Czynsz",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Czynsz",
+          "category": "rent",
+          "currency": "PLN"
+        },
+        "missing": [
+          "amount",
+          "interval_months",
+          "first_due"
+        ]
+      }
+    },
+    {
+      "id": 28,
+      "language": "pl",
+      "text": "Kupiłem buty za 300 zł",
+      "expected": {
+        "kind": "not_supported",
+        "reason": "one_off"
+      }
+    },
+    {
+      "id": 29,
+      "language": "pl",
+      "text": "Ile płacę miesięcznie?",
+      "expected": {
+        "kind": "question",
+        "question": "month_total"
+      }
+    },
+    {
+      "id": 30,
+      "language": "pl",
+      "text": "Kiedy mam najbliższą płatność?",
+      "expected": {
+        "kind": "question",
+        "question": "next_due"
+      }
+    },
+    {
+      "id": 31,
+      "language": "pl",
+      "text": "Ile wydaję na subskrypcje?",
+      "expected": {
+        "kind": "question",
+        "question": "subscriptions_total"
+      }
+    },
+    {
+      "id": 32,
+      "language": "pl",
+      "text": "Usuń Netflixa",
+      "expected": {
+        "kind": "not_supported",
+        "reason": "delete_by_chat"
+      }
+    },
+    {
+      "id": 33,
+      "language": "pl",
+      "text": "Zmień czynsz na 2500 zł",
+      "expected": {
+        "kind": "not_supported",
+        "reason": "edit_by_chat"
+      }
+    },
+    {
+      "id": 34,
+      "language": "pl",
+      "text": "Opłata za żłobek 1100 zł, płatna 31-go",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Żłobek",
+          "category": "other",
+          "amount": 1100,
+          "currency": "PLN",
+          "first_due": {
+            "day": 31
+          }
+        },
+        "missing": [
+          "interval_months"
+        ]
+      },
+      "alternatives": {
+        "draft.name": [
+          "Opłata za żłobek"
+        ]
+      }
+    },
+    {
+      "id": 35,
+      "language": "pl",
+      "text": "Leasing auta 1890,50 zł do 12-go, do marca 2029",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Leasing auta",
+          "category": "loan",
+          "amount": 1890.5,
+          "currency": "PLN",
+          "first_due": {
+            "day": 12
+          },
+          "until": {
+            "year": 2029,
+            "month": 3
+          }
+        },
+        "missing": [
+          "interval_months"
+        ]
+      }
+    },
+    {
+      "id": 36,
+      "language": "pl",
+      "text": "Telefon dla mamy 30 zł, co miesiąc",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Telefon dla mamy",
+          "category": "phone_internet",
+          "amount": 30,
+          "currency": "PLN",
+          "interval_months": 1
+        },
+        "missing": [
+          "first_due"
+        ]
+      }
+    },
+    {
+      "id": 37,
+      "language": "pl",
+      "text": "Netflix",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "subscription",
+          "name": "Netflix",
+          "category": "subscription",
+          "currency": "PLN"
+        },
+        "missing": [
+          "amount",
+          "interval_months",
+          "first_due"
+        ]
+      }
+    },
+    {
+      "id": 38,
+      "language": "pl",
+      "text": "Abonament Canal+ 65 zł co miesiąc od 5 listopada",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "subscription",
+          "name": "Canal+",
+          "category": "subscription",
+          "amount": 65,
+          "currency": "PLN",
+          "interval_months": 1,
+          "first_due": {
+            "day": 5,
+            "month": 11
+          }
+        },
+        "missing": []
+      }
+    },
+    {
+      "id": 39,
+      "language": "pl",
+      "text": "Kredyt 800 zł do 15-go i internet 60 zł do 20-go",
+      "expected": {
+        "kind": "clarify",
+        "reason": "multiple_entries"
+      }
+    },
+    {
+      "id": 40,
+      "language": "en",
+      "text": "Paid $1,850 for rent today",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Rent",
+          "category": "rent",
+          "amount": 1850,
+          "currency": "USD",
+          "first_due": {
+            "year": 2026,
+            "month": 10,
+            "day": 7
+          }
+        },
+        "missing": [
+          "interval_months"
+        ]
+      }
+    },
+    {
+      "id": 41,
+      "language": "en",
+      "text": "Rent is $1,850, due on the 1st",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Rent",
+          "category": "rent",
+          "amount": 1850,
+          "currency": "USD",
+          "first_due": {
+            "day": 1
+          }
+        },
+        "missing": [
+          "interval_months"
+        ]
+      }
+    },
+    {
+      "id": 42,
+      "language": "en",
+      "text": "Netflix $15.49 a month",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "subscription",
+          "name": "Netflix",
+          "category": "subscription",
+          "amount": 15.49,
+          "currency": "USD",
+          "interval_months": 1
+        },
+        "missing": [
+          "first_due"
+        ]
+      }
+    },
+    {
+      "id": 43,
+      "language": "en",
+      "text": "Car insurance £420 a year in June",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Car insurance",
+          "category": "insurance",
+          "amount": 420,
+          "currency": "GBP",
+          "interval_months": 12,
+          "first_due": {
+            "month": 6
+          }
+        },
+        "missing": [
+          "first_due"
+        ]
+      }
+    },
+    {
+      "id": 44,
+      "language": "en",
+      "text": "Electricity bill every two months, about 180 zł",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Electricity",
+          "category": "utilities",
+          "amount": 180,
+          "currency": "PLN",
+          "interval_months": 2
+        },
+        "missing": [
+          "first_due"
+        ]
+      },
+      "alternatives": {
+        "draft.name": [
+          "Electricity bill"
+        ]
+      }
+    },
+    {
+      "id": 45,
+      "language": "en",
+      "text": "Gym membership 39.99 USD monthly, renews on the 15th",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Gym membership",
+          "category": "other",
+          "amount": 39.99,
+          "currency": "USD",
+          "interval_months": 1,
+          "first_due": {
+            "day": 15
+          }
+        },
+        "missing": []
+      },
+      "alternatives": {
+        "draft.name": [
+          "Gym"
+        ]
+      }
+    },
+    {
+      "id": 46,
+      "language": "en",
+      "text": "Student loan 250 dollars on the 28th until June 2030",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Student loan",
+          "category": "loan",
+          "amount": 250,
+          "currency": "USD",
+          "first_due": {
+            "day": 28
+          },
+          "until": {
+            "year": 2030,
+            "month": 6
+          }
+        },
+        "missing": [
+          "interval_months"
+        ]
+      }
+    },
+    {
+      "id": 47,
+      "language": "en",
+      "text": "How much do I pay this month?",
+      "expected": {
+        "kind": "question",
+        "question": "month_total"
+      }
+    },
+    {
+      "id": 48,
+      "language": "en",
+      "text": "Bought a new jacket for $120",
+      "expected": {
+        "kind": "not_supported",
+        "reason": "one_off"
+      }
+    },
+    {
+      "id": 49,
+      "language": "en",
+      "text": "Phone bill",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "payment",
+          "name": "Phone bill",
+          "category": "phone_internet",
+          "currency": "USD"
+        },
+        "missing": [
+          "amount",
+          "interval_months",
+          "first_due"
+        ]
+      }
+    },
+    {
+      "id": 50,
+      "language": "en",
+      "text": "Spotify 11.99",
+      "expected": {
+        "kind": "proposal",
+        "draft": {
+          "kind": "subscription",
+          "name": "Spotify",
+          "category": "subscription",
+          "amount": 11.99,
+          "currency": "USD"
+        },
+        "missing": [
+          "interval_months",
+          "first_due"
+        ]
+      }
+    }
+  ]
+}

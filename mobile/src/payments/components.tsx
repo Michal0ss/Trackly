@@ -29,7 +29,7 @@ export function useDataRefresh() {
 }
 
 export function errorText(error: ApiError, copy: Copy) {
-  const keys = { network: 'offlineError', timeout: 'timeoutError', unauthorized: 'sessionExpired', validation: 'validationError', notFound: 'missingPayment', server: 'serverError', cancelled: 'serverError' } as const;
+  const keys = { network: 'offlineError', timeout: 'timeoutError', unauthorized: 'sessionExpired', validation: 'validationError', notFound: 'missingPayment', server: 'serverError', cancelled: 'serverError', limited: 'chatLimit', unavailable: 'serverError', conflict: 'chatConflict' } as const;
   return copy[keys[error.kind]];
 }
 
@@ -75,7 +75,9 @@ export function categoryLabel(category: string, copy: Copy): string {
 
 export function PaymentCard({ item }: { item: OverviewItem | PaymentRow }) {
   const { copy, language } = useLanguage();
+  const { data } = usePayments();
   const editable = item.kind === 'payment';
+  const source = 'source' in item ? item.source : data?.subscriptions.find(subscription => subscription.id === item.id)?.source;
   const plan = 'plan_name' in item ? item.plan_name : item.plan;
   const contents = <>
     <View style={styles.cardHeading}>
@@ -96,7 +98,7 @@ export function PaymentCard({ item }: { item: OverviewItem | PaymentRow }) {
       {item.status === 'expired' && <AppText style={styles.small}>{copy.expired}</AppText>}
       {item.status === 'confirmed' && !item.renews && <AppText style={styles.small}>{copy.noRenewal}</AppText>}
     </>}
-    {!editable && <AppText style={styles.small}>{copy.readOnlySubscription}</AppText>}
+    {!editable && <AppText style={styles.small}>{source === 'manual' ? copy.readOnlyManualSubscription : copy.readOnlySubscription}</AppText>}
   </>;
   if (!editable) return <View style={sharedStyles.card}>{contents}</View>;
   return <Pressable accessibilityRole="button" accessibilityLabel={`${copy.editPayment}: ${item.name}, ${formatMoney(item.amount, item.currency, language)}`}
