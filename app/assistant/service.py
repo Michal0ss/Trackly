@@ -39,7 +39,7 @@ def resolve_proposal(result):
     response.entry = ResolvedEntry(
         kind=draft.kind, name=draft.name, category=draft.category, amount=draft.amount,
         currency=draft.currency, interval_months=draft.interval_months, start_date=start,
-        end_date=end, plan_name=draft.plan_name,
+        end_date=end, plan_name=draft.plan_name, note=draft.note,
     )
     response.proposal_id = uuid4()
     return response

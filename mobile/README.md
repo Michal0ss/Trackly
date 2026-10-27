@@ -1,6 +1,6 @@
 # Trackly mobile
 
-An Expo SDK 57 app for recurring payments and subscriptions saved by the Trackly
+An Expo SDK 58 app for recurring payments and subscriptions saved by the Trackly
 extension. It connects to a local test account and includes a local chat prototype
 with prepared examples. Google/Apple sign-in, a model provider and reminders are
 not implemented yet.
@@ -10,13 +10,16 @@ not implemented yet.
 - Monthly planned commitments, separate totals for each currency and the next due date.
 - One list of recurring payments and read-only extension subscriptions.
 - Payment creation, editing and confirmed deletion, with form validation.
+- Editing and confirmed deletion of subscriptions added in the app.
+- Commitment search by name or plan, with type and currency filters.
 - Refresh, loading, empty, expired-session and connection-error states.
 - Polish and English, with a saved language preference.
 - Local test chat with follow-up questions, editable proposals and explicit confirmation.
 
 ## Run locally
 
-Use Python 3.12, Node 24 and Expo Go compatible with SDK 57. No Docker is needed.
+Use Python 3.12, Node 24.3 or newer on the Node 24 line, and Expo Go compatible with
+SDK 58. No Docker is needed.
 Run the following backend commands from the repository root, with dependencies
 already installed in `.venv`.
 
@@ -73,6 +76,9 @@ Keep the token out of Git, screenshots and messages.
 npm start
 ```
 
+After an SDK upgrade, stop the existing Expo process with Ctrl+C and restart it
+with `npm start -- --clear`. Scan the newly displayed QR code in Expo Go.
+
 Connect the iPhone and Mac to the same trusted Wi-Fi, scan the QR code with Camera
 and open Expo Go. Allow local network access. The API and Expo terminals must stay
 running. If connection fails, first open `http://<your Mac's Wi-Fi IPv4 address>:8000/docs`
@@ -96,14 +102,21 @@ the app shows a disconnected state. There is no production sign-in yet.
 
 Try adding a monthly payment, an annual payment and a second currency. Move between
 months, edit a payment, cancel a deletion and then confirm it. Check a payment due on
-the 31st in February and March, and one with an end date. Subscriptions saved in the
-same local account appear read-only. Totals are planned obligations, not recorded
+the 31st in February and March, and one with an end date. Extension subscriptions
+appear read-only; subscriptions added in the app can be edited and deleted. Totals are planned obligations, not recorded
 spending. The next due date is counted from today, even when browsing another month.
 
 Switch languages in Settings. Stop the API and refresh to check the connection state;
 previously loaded data is marked as potentially outdated. Restart the API and retry.
 A failed save is never retried automatically because the server may already have
 accepted it. Refresh the list before attempting another save.
+
+While a chat confirmation is pending, switch to the overview and choose another
+month. When the save finishes, that selected month should retain its totals and
+entries. A late response cannot replace it with the month selected before saving.
+An expired session clears loaded data and stays disconnected until a refresh
+succeeds. If a payment was already deleted elsewhere, confirming its deletion in
+an open form refreshes the list and returns to the previous screen.
 
 ### Local chat
 
@@ -124,7 +137,7 @@ Open Chat and try this sequence in Polish:
 5. Ask `Ile płacę miesięcznie?` or `Kiedy mam najbliższą płatność?`. Answers use
    the signed-in account's saved data and the phone's current date.
 6. Start a new conversation, send `Netflix 49 zł co miesiąc`, then `Od 2026-10-15`.
-   After confirmation, the subscription appears read-only in the commitments list.
+   After confirmation, open the subscription in the commitments list to edit it.
 
 In English, try `Paid $1,850 for rent today`, then `Monthly`. Other supported
 follow-ups include `2500 PLN`, `Do 2027-10-31`, `Co rok` and `Co 3 miesiące`;
@@ -132,11 +145,19 @@ English equivalents include `Until 2027-10-31`, `Yearly` and `Every 3 months`.
 First dates require a full `YYYY-MM-DD`; missing frequency is never assumed.
 Subscriptions support monthly and yearly schedules only.
 
+To check edits across follow-ups, add a note in the proposal editor and apply it.
+Then send `2600 PLN` before saving. The new amount and the note should both remain
+on the proposal and in the saved payment's edit screen.
+
 This is a fixture-based test, not general language understanding. Initial messages
 must match one of the prepared examples in `tests/fixtures/chat_cases.json`.
 Capitalization, extra whitespace and trailing sentence punctuation are ignored.
-An unknown message shows help. Try an invalid date such as `Od 2026-02-30` and
-then correct it; the previous draft should remain available.
+An unknown message shows help. With a complete proposal open, try an invalid date
+such as `Od 2026-02-30`. The proposal stays visible, but saving is disabled until
+you send a valid correction or review and apply the details in `Zmień` / `Change`.
+Try `Od 2026-11-30` to correct the date. Asking `Ile płacę miesięcznie?` keeps the
+current proposal, but does not clear an unresolved correction. A question after
+confirmation must not make the saved proposal available to save again.
 
 Parsing is limited to 60 requests per minute per account. Messages and the draft
 stay in memory and are lost on reload. If confirmation times out, use `Ponów
@@ -144,9 +165,40 @@ potwierdzenie` / `Retry confirmation`: the same proposal cannot create a second
 entry, even after a backend restart. Keep that conversation open until the outcome
 is known. After reloading the app, check the list before starting another save.
 The chat retry safeguard does not apply to the separate manual payment form.
+An expired session clears the conversation. After restoring access, check the
+commitments list before repeating a save whose result was unknown.
 
 The parser contract and offline evaluation command are described in
 [`docs/chat-contract.md`](../docs/chat-contract.md).
+
+### Subscription editing and list filters
+
+After adding Netflix through the local chat, open All commitments and tap Netflix.
+Change the amount to 59 and the plan to Premium, save and verify that the same entry
+and the monthly overview show the new amount. Monthly and yearly recurrence are
+supported. Changing the first date or frequency resets the schedule anchor to that
+first date; editing only the amount or plan preserves the existing anchor. Updating
+an inactive subscription does not reactivate it. No provider service is contacted.
+
+Try an invalid date, an end date before the first payment and a name already used
+by another active subscription. Each should prevent a save. Chat confirmation and
+manual subscription editing compare names without case or surrounding whitespace,
+including Polish letters and equivalent Unicode spellings. Another account's
+entries and cancelled subscriptions do not block a name. Tap Delete subscription,
+cancel once and check that the entry remains, then confirm. The entry and its planned
+payments should disappear. This deletes only the Trackly record, not the service
+with its provider. A failed update or delete is not automatically retried.
+
+Search by name or plan; case and Polish accents do not matter. Combine the search
+with Subscriptions and a currency, then clear the filters to restore the full list.
+No matches shows a separate empty state and does not change the overview totals.
+Filters are held in memory for this screen and do not modify saved data.
+
+The mobile editor uses authenticated `PUT` and `DELETE` requests to
+`/api/manual-subscriptions/{id}`. The backend requires both ownership and
+`source: "manual"`, validates editable fields and rejects owner/source/status
+overrides. Existing extension endpoints retain their contract. No migration or
+additional configuration is needed.
 
 ```bash
 npm run typecheck
@@ -177,5 +229,5 @@ analytics or model-provider integration. Expo Go has its own development tools.
 
 The logo and icon come from the existing Trackly site and extension. Manrope and
 Source Sans 3 use the SIL Open Font License. Feather icons come from `@expo/vector-icons`.
-The initial template was trimmed and upgraded to SDK 57. The application screens,
+The initial template was trimmed and upgraded to SDK 58. The application screens,
 API client and tests are project code; npm generates dependency metadata.

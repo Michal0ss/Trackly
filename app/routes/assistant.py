@@ -8,6 +8,7 @@ from sqlalchemy.exc import SQLAlchemyError
 from starlette.concurrency import run_in_threadpool
 
 from app.assistant.local_store import confirm_entry, consume_request
+from app.assistant.model_parser import InvalidParserResponse
 from app.assistant.provider import Parser, TestParser
 from app.assistant.service import resolve_proposal
 from app.database.db import engine
@@ -53,6 +54,8 @@ async def parse_message(request: ParseRequest, current_user=Depends(get_current_
         return response
     except TimeoutError:
         raise HTTPException(504, "Rozmowa nie odpowiedziała na czas.") from None
+    except InvalidParserResponse:
+        raise HTTPException(502, "Nie udało się odczytać odpowiedzi rozmowy.") from None
     except (ValidationError, ValueError):
         raise HTTPException(422, "Sprawdź kwotę i datę w wiadomości.") from None
     except (SQLAlchemyError, OSError):

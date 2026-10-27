@@ -60,6 +60,7 @@ def test_duration_is_preserved_without_inventing_frequency_or_last_payment():
     {"amount": float("nan")}, {"amount": float("inf")}, {"amount": "2400"}, {"amount": True},
     {"interval_months": True}, {"interval_months": 1.0}, {"interval_months": "1"}, {"interval_months": 4},
     {"currency": "BTC"}, {"category": "subscription"}, {"plan_name": "Premium"}, {"user_id": 7},
+    {"note": "a" * 501}, {"kind": "subscription", "category": "subscription", "note": "unsupported"},
     {"kind": "subscription", "category": "rent"}, {"duration_months": 0}, {"duration_months": True},
     {"duration_months": 24, "until": {"year": 2028, "month": 9}},
     {"first_due": {"year": 2026, "month": 10, "day": 7}, "until": {"year": 2026, "month": 9}},

@@ -1,13 +1,14 @@
 import Feather from '@expo/vector-icons/Feather';
 import { router } from 'expo-router';
-import { useEffect, useRef, useState } from 'react';
-import { ActivityIndicator, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View } from 'react-native';
+import { useEffect, useReducer, useRef, useState } from 'react';
+import { ActivityIndicator, Keyboard, KeyboardAvoidingView, Platform, Pressable, ScrollView, StyleSheet, TextInput, View, type ScrollViewInstance } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 import { ApiError } from '@/api/client';
 import { EntryEditor } from '@/chat/EntryEditor';
-import { chatReply, createConfirmation, draftFromEntry } from '@/chat/model';
-import type { ChatRequest, ChatResponse, EntryDraft, ResolvedEntry } from '@/chat/types';
+import { canConfirm, conversationReducer, newConversation } from '@/chat/conversation';
+import { chatReply, createConfirmation } from '@/chat/model';
+import type { ChatRequest, ResolvedEntry } from '@/chat/types';
 import { AppText, BrandHeader, IconTile, Notice, Screen, ScreenTitle, sharedStyles } from '@/components/ui';
 import { useLanguage } from '@/i18n/LanguageProvider';
 import { Action, categoryLabel, ConnectionState, errorText, intervalLabel } from '@/payments/components';
@@ -15,53 +16,37 @@ import { usePayments } from '@/payments/PaymentsProvider';
 import { categoryIcon, formatDueDate, formatMoney, localDate } from '@/payments/model';
 import { colors, fonts } from '@/theme/theme';
 
-type Message = { role: 'user' | 'assistant'; text: string };
-
 function LocalChat() {
   const { copy, language } = useLanguage();
   const { connected, parseChat, confirmChat } = usePayments();
-  const [messages, setMessages] = useState<Message[]>([]);
+  const [conversation, dispatch] = useReducer(conversationReducer, undefined, newConversation);
+  const { messages, draft, proposal: response, failure, failedRequest, saveState } = conversation;
   const [input, setInput] = useState('');
-  const [draft, setDraft] = useState<EntryDraft | null>(null);
-  const [response, setResponse] = useState<ChatResponse | null>(null);
-  const [failure, setFailure] = useState<ApiError | null>(null);
-  const [failedRequest, setFailedRequest] = useState<ChatRequest | null>(null);
   const [busy, setBusy] = useState<'parse' | 'save' | null>(null);
-  const [saveState, setSaveState] = useState<'ready' | 'uncertain' | 'saved'>('ready');
   const [editing, setEditing] = useState(false);
   const pending = useRef(false);
   const controller = useRef<AbortController | null>(null);
   const confirmation = useRef<ReturnType<typeof createConfirmation> | null>(null);
-  const scroll = useRef<ScrollView>(null);
+  const scroll = useRef<ScrollViewInstance>(null);
 
   useEffect(() => () => controller.current?.abort(), []);
-  useEffect(() => {
-    if (!connected) {
-      controller.current?.abort();
-      queueMicrotask(() => { setMessages([]); setDraft(null); setResponse(null); setEditing(false); setInput(''); setFailedRequest(null); });
-      confirmation.current = null;
-    }
-  }, [connected]);
-
   async function run(request: ChatRequest, append: boolean) {
     if (pending.current || !connected || saveState === 'uncertain') return;
     pending.current = true;
-    setBusy('parse'); setFailure(null); setFailedRequest(null); setResponse(null); setSaveState('ready');
+    setBusy('parse');
+    dispatch({ type: 'send', request, append });
     confirmation.current = null;
     const abort = new AbortController();
     controller.current = abort;
-    if (append) { setMessages(previous => [...previous.slice(-19), { role: 'user', text: request.text }]); setInput(''); }
+    if (append) setInput('');
     Keyboard.dismiss();
     try {
       const result = await parseChat(request, abort.signal);
       if (abort.signal.aborted) return;
-      setResponse(result);
-      if (result.result.kind === 'proposal') setDraft(result.result.draft);
-      setMessages(previous => [...previous.slice(-19), { role: 'assistant', text: chatReply(result, copy, language) }]);
+      dispatch({ type: 'reply', response: result, text: chatReply(result, copy, language) });
     } catch (cause) {
       if (abort.signal.aborted) return;
-      setFailure(cause instanceof ApiError ? cause : new ApiError('server'));
-      setFailedRequest(request);
+      dispatch({ type: 'parseFailed', error: cause instanceof ApiError ? cause : new ApiError('server'), request });
     } finally { pending.current = false; setBusy(null); }
   }
 
@@ -72,30 +57,29 @@ function LocalChat() {
   }
 
   async function save() {
-    if (pending.current || !response?.entry || !response.proposal_id || saveState === 'saved') return;
+    if (pending.current || !canConfirm(conversation) || !response?.entry || !response.proposal_id) return;
     confirmation.current ??= createConfirmation({ proposal_id: response.proposal_id, entry: response.entry }, confirmChat);
-    pending.current = true; setBusy('save'); setFailure(null);
+    pending.current = true; setBusy('save'); dispatch({ type: 'save' });
     try {
       await confirmation.current();
-      setSaveState('saved'); setDraft(null);
+      dispatch({ type: 'saved' });
     } catch (cause) {
       const error = cause instanceof ApiError ? cause : new ApiError('server');
       if (['validation', 'conflict', 'notFound'].includes(error.kind)) {
-        setSaveState('ready'); confirmation.current = null;
-      } else setSaveState('uncertain');
-      setFailure(error);
+        confirmation.current = null;
+      }
+      dispatch({ type: 'saveFailed', error });
     } finally { pending.current = false; setBusy(null); }
   }
 
   function reset() {
     if (pending.current || saveState === 'uncertain') return;
-    setMessages([]); setDraft(null); setResponse(null); setFailure(null); setInput(''); setFailedRequest(null); setSaveState('ready');
+    dispatch({ type: 'reset' }); setInput('');
     confirmation.current = null;
   }
 
   function apply(entry: ResolvedEntry) {
-    setResponse(previous => previous ? { ...previous, entry } : previous);
-    setDraft(draftFromEntry(entry)); setEditing(false);
+    dispatch({ type: 'edit', entry }); setEditing(false);
   }
 
   const locked = Boolean(busy) || saveState === 'uncertain';
@@ -103,8 +87,6 @@ function LocalChat() {
   const examples = language === 'pl'
     ? ['Czynsz 2400 zł', 'Netflix 49 zł co miesiąc', 'Ile płacę miesięcznie?', 'Kiedy mam najbliższą płatność?']
     : ['Paid $1,850 for rent today', 'Netflix $15.49 a month', 'How much do I pay this month?'];
-
-  if (!connected) return <Screen><BrandHeader /><ScreenTitle title={copy.chatTitle} subtitle={copy.chatSubtitle} /><ConnectionState /></Screen>;
 
   return <SafeAreaView style={styles.page} edges={['top', 'left', 'right']}>
     <KeyboardAvoidingView style={styles.page} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
@@ -134,7 +116,8 @@ function LocalChat() {
               <Action label={copy.backHome} secondary onPress={() => router.navigate('/')} />
             </> : <>
               {saveState === 'uncertain' && <AppText>{copy.chatUncertain}</AppText>}
-              <Action label={busy === 'save' ? copy.saving : saveState === 'uncertain' ? copy.chatRetrySave : copy.save} disabled={Boolean(busy)} onPress={() => void save()} />
+              {failedRequest && <AppText>{copy.chatCorrectionRequired}</AppText>}
+              <Action label={busy === 'save' ? copy.saving : saveState === 'uncertain' ? copy.chatRetrySave : copy.save} disabled={Boolean(busy) || !canConfirm(conversation)} onPress={() => void save()} />
               <Action label={copy.chatChange} secondary disabled={locked} onPress={() => setEditing(true)} />
             </>}
           </View>}
@@ -158,7 +141,9 @@ function LocalChat() {
 
 export default function ChatScreen() {
   const { copy } = useLanguage();
+  const { connected } = usePayments();
   if (!__DEV__) return <Screen><BrandHeader /><ScreenTitle title={copy.chatTitle} subtitle={copy.chatSubtitle} /><Notice>{copy.chatNotice}</Notice></Screen>;
+  if (!connected) return <Screen><BrandHeader /><ScreenTitle title={copy.chatTitle} subtitle={copy.chatSubtitle} /><ConnectionState /></Screen>;
   return <LocalChat />;
 }
 

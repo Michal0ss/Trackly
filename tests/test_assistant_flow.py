@@ -181,6 +181,17 @@ def test_invalid_followup_can_be_corrected_without_losing_prior_fields(client, c
     assert corrected["entry"]["name"] == "Czynsz"
 
 
+def test_followup_preserves_edited_note_through_confirmation(client, chat_headers):
+    headers, _ = chat_headers
+    response = proposal(client, headers)
+    draft = {**response["result"]["draft"], "note": "Przelew do wspólnoty"}
+    changed = parse(client, headers, "2500 PLN", draft=draft).json()
+    assert changed["entry"]["note"] == draft["note"]
+    assert changed["entry"]["amount"] == 2500
+    assert client.post("/api/assistant/confirm", headers=headers, json=confirmation(changed)).status_code == 200
+    assert client.get("/api/payments", headers=headers).json()[0]["note"] == draft["note"]
+
+
 def test_explicit_today_uses_phone_date_instead_of_benchmark_date(client, chat_headers):
     headers, _ = chat_headers
     response = parse(client, headers, "Paid $1,850 for rent today", language="en", today="2026-11-03", default_currency="USD")

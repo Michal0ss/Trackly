@@ -29,7 +29,7 @@ export function chatReply(response: ChatResponse, copy: Copy, language: Language
 
 export function draftFromEntry(entry: ResolvedEntry): EntryDraft {
   const parts = (value: string) => { const [year = 0, month = 0, day = 0] = value.split('-').map(Number); return { year, month, day }; };
-  return { kind: entry.kind, name: entry.name, category: entry.category, amount: entry.amount, currency: entry.currency, interval_months: entry.interval_months, first_due: parts(entry.start_date), until: entry.end_date ? parts(entry.end_date) : null, duration_months: null, plan_name: entry.plan_name };
+  return { kind: entry.kind, name: entry.name, category: entry.category, amount: entry.amount, currency: entry.currency, interval_months: entry.interval_months, first_due: parts(entry.start_date), until: entry.end_date ? parts(entry.end_date) : null, duration_months: null, plan_name: entry.plan_name, note: entry.note };
 }
 
 export function createConfirmation(request: Confirmation, send: (request: Confirmation) => Promise<SavedEntry>) {

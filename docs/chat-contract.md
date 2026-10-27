@@ -31,6 +31,8 @@ The `POST /api/assistant/parse` request is validated by `ParseRequest` in
 the backend must not infer it from language. `context` contains up to six previous
 user messages kept in the phone's memory. Each message is limited to 2,000 characters.
 `draft` carries the last partial proposal so an answer can fill a missing field.
+Payment notes edited on the proposal are included in this draft and preserved
+through follow-ups. Subscriptions do not support notes.
 The test parser uses that draft, not free-form context, to process follow-ups.
 Context is untrusted user text, never system instructions. Raw messages are not
 persisted or included in server logs. The authenticated session determines the owner;
@@ -113,7 +115,15 @@ The confirmation receipt and entry are stored in one SQLite transaction. Retryin
 the same key and payload returns the original ID; simultaneous attempts create
 only one entry. Reusing a key with different fields returns 409. An active
 subscription with the same service name also returns 409. Subscriptions added this
-way use `source: "manual"` and appear read-only in the mobile list.
+way use `source: "manual"` and can be edited or deleted from the mobile list through
+the authenticated `/api/manual-subscriptions/{id}` endpoints. Extension entries
+remain read-only in the app. Editing preserves the entry ID; replaying the original
+confirmation does not overwrite later edits or recreate a deleted entry.
+
+Confirmation and manual subscription editing share the same duplicate-name check
+within the signed-in account, excluding cancelled entries. It ignores case and
+surrounding whitespace and normalizes equivalent Unicode spellings. The original
+name remains unchanged in storage and display.
 
 The local `chat_confirmations` table stores the owner, key, payload hash and saved
 entry ID, without conversation text. `chat_test_usage` stores the per-user limit
@@ -126,6 +136,11 @@ Parsing times out after three seconds; the mobile request timeout is twelve
 seconds. Neither parsing nor confirmation is retried automatically. The mobile
 screen keeps the confirmation key and payload fixed after an uncertain save and
 offers an explicit retry. Conversation state is held in memory only.
+Failed follow-ups retain the last proposal but block confirmation until a valid
+correction or an explicit form review. Read-only questions retain the proposal
+and its saved status; they cannot unlock a second confirmation. Losing the local
+session unmounts the conversation and clears its state. After restoring access,
+check saved entries before repeating an uncertain confirmation.
 
 ## Dates and follow-up questions
 
@@ -147,6 +162,33 @@ dates before a fully specified start are rejected. An end month with a year reso
 to that month's final day. A duration resolves to the last scheduled occurrence
 within the stated number of months. For example, twelve months of quarterly
 payments produces four occurrences, not twelve.
+
+## Model boundary
+
+`app/assistant/model_parser.py` prepares a provider-independent model request.
+It supplies fixed extraction instructions separately from the JSON user input,
+the output schema and a requested limit of 1,200 output tokens. The input contains
+only the message, language, phone date, default currency, recent context and draft.
+It does not add account IDs, tokens or database contents. Text supplied by the user
+is data, including text that looks like a system message or instruction.
+
+The model returns `{"result": {...}}`. For proposals, it returns `kind` and `draft`;
+the backend calculates `missing`. The decoder rejects malformed or oversized JSON
+(over 16 KiB in UTF-8), duplicate keys, non-finite numbers, unknown fields and invalid
+calendar values. It accepts no totals, save permission or owner identifiers. Invalid
+model replies return a generic 502 response and never write a payment.
+
+`ModelParser` accepts an asynchronous completion function. No network implementation
+is included or selected, and `get_parser()` still uses `TestParser`. The completion
+function must map the schema to its provider's supported format, enforce the token
+limit during generation, handle refusal/truncation and use an explicit timeout with
+no automatic retries. The byte limit validates received output; it is not a spending
+cap. Credentials, provider-specific limits and a budget still need configuration
+before any paid calls are enabled.
+
+Tests inject deterministic completions to check this boundary. They do not prove
+language accuracy or resistance to malicious instructions. Those require runs
+against the selected model, including follow-up and adversarial cases.
 
 ## Local checks
 
@@ -185,6 +227,7 @@ invalid file. Never treat reference answers passed through the scorer as model r
 The schemas, scorer and authenticated flow have regression tests in
 `tests/test_assistant_contract.py`, `tests/test_chat_evaluation.py` and
 `tests/test_assistant_flow.py`. The existing backend CI runs all three files.
+`tests/test_model_parser.py` covers the provider-independent request and reply boundary.
 
 Before enabling a real provider, select it using real runs of this suite, set a
 budget and token limits, and replace the local-only storage and guard with reviewed

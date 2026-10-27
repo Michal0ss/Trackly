@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.database.db import engine, Base
-from app.routes import assistant, health, overview, payments, subscriptions, users, waitlist
+from app.routes import assistant, health, manual_subscriptions, overview, payments, subscriptions, users, waitlist
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.utils.security import cors_config
@@ -23,3 +23,4 @@ app.include_router(waitlist.router, prefix="/api")
 app.include_router(payments.router, prefix="/api")
 app.include_router(overview.router, prefix="/api")
 app.include_router(assistant.router, prefix="/api")
+app.include_router(manual_subscriptions.router, prefix="/api")

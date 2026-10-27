@@ -13,6 +13,7 @@ export type EntryDraft = {
   until: DateParts | null;
   duration_months: number | null;
   plan_name: string | null;
+  note: string | null;
 };
 export type Missing = 'name' | 'category' | 'amount' | 'currency' | 'interval_months' | 'first_due' | 'until';
 export type ParseResult =

@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import type { Payment, Subscription } from '../src/api/types.ts';
 import { formatDueDate, formatMoney, localDate, monthLabel, newDraft, paymentDraft, paymentRows, shiftMonth, validDate, validateDraft } from '../src/payments/model.ts';
+import { filterPayments } from '../src/payments/filters.ts';
 
 const payment: Payment = { id: 1, name: 'Czynsz', category: 'rent', amount: 2400.5, currency: 'PLN', interval_months: 1, start_date: '2026-01-31', end_date: null, note: null, created_at: '2026-01-01T00:00:00', updated_at: null };
 const subscription: Subscription = { id: 1, user_id: 1, service_name: 'Spotify', plan_name: 'Premium', price: 5.99, currency: 'EUR', billing_cycle: 'monthly', start_date: null, end_date: null, renewal_date: '2026-10-20', status: 'confirmed', source: 'extension', source_url: 'https://example.com', auto_renew: true, created_at: '2026-01-01T00:00:00', detected_at: null };
@@ -89,4 +90,31 @@ test('one list preserves identity, original amount, yearly intervals and subscri
   assert.equal(rows[1]?.renews, false);
   assert.equal(rows[1]?.status, 'cancelled');
   assert.equal(paymentRows([], [{ ...subscription, billing_cycle: 'unknown', renewal_date: null }])[0]?.interval, null);
+});
+
+test('search matches names and plans regardless of case, Polish accents and extra spaces', () => {
+  const rows = paymentRows([{ ...payment, name: 'Żłobek Łódź' }], [{ ...subscription, plan_name: 'Rodzinny Premium' }]);
+  assert.equal(filterPayments(rows, '  LODZ   zlobek ', 'all', 'all')[0]?.kind, 'payment');
+  assert.equal(filterPayments(rows, 'SPOTIFY premium', 'all', 'all')[0]?.kind, 'subscription');
+  assert.equal(filterPayments(rows, 'rodzinny', 'all', 'all').length, 1);
+  assert.deepEqual(filterPayments(rows, '   ', 'all', 'all'), rows);
+  assert.deepEqual(filterPayments(rows, 'nieznana nazwa', 'all', 'all'), []);
+});
+
+test('type and currency filters combine with search without changing the source list or order', () => {
+  const rows = paymentRows([payment], [subscription, { ...subscription, id: 2, currency: 'PLN', source: 'manual' }]);
+  const original = structuredClone(rows);
+  assert.equal(filterPayments(rows, '', 'payment', 'PLN').length, 1);
+  assert.equal(filterPayments(rows, 'premium', 'subscription', 'PLN')[0]?.id, 2);
+  assert.equal(filterPayments(rows, '', 'subscription', 'EUR')[0]?.id, 1);
+  assert.deepEqual(filterPayments(rows, '', 'payment', 'EUR'), []);
+  assert.deepEqual(filterPayments([], '', 'all', 'all'), []);
+  assert.deepEqual(rows, original);
+  assert.deepEqual(filterPayments(rows, '', 'all', 'all'), original);
+});
+
+test('manual subscription list shows its first date instead of labelling it as extension data', () => {
+  const row = paymentRows([], [{ ...subscription, source: 'manual', start_date: '2026-01-31' }])[0];
+  assert.equal(row?.source, 'manual');
+  assert.equal(row?.start, '2026-01-31');
 });

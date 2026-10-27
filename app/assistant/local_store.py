@@ -10,6 +10,7 @@ from sqlalchemy.dialects.sqlite import insert
 from app.database.db import engine
 from app.models.models import Payment, Subscription
 from app.schemas.assistant import ConfirmResponse
+from app.utils.subscriptions import has_subscription_duplicate
 
 
 metadata = MetaData()
@@ -67,11 +68,7 @@ def confirm_entry(user_id, request):
             values = entry.model_dump(exclude={"kind", "plan_name"})
             statement = Payment.__table__.insert().values(**values, user_id=user_id)
         else:
-            exists = connection.execute(select(Subscription.id).where(
-                Subscription.user_id == user_id, Subscription.service_name == entry.name,
-                Subscription.status != "cancelled",
-            )).first()
-            if exists:
+            if has_subscription_duplicate(connection, user_id, entry.name):
                 raise HTTPException(409, "Ta subskrypcja już istnieje.")
             statement = Subscription.__table__.insert().values(
                 user_id=user_id, service_name=entry.name, plan_name=entry.plan_name or "",

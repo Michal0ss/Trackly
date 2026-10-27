@@ -1,4 +1,4 @@
-import type { Overview, Payment, PaymentInput, Subscription } from './types.ts';
+import type { ManualSubscriptionInput, Overview, Payment, PaymentInput, Subscription } from './types.ts';
 import type { ChatRequest, ChatResponse, Confirmation, SavedEntry } from '../chat/types.ts';
 
 export type ErrorKind = 'unauthorized' | 'network' | 'timeout' | 'validation' | 'notFound' | 'server' | 'cancelled' | 'limited' | 'unavailable' | 'conflict';
@@ -26,7 +26,7 @@ export function validationFields(body: unknown): string[] {
 export function createApi(baseUrl: string, token: string, fetcher: typeof fetch = fetch, timeoutMs = 12000) {
   const base = baseUrl.replace(/\/+$/, '');
 
-  async function request<T>(path: string, method = 'GET', body?: PaymentInput | ChatRequest | Confirmation, signal?: AbortSignal): Promise<T> {
+  async function request<T>(path: string, method = 'GET', body?: PaymentInput | ManualSubscriptionInput | ChatRequest | Confirmation, signal?: AbortSignal): Promise<T> {
     const controller = new AbortController();
     let timedOut = false;
     const cancel = () => controller.abort();
@@ -68,6 +68,8 @@ export function createApi(baseUrl: string, token: string, fetcher: typeof fetch 
     overview: (month: string, today: string, signal?: AbortSignal) => request<Overview>(`/api/overview?${new URLSearchParams({ month, today })}`, 'GET', undefined, signal),
     payments: (signal?: AbortSignal) => request<Payment[]>('/api/payments', 'GET', undefined, signal),
     subscriptions: (signal?: AbortSignal) => request<Subscription[]>('/api/subscriptions', 'GET', undefined, signal),
+    saveSubscription: (id: number, value: ManualSubscriptionInput) => request<Subscription>(`/api/manual-subscriptions/${id}`, 'PUT', value),
+    removeSubscription: (id: number) => request<{ message: string }>(`/api/manual-subscriptions/${id}`, 'DELETE'),
     payment: (id: number, signal?: AbortSignal) => request<Payment>(`/api/payments/${id}`, 'GET', undefined, signal),
     save: (value: PaymentInput, id?: number) => request<Payment>(id ? `/api/payments/${id}` : '/api/payments', id ? 'PUT' : 'POST', value),
     remove: (id: number) => request<{ message: string }>(`/api/payments/${id}`, 'DELETE'),

@@ -1,24 +1,22 @@
-import { createContext, useCallback, useContext, useEffect, useRef, useState, type ReactNode } from 'react';
+import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from 'react';
 import { AppState } from 'react-native';
 
 import { ApiError } from '@/api/client';
 import { developmentApi } from '@/api/session';
-import type { Overview, Payment, PaymentInput, Subscription } from '@/api/types';
+import type { ManualSubscriptionInput, PaymentInput } from '@/api/types';
 import type { ChatRequest, ChatResponse, Confirmation, SavedEntry } from '@/chat/types';
 import { localDate } from '@/payments/model';
+import { createSnapshotLoader, type SnapshotState } from '@/payments/refresh';
 
-type Snapshot = { overview: Overview; payments: Payment[]; subscriptions: Subscription[] };
-type PaymentsContextValue = {
+type PaymentsContextValue = SnapshotState & {
   month: string;
   setMonth: (month: string) => void;
-  today: string;
-  data: Snapshot | null;
-  loading: boolean;
   connected: boolean;
-  error: ApiError | null;
   refresh: () => Promise<void>;
   save: (value: PaymentInput, id?: number) => Promise<void>;
   remove: (id: number) => Promise<void>;
+  saveSubscription: (id: number, value: ManualSubscriptionInput) => Promise<void>;
+  removeSubscription: (id: number) => Promise<void>;
   parseChat: (value: ChatRequest, signal?: AbortSignal) => Promise<ChatResponse>;
   confirmChat: (value: Confirmation) => Promise<SavedEntry>;
 };
@@ -27,45 +25,17 @@ const PaymentsContext = createContext<PaymentsContextValue | null>(null);
 
 export function PaymentsProvider({ children }: { children: ReactNode }) {
   const [api] = useState(developmentApi);
-  const [today, setToday] = useState(localDate);
+  const [snapshot, setSnapshot] = useState<SnapshotState>(() => ({ today: localDate(), data: null, loading: Boolean(api), error: null }));
   const [month, setMonth] = useState(() => localDate().slice(0, 7));
-  const [data, setData] = useState<Snapshot | null>(null);
-  const [loading, setLoading] = useState(Boolean(api));
-  const [error, setError] = useState<ApiError | null>(null);
-  const active = useRef<AbortController | null>(null);
-
-  const refresh = useCallback(async () => {
-    if (!api) return;
-    active.current?.abort();
-    const controller = new AbortController();
-    active.current = controller;
-    setLoading(true);
-    setError(null);
-    try {
-      const [overview, payments, subscriptions] = await Promise.all([
-        api.overview(month, localDate(), controller.signal),
-        api.payments(controller.signal),
-        api.subscriptions(controller.signal),
-      ]);
-      if (!controller.signal.aborted) {
-        setData({ overview, payments, subscriptions });
-        setToday(localDate());
-      }
-    } catch (cause) {
-      if (controller.signal.aborted) return;
-      const failure = cause instanceof ApiError ? cause : new ApiError('server');
-      setError(failure);
-      if (failure.kind === 'unauthorized') setData(null);
-    } finally {
-      if (!controller.signal.aborted) setLoading(false);
-    }
-  }, [api, month]);
+  const [loader] = useState(() => api ? createSnapshotLoader(api, month, setSnapshot) : null);
+  const refresh = useCallback(async () => { await loader?.refresh(); }, [loader]);
+  const { today, error } = snapshot;
 
   useEffect(() => {
     let cancelled = false;
     queueMicrotask(() => { if (!cancelled) void refresh(); });
-    return () => { cancelled = true; active.current?.abort(); };
-  }, [refresh]);
+    return () => { cancelled = true; loader?.cancel(); };
+  }, [refresh, loader, month]);
 
   useEffect(() => {
     const subscription = AppState.addEventListener('change', state => { if (state === 'active') void refresh(); });
@@ -78,7 +48,7 @@ export function PaymentsProvider({ children }: { children: ReactNode }) {
     try {
       return await action();
     } catch (cause) {
-      if (cause instanceof ApiError && cause.kind === 'unauthorized') { setData(null); setError(cause); }
+      if (cause instanceof ApiError && cause.kind === 'unauthorized') loader?.expire(cause);
       throw cause;
     }
   }
@@ -89,9 +59,12 @@ export function PaymentsProvider({ children }: { children: ReactNode }) {
   }
 
   return <PaymentsContext.Provider value={{
-    month, setMonth, today, data, loading, error, connected: Boolean(api) && error?.kind !== 'unauthorized', refresh,
+    ...snapshot, month, setMonth: value => { loader?.selectMonth(value); setMonth(value); },
+    connected: Boolean(api) && error?.kind !== 'unauthorized', refresh,
     save: (value, id) => mutate(() => api!.save(value, id)),
     remove: id => mutate(() => api!.remove(id)),
+    saveSubscription: (id, value) => mutate(() => api!.saveSubscription(id, value)),
+    removeSubscription: id => mutate(() => api!.removeSubscription(id)),
     parseChat: (value, signal) => access(() => api!.parseChat(value, signal)),
     confirmChat: async value => {
       const saved = await access(() => api!.confirmChat(value));

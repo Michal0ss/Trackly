@@ -40,6 +40,7 @@ class EntryDraft(ChatModel):
     until: DateParts | None = None
     duration_months: Annotated[StrictInt, Field(ge=1, le=1200)] | None = None
     plan_name: Annotated[str, Field(min_length=1, max_length=120)] | None = None
+    note: Annotated[str, Field(max_length=500)] | None = None
 
     @field_validator("interval_months", mode="before")
     @classmethod
@@ -52,7 +53,7 @@ class EntryDraft(ChatModel):
     def consistent_entry(self):
         if self.kind == "payment" and (self.category == "subscription" or self.plan_name is not None):
             raise ValueError("A payment cannot contain subscription fields")
-        if self.kind == "subscription" and self.category not in (None, "subscription"):
+        if self.kind == "subscription" and (self.category not in (None, "subscription") or self.note is not None):
             raise ValueError("Invalid subscription category")
         if self.until is not None and self.duration_months is not None:
             raise ValueError("Use one end condition")
