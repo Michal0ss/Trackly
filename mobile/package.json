@@ -19,33 +19,33 @@
     "@expo-google-fonts/source-sans-3": "0.4.1",
     "@expo/vector-icons": "15.0.3",
     "@react-native-async-storage/async-storage": "2.2.0",
-    "expo": "57.0.26",
-    "expo-constants": "57.0.20",
-    "expo-font": "57.0.4",
-    "expo-linking": "57.0.11",
-    "expo-localization": "57.0.2",
-    "expo-router": "57.0.24",
-    "expo-splash-screen": "57.0.9",
-    "expo-status-bar": "57.0.1",
-    "expo-system-ui": "57.0.4",
-    "react": "19.2.3",
-    "react-dom": "19.2.3",
-    "react-native": "0.86.3",
-    "react-native-safe-area-context": "5.7.0",
-    "react-native-screens": "4.26.2",
-    "react-native-web": "0.21.3"
+    "expo": "58.0.19",
+    "expo-constants": "58.0.13",
+    "expo-font": "58.0.10",
+    "expo-linking": "58.0.14",
+    "expo-localization": "58.0.5",
+    "expo-router": "58.0.26",
+    "expo-splash-screen": "58.0.11",
+    "expo-status-bar": "58.0.4",
+    "expo-system-ui": "58.0.6",
+    "react": "19.3.0",
+    "react-dom": "19.3.0",
+    "react-native": "0.88.0",
+    "react-native-safe-area-context": "5.10.1",
+    "react-native-screens": "4.30.0",
+    "react-native-web": "0.21.4"
   },
   "devDependencies": {
     "@types/node": "24.0.0",
-    "@types/react": "19.2.18",
+    "@types/react": "19.3.0",
     "eslint": "9.39.5",
-    "eslint-config-expo": "57.0.2",
+    "eslint-config-expo": "58.0.4",
     "typescript": "6.0.3"
   },
   "overrides": {
     "postcss": "8.5.29"
   },
   "engines": {
-    "node": ">=22.13.0"
+    "node": "^22.13.0 || ^24.3.0 || >=26.0.0"
   }
 }

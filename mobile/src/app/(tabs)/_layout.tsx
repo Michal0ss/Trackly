@@ -30,17 +30,17 @@ export default function TabsLayout() {
       <Tabs.Screen name="index" options={{
         title: copy.overviewTab,
         tabBarAccessibilityLabel: copy.overviewTab,
-        tabBarIcon: ({ color }) => <Feather name="grid" size={22} color={color} aria-hidden />,
+        tabBarIcon: ({ focused }) => <Feather name="grid" size={22} color={focused ? colors.greenSoft : colors.muted} aria-hidden />,
       }} />
       <Tabs.Screen name="chat" options={{
         title: copy.chatTab,
         tabBarAccessibilityLabel: copy.chatTab,
-        tabBarIcon: ({ color }) => <Feather name="message-circle" size={22} color={color} aria-hidden />,
+        tabBarIcon: ({ focused }) => <Feather name="message-circle" size={22} color={focused ? colors.greenSoft : colors.muted} aria-hidden />,
       }} />
       <Tabs.Screen name="settings" options={{
         title: copy.settingsTab,
         tabBarAccessibilityLabel: copy.settingsTab,
-        tabBarIcon: ({ color }) => <Feather name="sliders" size={22} color={color} aria-hidden />,
+        tabBarIcon: ({ focused }) => <Feather name="sliders" size={22} color={focused ? colors.greenSoft : colors.muted} aria-hidden />,
       }} />
     </Tabs>
   );

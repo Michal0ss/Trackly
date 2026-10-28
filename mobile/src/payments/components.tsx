@@ -29,7 +29,7 @@ export function useDataRefresh() {
 }
 
 export function errorText(error: ApiError, copy: Copy) {
-  const keys = { network: 'offlineError', timeout: 'timeoutError', unauthorized: 'sessionExpired', validation: 'validationError', notFound: 'missingPayment', server: 'serverError', cancelled: 'serverError' } as const;
+  const keys = { network: 'offlineError', timeout: 'timeoutError', unauthorized: 'sessionExpired', validation: 'validationError', notFound: 'missingPayment', server: 'serverError', cancelled: 'serverError', limited: 'chatLimit', unavailable: 'serverError', conflict: 'chatConflict' } as const;
   return copy[keys[error.kind]];
 }
 
@@ -75,7 +75,9 @@ export function categoryLabel(category: string, copy: Copy): string {
 
 export function PaymentCard({ item }: { item: OverviewItem | PaymentRow }) {
   const { copy, language } = useLanguage();
-  const editable = item.kind === 'payment';
+  const { data } = usePayments();
+  const source = 'source' in item ? item.source : data?.subscriptions.find(subscription => subscription.id === item.id)?.source;
+  const editable = item.kind === 'payment' || source === 'manual';
   const plan = 'plan_name' in item ? item.plan_name : item.plan;
   const contents = <>
     <View style={styles.cardHeading}>
@@ -90,17 +92,17 @@ export function PaymentCard({ item }: { item: OverviewItem | PaymentRow }) {
     <AppText style={styles.amount}>{formatMoney(item.amount, item.currency, language)}</AppText>
     {'due_date' in item ? <AppText>{formatDueDate(item.due_date, language)}</AppText> : <>
       <AppText>{intervalLabel(item.interval, copy)}</AppText>
-      <AppText style={styles.small}>{item.start ? `${item.kind === 'payment' ? copy.firstDue : copy.renewalDue}: ${formatDueDate(item.start, language)}` : copy.unknownDate}</AppText>
+      <AppText style={styles.small}>{item.start ? `${item.kind === 'payment' || source === 'manual' ? copy.firstDue : copy.renewalDue}: ${formatDueDate(item.start, language)}` : copy.unknownDate}</AppText>
       {!!item.end && <AppText style={styles.small}>{copy.endsOn} {formatDueDate(item.end, language)}</AppText>}
       {item.status === 'cancelled' && <AppText style={styles.small}>{copy.cancelled}</AppText>}
       {item.status === 'expired' && <AppText style={styles.small}>{copy.expired}</AppText>}
       {item.status === 'confirmed' && !item.renews && <AppText style={styles.small}>{copy.noRenewal}</AppText>}
     </>}
-    {!editable && <AppText style={styles.small}>{copy.readOnlySubscription}</AppText>}
+    {item.kind === 'subscription' && <AppText style={styles.small}>{source === 'manual' ? copy.manualSubscription : copy.readOnlySubscription}</AppText>}
   </>;
   if (!editable) return <View style={sharedStyles.card}>{contents}</View>;
-  return <Pressable accessibilityRole="button" accessibilityLabel={`${copy.editPayment}: ${item.name}, ${formatMoney(item.amount, item.currency, language)}`}
-    onPress={() => router.push({ pathname: '/payment', params: { id: item.id } })}
+  return <Pressable accessibilityRole="button" accessibilityLabel={`${item.kind === 'payment' ? copy.editPayment : copy.editSubscription}: ${item.name}, ${formatMoney(item.amount, item.currency, language)}`}
+    onPress={() => router.push({ pathname: item.kind === 'payment' ? '/payment' : '/subscription', params: { id: item.id } })}
     style={({ pressed }) => [sharedStyles.card, pressed && styles.dimmed]}>{contents}</Pressable>;
 }
 

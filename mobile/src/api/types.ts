@@ -41,6 +41,16 @@ export type Subscription = {
   detected_at: string | null;
 };
 
+export type ManualSubscriptionInput = {
+  service_name: string;
+  plan_name: string;
+  price: number;
+  currency: Currency;
+  billing_cycle: 'monthly' | 'yearly';
+  start_date: string;
+  end_date: string | null;
+};
+
 export type OverviewItem = {
   kind: 'payment' | 'subscription';
   id: number;

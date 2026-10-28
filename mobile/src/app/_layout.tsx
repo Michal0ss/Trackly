@@ -53,6 +53,7 @@ function Navigation() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="payments" />
         <Stack.Screen name="payment" />
+        <Stack.Screen name="subscription" />
         <Stack.Screen name="+not-found" />
       </Stack>
     </ThemeProvider>
