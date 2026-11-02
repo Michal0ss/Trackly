@@ -3,6 +3,7 @@ import test from 'node:test';
 
 import { ApiError, createApi } from '../src/api/client.ts';
 import type { PaymentInput } from '../src/api/types.ts';
+import type { ChatRequest } from '../src/chat/types.ts';
 
 const payload: PaymentInput = { name: 'Rent', category: 'rent', amount: 1850, currency: 'USD', interval_months: 1, start_date: '2026-10-10', end_date: null, note: null };
 const errorKind = (kind: string) => (error: unknown) => error instanceof ApiError && error.kind === kind;
@@ -76,4 +77,32 @@ test('switching months can cancel old requests without reporting an offline erro
 test('a successful response containing invalid JSON produces a safe error', async () => {
   const api = createApi('http://localhost:8000', 'test-only', async () => new Response('<html>proxy</html>'));
   await assert.rejects(api.payments(), errorKind('server'));
+});
+
+const chatRequest: ChatRequest = { text: 'Czynsz 2400 zł', language: 'pl', today: '2026-10-30', default_currency: 'PLN', context: [], draft: null };
+
+test('chat parsing can wait longer than ordinary reads without retrying', async () => {
+  let calls = 0;
+  const api = createApi('http://localhost:8000', 'test-only', async (_url, options) => new Promise((resolve, reject) => {
+    calls++;
+    const timer = setTimeout(() => resolve(Response.json({ mode: 'test' })), 30);
+    options?.signal?.addEventListener('abort', () => { clearTimeout(timer); reject(new Error('aborted')); }, { once: true });
+  }), 5, 1000);
+  await assert.rejects(api.payments(), errorKind('timeout'));
+  assert.equal((await api.parseChat(chatRequest)).mode, 'test');
+  assert.equal(calls, 2);
+});
+
+test('chat parsing respects its own deadline and remains cancellable', async () => {
+  let calls = 0;
+  const api = createApi('http://localhost:8000', 'test-only', async (_url, options) => new Promise((_resolve, reject) => {
+    calls++;
+    options?.signal?.addEventListener('abort', () => reject(new Error('aborted')), { once: true });
+  }), 1000, 5);
+  await assert.rejects(api.parseChat(chatRequest), errorKind('timeout'));
+  const controller = new AbortController();
+  const pending = api.parseChat(chatRequest, controller.signal);
+  controller.abort();
+  await assert.rejects(pending, errorKind('cancelled'));
+  assert.equal(calls, 2);
 });

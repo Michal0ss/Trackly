@@ -23,16 +23,16 @@ export function validationFields(body: unknown): string[] {
   }))];
 }
 
-export function createApi(baseUrl: string, token: string, fetcher: typeof fetch = fetch, timeoutMs = 12000) {
+export function createApi(baseUrl: string, token: string, fetcher: typeof fetch = fetch, timeoutMs = 12000, parseTimeoutMs = 30000) {
   const base = baseUrl.replace(/\/+$/, '');
 
-  async function request<T>(path: string, method = 'GET', body?: PaymentInput | ManualSubscriptionInput | ChatRequest | Confirmation, signal?: AbortSignal): Promise<T> {
+  async function request<T>(path: string, method = 'GET', body?: PaymentInput | ManualSubscriptionInput | ChatRequest | Confirmation, signal?: AbortSignal, deadline = timeoutMs): Promise<T> {
     const controller = new AbortController();
     let timedOut = false;
     const cancel = () => controller.abort();
     if (signal?.aborted) throw new ApiError('cancelled');
     signal?.addEventListener('abort', cancel, { once: true });
-    const timer = setTimeout(() => { timedOut = true; controller.abort(); }, timeoutMs);
+    const timer = setTimeout(() => { timedOut = true; controller.abort(); }, deadline);
     try {
       const response = await fetcher(`${base}${path}`, {
         method,
@@ -73,7 +73,7 @@ export function createApi(baseUrl: string, token: string, fetcher: typeof fetch 
     payment: (id: number, signal?: AbortSignal) => request<Payment>(`/api/payments/${id}`, 'GET', undefined, signal),
     save: (value: PaymentInput, id?: number) => request<Payment>(id ? `/api/payments/${id}` : '/api/payments', id ? 'PUT' : 'POST', value),
     remove: (id: number) => request<{ message: string }>(`/api/payments/${id}`, 'DELETE'),
-    parseChat: (value: ChatRequest, signal?: AbortSignal) => request<ChatResponse>('/api/assistant/parse', 'POST', value, signal),
+    parseChat: (value: ChatRequest, signal?: AbortSignal) => request<ChatResponse>('/api/assistant/parse', 'POST', value, signal, parseTimeoutMs),
     confirmChat: (value: Confirmation) => request<SavedEntry>('/api/assistant/confirm', 'POST', value),
   };
 }

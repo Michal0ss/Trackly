@@ -132,8 +132,8 @@ guard succeeds, outside the production schema. Counters and receipts survive API
 restarts. A new proposal key represents a new save, so restarting the app and
 repeating the conversation is not a retry of the original confirmation.
 
-Parsing times out after three seconds; the mobile request timeout is twelve
-seconds. Neither parsing nor confirmation is retried automatically. The mobile
+Parsing times out after twenty seconds; the mobile parsing timeout is thirty
+seconds. Other mobile requests retain their twelve-second timeout. Neither parsing nor confirmation is retried automatically. The mobile
 screen keeps the confirmation key and payload fixed after an uncertain save and
 offers an explicit retry. Conversation state is held in memory only.
 Failed follow-ups retain the last proposal but block confirmation until a valid
@@ -141,6 +141,14 @@ correction or an explicit form review. Read-only questions retain the proposal
 and its saved status; they cannot unlock a second confirmation. Losing the local
 session unmounts the conversation and clears its state. After restoring access,
 check saved entries before repeating an uncertain confirmation.
+
+Unsupported or ambiguous replies also retain the current proposal. An unsaved
+complete proposal requires review before saving after such a reply; a valid new
+proposal or applying the editor clears this requirement. Saved confirmations keep
+their saved status. The mobile client can cancel parsing without clearing the next
+typed message. It aborts the transport and ignores late replies and errors, even
+after another request starts. Confirmation has no cancel action because its outcome
+may already be committed. Retrying parsing does not duplicate its user message.
 
 ## Dates and follow-up questions
 
@@ -201,6 +209,25 @@ Run from the repository root. No provider key or paid calls are needed:
 This validates the case file and expected results only. It does not measure a model's
 quality. The reference day remains 2026-10-07 so that results are reproducible.
 
+The additional conversation suite contains 16 cases with prior context and edited
+drafts, including topic changes, ambiguous dates and attempted instruction overrides:
+
+```bash
+.venv/bin/python -m scripts.evaluate_chat --suite tests/fixtures/chat_conversation_cases.json
+```
+
+This validates reference data only and does not load credentials or make requests.
+The evaluator passes each case's optional `context` and `draft` through the same
+request validation as the application. To score externally collected results for
+this suite, use the same `--suite` with the result file:
+
+```bash
+.venv/bin/python -m scripts.evaluate_chat --suite tests/fixtures/chat_conversation_cases.json /tmp/trackly-conversation-results.json
+```
+
+No network adapter, provider selection, key configuration or paid collection command
+is included. The application continues to use the local fixture parser.
+
 After a separate provider integration is available, collect one parsing result per
 case in a JSON array outside the repository:
 
@@ -228,6 +255,8 @@ The schemas, scorer and authenticated flow have regression tests in
 `tests/test_assistant_contract.py`, `tests/test_chat_evaluation.py` and
 `tests/test_assistant_flow.py`. The existing backend CI runs all three files.
 `tests/test_model_parser.py` covers the provider-independent request and reply boundary.
+`tests/test_model_chat_flow.py` injects a completion function without network access to
+check the authenticated proposal, question and confirmation flow.
 
 Before enabling a real provider, select it using real runs of this suite, set a
 budget and token limits, and replace the local-only storage and guard with reviewed

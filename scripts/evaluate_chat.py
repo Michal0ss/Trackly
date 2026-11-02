@@ -10,6 +10,14 @@ from app.schemas.assistant import ParseRequest, parse_result_adapter
 CASES_PATH = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "chat_cases.json"
 
 
+def case_request(suite, case):
+    return ParseRequest.model_validate({
+        "text": case["text"], "language": case["language"], "today": suite["today"],
+        "default_currency": suite["default_currency"][case["language"]],
+        "context": case.get("context", []), "draft": case.get("draft"),
+    })
+
+
 def normalize_result(value):
     result = parse_result_adapter.validate_python(value).model_dump(mode="json")
     if result["kind"] == "proposal":
@@ -38,10 +46,7 @@ def load_cases(path=CASES_PATH):
         if type(case_id) is not int or case_id < 1 or case_id in ids:
             raise ValueError("Invalid or duplicate case ID")
         ids.add(case_id)
-        ParseRequest.model_validate({
-            "text": case["text"], "language": case["language"], "today": suite["today"],
-            "default_currency": suite["default_currency"][case["language"]],
-        })
+        case_request(suite, case)
         expected = flatten(normalize_result(case["expected"]))
         for field, alternatives in case.get("alternatives", {}).items():
             if field not in ("draft.name", "draft.category") or field not in expected:
@@ -98,9 +103,10 @@ def evaluate(suite, results):
 def main():
     parser = argparse.ArgumentParser(description="Validate chat cases or score saved parsing results without network calls.")
     parser.add_argument("results", nargs="?", type=Path)
+    parser.add_argument("--suite", type=Path, default=CASES_PATH)
     args = parser.parse_args()
     try:
-        suite = load_cases()
+        suite = load_cases(args.suite)
         if args.results is None:
             print(f"{len(suite['cases'])} chat cases validated. No model was called or evaluated.")
             return 0
