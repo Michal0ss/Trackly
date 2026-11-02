@@ -24,7 +24,7 @@ def require_local_chat():
 
 
 router = APIRouter(dependencies=[Depends(require_local_chat)])
-PARSER_TIMEOUT = 3
+PARSER_TIMEOUT = 20
 
 
 def get_parser() -> Parser:

@@ -168,3 +168,60 @@ test('uncertain confirmations cannot be edited and a fresh conversation has no s
   assert.equal(fresh.proposal, null);
   assert.deepEqual(fresh.messages, []);
 });
+
+test('an unrecognized correction keeps the proposal visible but requires a review before saving', () => {
+  const unsupported: ChatResponse = { ...question, result: { kind: 'not_supported', reason: 'test_message' }, overview: null };
+  let state = conversationReducer(preparedConversation(), { type: 'reply', response: unsupported, text: translations.pl.chatTestHelp });
+  assert.deepEqual(state.proposal?.entry, entry);
+  assert.equal(canConfirm(state), false);
+  state = conversationReducer(state, { type: 'reply', response: question, text: 'Brak płatności' });
+  assert.equal(canConfirm(state), false);
+  state = conversationReducer(state, { type: 'edit', entry });
+  assert.equal(canConfirm(state), true);
+});
+
+test('a clarification never removes the saved receipt or makes it available for another save', () => {
+  let state = conversationReducer(preparedConversation(), { type: 'saved' });
+  state = conversationReducer(state, { type: 'reply', response: { ...question, result: { kind: 'clarify', reason: 'multiple_entries' }, overview: null }, text: translations.pl.chatOneAtATime });
+  assert.deepEqual(state.proposal?.entry, entry);
+  assert.equal(state.saveState, 'saved');
+  assert.equal(state.draft, null);
+  assert.equal(canConfirm(state), false);
+});
+
+test('a valid correction replaces a retained proposal and clears the review requirement', () => {
+  let state = conversationReducer(preparedConversation(), { type: 'reply', response: { ...question, result: { kind: 'clarify', reason: 'multiple_entries' } }, text: translations.pl.chatOneAtATime });
+  assert.equal(canConfirm(state), false);
+  const changed = { ...entry, amount: 2500 };
+  state = conversationReducer(state, { type: 'reply', response: { ...proposal, entry: changed, result: { kind: 'proposal', draft: draftFromEntry(changed), missing: [] } }, text: translations.pl.chatReview });
+  assert.equal(canConfirm(state), true);
+  assert.equal(state.proposal?.entry?.amount, 2500);
+  assert.equal(state.reviewRequired, false);
+});
+
+test('retained message identities stay stable when the oldest bubbles leave the conversation', () => {
+  let state = newConversation();
+  for (let index = 0; index < 20; index++) {
+    state = conversationReducer(state, { type: 'send', request: { ...correction, text: String(index) }, append: true });
+  }
+  const previous = state.messages;
+  state = conversationReducer(state, { type: 'reply', response: question, text: 'Odpowiedź' });
+  assert.deepEqual(state.messages.slice(0, 19), previous.slice(1));
+  assert.equal(new Set(state.messages.map(message => message.id)).size, 20);
+  assert.ok(state.messages.at(-1)!.id > previous.at(-1)!.id);
+  const identities = state.messages.map(message => message.id);
+  state = conversationReducer(state, { type: 'send', request: correction, append: false });
+  assert.deepEqual(state.messages.map(message => message.id), identities);
+});
+
+test('a cancelled correction can be retried without duplicating its bubble or unlocking stale values', () => {
+  let state = conversationReducer(preparedConversation(), { type: 'send', request: correction, append: true });
+  state = conversationReducer(state, { type: 'parseFailed', request: correction, error: new ApiError('cancelled') });
+  assert.equal(canConfirm(state), false);
+  const messages = state.messages;
+  state = conversationReducer(state, { type: 'send', request: correction, append: false });
+  assert.deepEqual(state.messages, messages);
+  state = conversationReducer(state, { type: 'reply', response: proposal, text: translations.pl.chatReview });
+  assert.equal(canConfirm(state), true);
+  assert.equal(state.failedRequest, null);
+});

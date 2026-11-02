@@ -7,6 +7,7 @@ import { DarkTheme, Stack, ThemeProvider } from 'expo-router';
 import * as SplashScreen from 'expo-splash-screen';
 import { StatusBar } from 'expo-status-bar';
 import { useEffect } from 'react';
+import { KeyboardProvider } from 'react-native-keyboard-controller';
 
 import { LanguageProvider, useLanguage } from '@/i18n/LanguageProvider';
 import { PaymentsProvider } from '@/payments/PaymentsProvider';
@@ -61,5 +62,5 @@ function Navigation() {
 }
 
 export default function RootLayout() {
-  return <LanguageProvider><PaymentsProvider><Navigation /></PaymentsProvider></LanguageProvider>;
+  return <LanguageProvider><PaymentsProvider><KeyboardProvider><Navigation /></KeyboardProvider></PaymentsProvider></LanguageProvider>;
 }
