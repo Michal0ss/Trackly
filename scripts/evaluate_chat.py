@@ -4,10 +4,19 @@ from pathlib import Path
 
 from pydantic import ValidationError
 
+from app.assistant.model_parser import InvalidParserResponse, completion_settings, decode_reply
 from app.schemas.assistant import ParseRequest, parse_result_adapter
 
 
 CASES_PATH = Path(__file__).resolve().parents[1] / "tests" / "fixtures" / "chat_cases.json"
+
+
+def case_request(suite, case):
+    return ParseRequest.model_validate({
+        "text": case["text"], "language": case["language"], "today": suite["today"],
+        "default_currency": suite["default_currency"][case["language"]],
+        "context": case.get("context", []), "draft": case.get("draft"),
+    })
 
 
 def normalize_result(value):
@@ -15,6 +24,14 @@ def normalize_result(value):
     if result["kind"] == "proposal":
         result["missing"] = sorted(result["missing"])
     return result
+
+
+def export_inputs(suite):
+    return {
+        **completion_settings(),
+        "cases": [{"id": case["id"], "user_input": case_request(suite, case).model_dump_json()}
+                  for case in suite["cases"]],
+    }
 
 
 def flatten(value, prefix=""):
@@ -38,10 +55,7 @@ def load_cases(path=CASES_PATH):
         if type(case_id) is not int or case_id < 1 or case_id in ids:
             raise ValueError("Invalid or duplicate case ID")
         ids.add(case_id)
-        ParseRequest.model_validate({
-            "text": case["text"], "language": case["language"], "today": suite["today"],
-            "default_currency": suite["default_currency"][case["language"]],
-        })
+        case_request(suite, case)
         expected = flatten(normalize_result(case["expected"]))
         for field, alternatives in case.get("alternatives", {}).items():
             if field not in ("draft.name", "draft.category") or field not in expected:
@@ -55,18 +69,19 @@ def load_cases(path=CASES_PATH):
     return suite
 
 
-def evaluate(suite, results):
+def evaluate(suite, results, *, raw_replies=False):
     if not isinstance(results, list):
         raise ValueError("Results must be an array")
     cases = {case["id"]: case for case in suite["cases"]}
     by_id = {}
+    field = "reply" if raw_replies else "result"
     for item in results:
-        if not isinstance(item, dict) or set(item) != {"id", "result"}:
-            raise ValueError("Each result requires only id and result")
+        if not isinstance(item, dict) or set(item) != {"id", field}:
+            raise ValueError(f"Each result requires only id and {field}")
         case_id = item["id"]
         if type(case_id) is not int or case_id not in cases or case_id in by_id:
             raise ValueError("Unknown or duplicate result ID")
-        by_id[case_id] = item["result"]
+        by_id[case_id] = item[field]
 
     report = []
     for case_id, case in cases.items():
@@ -74,7 +89,13 @@ def evaluate(suite, results):
             report.append({"id": case_id, "status": "missing", "fields": []})
             continue
         try:
-            actual = flatten(normalize_result(by_id[case_id]))
+            value = by_id[case_id]
+            if raw_replies:
+                value = decode_reply(value).model_dump()
+            actual = flatten(normalize_result(value))
+        except InvalidParserResponse:
+            report.append({"id": case_id, "status": "invalid", "fields": ["reply"]})
+            continue
         except ValidationError as error:
             fields = sorted({".".join(map(str, item["loc"])) or "result"
                              for item in error.errors(include_input=False, include_context=False)})
@@ -97,14 +118,22 @@ def evaluate(suite, results):
 
 def main():
     parser = argparse.ArgumentParser(description="Validate chat cases or score saved parsing results without network calls.")
-    parser.add_argument("results", nargs="?", type=Path)
+    mode = parser.add_mutually_exclusive_group()
+    mode.add_argument("results", nargs="?", type=Path)
+    mode.add_argument("--raw-replies", type=Path, help="Score saved model replies using the application decoder.")
+    mode.add_argument("--export-inputs", action="store_true", help="Print the model inputs without reference answers.")
+    parser.add_argument("--suite", type=Path, default=CASES_PATH)
     args = parser.parse_args()
     try:
-        suite = load_cases()
-        if args.results is None:
+        suite = load_cases(args.suite)
+        if args.export_inputs:
+            print(json.dumps(export_inputs(suite), ensure_ascii=False, indent=2))
+            return 0
+        path = args.raw_replies or args.results
+        if path is None:
             print(f"{len(suite['cases'])} chat cases validated. No model was called or evaluated.")
             return 0
-        report = evaluate(suite, json.loads(args.results.read_text(encoding="utf-8")))
+        report = evaluate(suite, json.loads(path.read_text(encoding="utf-8")), raw_replies=args.raw_replies is not None)
     except (OSError, ValueError, KeyError, TypeError):
         print("Invalid test suite or results file. Check the documented format.")
         return 2

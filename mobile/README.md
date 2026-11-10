@@ -15,6 +15,10 @@ not implemented yet.
 - Refresh, loading, empty, expired-session and connection-error states.
 - Polish and English, with a saved language preference.
 - Local test chat with follow-up questions, editable proposals and explicit confirmation.
+- Swipe between the three main tabs on iOS and Android.
+- Interactive keyboard dismissal, a growing message field and a jump-to-latest button.
+- Unsent chat text stays in memory while switching tabs or hiding the keyboard.
+- Stop a pending reply without clearing the next typed message; retry without duplicating the sent bubble.
 
 ## Run locally
 
@@ -78,6 +82,17 @@ npm start
 
 After an SDK upgrade, stop the existing Expo process with Ctrl+C and restart it
 with `npm start -- --clear`. Scan the newly displayed QR code in Expo Go.
+
+After installing changes to navigation or keyboard handling, also restart Expo with
+`npm start -- --clear`. The pager and keyboard libraries are included in Expo Go
+SDK 58; no custom development build is required.
+
+On the phone, swipe horizontally between Overview, Chat and Settings. In Chat,
+type a long message and check that the field grows up to five lines and then keeps
+the cursor in view. Tap the conversation or drag it down to dismiss the keyboard,
+switch tabs and return. The unsent text should still be there. Scroll up in a longer conversation
+and check that a reply does not pull you away; use the down arrow to return to the
+latest message. Chat drafts and history are not restored after restarting the app.
 
 Connect the iPhone and Mac to the same trusted Wi-Fi, scan the QR code with Camera
 and open Expo Go. Allow local network access. The API and Expo terminals must stay
@@ -152,13 +167,26 @@ on the proposal and in the saved payment's edit screen.
 This is a fixture-based test, not general language understanding. Initial messages
 must match one of the prepared examples in `tests/fixtures/chat_cases.json`.
 Capitalization, extra whitespace and trailing sentence punctuation are ignored.
-An unknown message shows help. With a complete proposal open, try an invalid date
+An unknown message shows help and keeps the current proposal visible. With a complete
+proposal open, send `hej`: saving should be disabled until you send a valid correction
+or review the proposal in `Zmień` / `Change` and apply it. A question does not bypass
+this review. After saving, an unknown message must preserve the saved confirmation
+without offering to save it again.
+
+While a reply is pending, the send button becomes a stop button. Type a new draft,
+stop waiting and check that this new text remains. Retry should reuse the sent
+message without adding a second copy. A late answer to the cancelled request must
+not replace a newer answer or re-enable controls during the newer request. Stopping
+is available only while preparing a reply, never during payment confirmation.
+
+With a complete proposal open, try an invalid date
 such as `Od 2026-02-30`. The proposal stays visible, but saving is disabled until
 you send a valid correction or review and apply the details in `Zmień` / `Change`.
 Try `Od 2026-11-30` to correct the date. Asking `Ile płacę miesięcznie?` keeps the
 current proposal, but does not clear an unresolved correction. A question after
 confirmation must not make the saved proposal available to save again.
 
+The visible conversation keeps the latest twenty messages with stable identities.
 Parsing is limited to 60 requests per minute per account. Messages and the draft
 stay in memory and are lost on reload. If confirmation times out, use `Ponów
 potwierdzenie` / `Retry confirmation`: the same proposal cannot create a second

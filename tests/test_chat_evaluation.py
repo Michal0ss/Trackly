@@ -2,10 +2,11 @@ from copy import deepcopy
 import json
 import subprocess
 import sys
+from pathlib import Path
 
 import pytest
 
-from scripts.evaluate_chat import evaluate, load_cases, normalize_result
+from scripts.evaluate_chat import case_request, evaluate, load_cases, normalize_result
 
 
 def saved_results(suite):
@@ -111,3 +112,70 @@ def test_cli_validates_cases_without_a_model_and_reports_missing_results(tmp_pat
     malformed = subprocess.run([*command, str(results_path)], capture_output=True, text=True, check=False)
     assert malformed.returncode == 2
     assert "Traceback" not in malformed.stderr
+
+
+CONVERSATION_CASES = Path(__file__).parent / "fixtures" / "chat_conversation_cases.json"
+
+
+def test_conversation_suite_passes_context_and_latest_draft_to_the_model():
+    suite = load_cases(CONVERSATION_CASES)
+    request = case_request(suite, suite["cases"][2])
+    assert request.draft.amount == 2500
+    assert request.draft.note == "Opłata administracyjna"
+    assert request.context == ["Czynsz 2400 zł", "Notatka: stara notatka"]
+    assert request.today.isoformat() == "2026-10-30"
+    assert evaluate(suite, saved_results(suite))["passed"] == 16
+
+
+@pytest.mark.parametrize("case_index,field,value", [
+    (0, "note", None), (0, "first_due", None),
+    (1, "interval_months", 1), (1, "note", "Przelew do wspólnoty"),
+    (2, "amount", 2400), (2, "note", "stara notatka"),
+    (3, "first_due", {"year": 2026, "month": 11, "day": 1}),
+    (7, "amount", 999), (10, "first_due", {"year": 2026, "month": 10, "day": 30}),
+])
+def test_conversation_scorer_rejects_lost_edits_and_invented_context(case_index, field, value):
+    suite = load_cases(CONVERSATION_CASES)
+    results = saved_results(suite)
+    results[case_index]["result"]["draft"][field] = value
+    report = evaluate(suite, results)
+    assert report["cases"][case_index]["status"] in ("failed", "invalid")
+    assert report["passed"] == 15
+
+
+def test_cli_accepts_conversation_suite_without_network_calls():
+    checked = subprocess.run([sys.executable, "-m", "scripts.evaluate_chat", "--suite", str(CONVERSATION_CASES)], capture_output=True, text=True, check=False)
+    assert checked.returncode == 0
+    assert "16 chat cases validated. No model was called or evaluated." in checked.stdout
+
+
+def test_export_contains_only_model_settings_and_blind_inputs():
+    command = [sys.executable, "-m", "scripts.evaluate_chat", "--suite", str(CONVERSATION_CASES), "--export-inputs"]
+    bundle = json.loads(subprocess.check_output(command))
+    assert set(bundle) == {"instructions", "schema", "max_output_tokens", "cases"}
+    suite = load_cases(CONVERSATION_CASES)
+    assert len(bundle["cases"]) == len(suite["cases"])
+    for row, case in zip(bundle["cases"], suite["cases"]):
+        assert set(row) == {"id", "user_input"}
+        assert row["id"] == case["id"]
+        assert json.loads(row["user_input"]) == case_request(suite, case).model_dump(mode="json")
+
+
+def test_raw_replies_use_runtime_decoder_and_score_invalid_or_missing_cases(tmp_path):
+    suite = load_cases()
+    proposal = deepcopy(suite["cases"][0]["expected"])
+    del proposal["missing"]
+    path = tmp_path / "replies.json"
+    path.write_text(json.dumps([
+        {"id": 1, "reply": json.dumps({"result": proposal})},
+        {"id": 2, "reply": '{"result":null,"result":{"kind":"question","question":"next_due"}}'},
+        {"id": 3, "reply": "private refusal"},
+        {"id": 4, "reply": '{"result":{"kind":"question","question":"next_due"}}'},
+    ]))
+    result = subprocess.run([sys.executable, "-m", "scripts.evaluate_chat", "--raw-replies", str(path)],
+                            capture_output=True, text=True)
+    assert result.returncode == 1
+    report = json.loads(result.stdout)
+    assert (report["passed"], report["submitted"], report["total"]) == (1, 4, 50)
+    assert [row["status"] for row in report["cases"][:5]] == ["passed", "invalid", "invalid", "failed", "missing"]
+    assert "private refusal" not in result.stdout
