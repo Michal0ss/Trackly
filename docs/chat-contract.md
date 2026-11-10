@@ -228,6 +228,25 @@ this suite, use the same `--suite` with the result file:
 No network adapter, provider selection, key configuration or paid collection command
 is included. The application continues to use the local fixture parser.
 
+Export blind inputs for an offline comparison. The bundle contains the runtime
+instructions, schema, token limit and each case's ID and serialized user input.
+It omits expected answers, alternatives and case labels.
+
+```bash
+.venv/bin/python -m scripts.evaluate_chat --export-inputs > /tmp/trackly-inputs.json
+```
+
+Keep the raw text returned for each ID in an array outside the repository, for
+example `[{"id":29,"reply":"{\"result\":{\"kind\":\"question\",\"question\":\"month_total\"}}"}]`.
+Score that file through the same decoder used by the application:
+
+```bash
+.venv/bin/python -m scripts.evaluate_chat --raw-replies /tmp/trackly-replies.json
+```
+
+Use the same `--suite` for export and scoring. Invalid replies and missing IDs
+count against the full suite. The report omits raw reply text.
+
 After a separate provider integration is available, collect one parsing result per
 case in a JSON array outside the repository:
 

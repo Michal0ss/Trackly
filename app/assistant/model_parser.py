@@ -69,6 +69,14 @@ class Completion(Protocol):
     async def __call__(self, *, instructions: str, user_input: str, schema: dict, max_output_tokens: int) -> str: ...
 
 
+def completion_settings():
+    return {
+        "instructions": INSTRUCTIONS,
+        "schema": ModelReply.model_json_schema(),
+        "max_output_tokens": MAX_OUTPUT_TOKENS,
+    }
+
+
 def unique_object(pairs):
     value = {}
     for key, item in pairs:
@@ -101,9 +109,7 @@ class ModelParser:
 
     async def parse(self, request: ParseRequest):
         raw = await self.complete(
-            instructions=INSTRUCTIONS,
             user_input=request.model_dump_json(),
-            schema=ModelReply.model_json_schema(),
-            max_output_tokens=MAX_OUTPUT_TOKENS,
+            **completion_settings(),
         )
         return decode_reply(raw)
