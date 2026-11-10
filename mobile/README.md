@@ -88,8 +88,9 @@ After installing changes to navigation or keyboard handling, also restart Expo w
 SDK 58; no custom development build is required.
 
 On the phone, swipe horizontally between Overview, Chat and Settings. In Chat,
-type a few lines, drag the conversation down to dismiss the keyboard, switch tabs
-and return. The unsent text should still be there. Scroll up in a longer conversation
+type a long message and check that the field grows up to five lines and then keeps
+the cursor in view. Tap the conversation or drag it down to dismiss the keyboard,
+switch tabs and return. The unsent text should still be there. Scroll up in a longer conversation
 and check that a reply does not pull you away; use the down arrow to return to the
 latest message. Chat drafts and history are not restored after restarting the app.
 

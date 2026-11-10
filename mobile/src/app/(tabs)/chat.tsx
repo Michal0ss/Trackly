@@ -19,7 +19,8 @@ import { usePayments } from '@/payments/PaymentsProvider';
 import { categoryIcon, formatDueDate, formatMoney, localDate } from '@/payments/model';
 import { colors, fonts } from '@/theme/theme';
 
-function LocalChat({ input, setInput }: { input: string; setInput: (value: string) => void }) {
+function LocalChat() {
+  const [input, setInput] = useState('');
   const { copy, language } = useLanguage();
   const { connected, parseChat, confirmChat } = usePayments();
   const [conversation, dispatch] = useReducer(conversationReducer, undefined, newConversation);
@@ -140,10 +141,9 @@ function LocalChat({ input, setInput }: { input: string; setInput: (value: strin
 export default function ChatScreen() {
   const { copy } = useLanguage();
   const { connected } = usePayments();
-  const [input, setInput] = useState('');
   if (!__DEV__) return <Screen><BrandHeader /><ScreenTitle title={copy.chatTitle} subtitle={copy.chatSubtitle} /><Notice>{copy.chatNotice}</Notice></Screen>;
   if (!connected) return <Screen><BrandHeader /><ScreenTitle title={copy.chatTitle} subtitle={copy.chatSubtitle} /><ConnectionState /></Screen>;
-  return <LocalChat input={input} setInput={setInput} />;
+  return <LocalChat />;
 }
 
 const styles = StyleSheet.create({
